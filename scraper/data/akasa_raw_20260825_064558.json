@@ -566,7 +566,7 @@
     "origin": "BLR",
     "destination": "DEL",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:47:21.275784",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -1128,7 +1128,7 @@
     "origin": "BLR",
     "destination": "BOM",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:48:01.714747",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -1690,7 +1690,7 @@
     "origin": "DEL",
     "destination": "HYD",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:49:16.966417",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -2252,7 +2252,7 @@
     "origin": "DEL",
     "destination": "PNQ",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:51:06.425802",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -2814,7 +2814,7 @@
     "origin": "GOX",
     "destination": "BOM",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:51:44.647768",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -3376,7 +3376,7 @@
     "origin": "AMD",
     "destination": "DEL",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:52:54.295281",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -3938,7 +3938,7 @@
     "origin": "MAA",
     "destination": "BOM",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:54:41.420053",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -4500,7 +4500,7 @@
     "origin": "HYD",
     "destination": "BOM",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:55:51.709695",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -5062,7 +5062,7 @@
     "origin": "CCU",
     "destination": "BOM",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:56:28.135974",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -5624,7 +5624,7 @@
     "origin": "MAA",
     "destination": "DEL",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:57:40.601595",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -6186,7 +6186,7 @@
     "origin": "BLR",
     "destination": "HYD",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:59:10.359773",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -6748,7 +6748,7 @@
     "origin": "AMD",
     "destination": "BOM",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:59:56.269689",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -7310,7 +7310,7 @@
     "origin": "BLR",
     "destination": "CCU",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T07:01:14.756882",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -7872,7 +7872,7 @@
     "origin": "DEL",
     "destination": "SXR",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T07:02:34.380002",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -8434,7 +8434,7 @@
     "origin": "BLR",
     "destination": "PNQ",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T07:03:45.945239",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -8996,7 +8996,7 @@
     "origin": "DEL",
     "destination": "GAU",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T07:05:09.883885",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -9558,7 +9558,7 @@
     "origin": "BLR",
     "destination": "GOX",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T07:07:12.690317",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -10120,7 +10120,7 @@
     "origin": "BLR",
     "destination": "MAA",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T07:08:24.171785",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -10682,7 +10682,7 @@
     "origin": "DEL",
     "destination": "LKO",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T07:09:35.999157",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {
@@ -11244,7 +11244,7 @@
     "origin": "COK",
     "destination": "BOM",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T07:10:16.586974",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {

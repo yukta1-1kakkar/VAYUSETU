@@ -4,7 +4,7 @@
     "origin": "DEL",
     "destination": "BOM",
     "advance_window": 3,
-    "travel_date": "2026-08-28",
+    "travel_date": "2026-10-24",
     "scraped_at": "2026-08-25T06:46:44.216381",
     "source_url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/search/lowFare",
     "raw_response": {

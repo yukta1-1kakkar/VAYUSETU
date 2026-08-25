@@ -15,7 +15,7 @@ from playwright_stealth import Stealth
 # CONFIG
 # ---------------------------
 
-ADVANCE_WINDOWS = [3]  # days from today; must stay within API's ~9-day calendar window
+ADVANCE_WINDOWS = [60]  
 
 OUTPUT_DIR = Path("data")
 OUTPUT_DIR.mkdir(exist_ok=True)

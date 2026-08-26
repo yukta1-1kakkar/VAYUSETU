@@ -32,6 +32,8 @@ export interface FlightRoute {
   observationsCount: number;
   volatilityIndex: number; // 0-100
   dominantCarrier: string;
+  primaryAirline: 'IndiGo' | 'Air India' | 'Akasa Air' | 'SpiceJet' | 'Vistara' | 'Alliance Air';
+  sectorType: 'Metro-Metro' | 'Metro-Tier2' | 'Tier2-Tier2' | 'Leisure';
   distanceKm: number;
   weeklyFrequency: number;
   historicalData: {
@@ -49,8 +51,8 @@ export interface IndexPoint {
   baseline: number;
   monthlyChange: number;
   observations: number;
-  upperConfidence: number;
-  lowerConfidence: number;
+  upperConfidence?: number;
+  lowerConfidence?: number;
 }
 
 export interface CPIDataPoint {
@@ -81,30 +83,42 @@ export interface KpaMetric {
   subtitle?: string;
   trend?: string;
   trendType?: 'positive' | 'negative' | 'neutral' | 'alert';
-  iconType: 'plane' | 'route' | 'airline' | 'database' | 'shield' | 'alert' | 'activity';
+  iconType: 'plane' | 'route' | 'airline' | 'database' | 'alert' | 'activity' | 'trend';
+  tooltip: string;
 }
 
-export interface DataQualityMetrics {
-  overallConfidence: number;
-  coverage: number;
-  completeness: number;
-  freshness: number;
-  consistency: number;
-  totalDailyScrapes: number;
-  verifiedCarriers: number;
-  activeMonitoringNodes: number;
-  lastSyncTimestamp: string;
+export interface SectorHeatmapItem {
+  sector: string;
+  label: string;
+  routePairs: number;
+  avgFare: number;
+  baselineFare: number;
+  indexScore: number;
+  changePercent: number;
+  volatility: number;
+  status: 'Equilibrium' | 'Moderate Surge' | 'High Yield Stress' | 'Discounted';
+  keyRoutes: string[];
 }
 
-export interface DataSourceNode {
-  id: string;
-  name: string;
-  type: 'carrier' | 'regulatory' | 'market' | 'macroeconomic';
-  throughput: string;
-  status: 'active' | 'syncing' | 'verified';
-  latency: string;
-  description: string;
-  recordsPerDay: number;
+export interface LeadTimeDataPoint {
+  window: string;
+  daysAdvance: string;
+  avgFare: number;
+  multiplier: number; // e.g. 1.0x, 1.72x
+  markupPercent: number;
+  seatInventoryShare: number;
+  volatility: number;
+  bookingUrgency: 'Normal' | 'Elevated' | 'Surge' | 'Critical Dynamic';
+}
+
+export interface PriceTrendPoint {
+  date: string;
+  nationalIndex: number;
+  delBom: number;
+  delBlr: number;
+  bomBlr: number;
+  delCcu: number;
+  delHyd: number;
 }
 
 export interface LiveTelemetryEvent {
@@ -115,6 +129,6 @@ export interface LiveTelemetryEvent {
   dest: string;
   carrier: string;
   observedFare: number;
-  changeType: 'up' | 'down' | 'stable' | 'spike';
+  changeType: 'spike' | 'up' | 'down' | 'stable';
   deviation: number;
 }

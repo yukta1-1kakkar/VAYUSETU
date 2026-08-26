@@ -9,7 +9,7 @@ import {
   TOP_6_ROUTES,
   projectLngLatToMap,
 } from '../india-map/mapData';
-import { TrendingUp, ShieldCheck, Database, Layers, ArrowRight } from 'lucide-react';
+import { TrendingUp, ShieldCheck, Database, Layers, ArrowRight, Plane } from 'lucide-react';
 
 interface VayuSetuIntroProps {
   onComplete: () => void;
@@ -349,22 +349,22 @@ export const VayuSetuIntro: React.FC<VayuSetuIntroProps> = ({ onComplete }) => {
                   </div>
                 </motion.div>
 
-                {/* Card 4: Multi-carrier Confidence */}
+                {/* Card 4: Verified Carriers */}
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.45 }}
-                  className="absolute bottom-6 right-2 sm:right-6 z-30 p-3.5 rounded-2xl bg-white/95 border border-emerald-200 shadow-lg backdrop-blur-sm space-y-1 min-w-[150px]"
+                  className="absolute bottom-6 right-2 sm:right-6 z-30 p-3.5 rounded-2xl bg-white/95 border border-purple-200 shadow-lg backdrop-blur-sm space-y-1 min-w-[150px]"
                 >
-                  <div className="text-[10px] font-bold text-[#16A34A] uppercase tracking-wider flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-[#16A34A]" />
-                    <span>CONFIDENCE METRIC</span>
+                  <div className="text-[10px] font-bold text-[#8B5CF6] uppercase tracking-wider flex items-center gap-1">
+                    <Plane className="w-3 h-3 text-[#8B5CF6]" />
+                    <span>VERIFIED AIRLINES</span>
                   </div>
-                  <div className="text-2xl font-black font-heading text-[#16A34A]">
-                    {countValues.confidence}%
+                  <div className="text-2xl font-black font-heading text-[#8B5CF6]">
+                    5 Carriers
                   </div>
                   <div className="text-[10px] text-[#64748B]">
-                    ±1.98 Statistical CI
+                    Direct NDC / GDS Feeds
                   </div>
                 </motion.div>
               </>

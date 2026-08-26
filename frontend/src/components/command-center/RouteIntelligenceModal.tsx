@@ -92,7 +92,7 @@ export const RouteIntelligenceModal: React.FC<{
           <div className="text-xs text-[#64748B] mb-3 flex items-center justify-between">
             <span className="flex items-center gap-1.5 font-bold text-[#172033]">
               <BarChart2 className="w-3.5 h-3.5 text-[#1769AA]" />
-              <span>30-DAY CORRIDOR FARE TRAJECTORY & CONFIDENCE BAND</span>
+              <span>30-DAY CORRIDOR FARE TRAJECTORY</span>
             </span>
             <span className="text-xs font-semibold text-[#1769AA]">
               Reference Baseline: {formatINR(route.referenceFare)}

@@ -496,7 +496,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
               </div>
 
               <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                <div className="text-[11px] text-[#64748B] font-medium uppercase">Volatility Index</div>
+                <div className="text-[11px] text-[#64748B] font-medium uppercase">Volatility</div>
                 <div className="text-xl font-extrabold text-[#172033] mt-0.5">
                   {selectedRoute.volatility}/100
                 </div>

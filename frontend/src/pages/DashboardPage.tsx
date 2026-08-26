@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { KpaiSection } from '../components/dashboard/KpaiSection';
 import { ApixOverviewChart } from '../components/dashboard/ApixOverviewChart';
+import { PriceTrendChart } from '../components/dashboard/PriceTrendChart';
+import { SectorHeatmap } from '../components/dashboard/SectorHeatmap';
+import { LeadTimeElasticityChart } from '../components/dashboard/LeadTimeElasticityChart';
 import { IndiaMap } from '../components/india-map/IndiaMap';
 import { FLIGHT_ROUTES } from '../mock/airfareData';
 import { formatINR, formatDelta } from '../utils/geo';
 import { RouteIntelligenceModal } from '../components/command-center/RouteIntelligenceModal';
-import { TrendingUp, AlertTriangle, ArrowRight, Activity, ShieldCheck, Zap, Layers, Compass } from 'lucide-react';
+import { TrendingUp, AlertTriangle, ArrowRight, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const DashboardPage: React.FC = () => {
@@ -27,16 +30,16 @@ export const DashboardPage: React.FC = () => {
             National Aviation Fare Intelligence Console
           </h1>
           <p className="text-sm text-[#64748B] mt-1">
-            Real-time price telemetry, sovereign airfare index benchmarks, and structural route volatility across India.
+            Real-time price telemetry, sovereign airfare index benchmarks, and structural route volatility across India (08/26).
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <Link
-            to="/analytics"
+            to="/cpi"
             className="px-4 py-2 rounded-xl bg-white border border-[#CBD5E1] hover:border-[#1769AA] text-xs font-bold text-[#172033] flex items-center gap-1.5 transition-all shadow-xs"
           >
-            <span>Full Analytics Suite</span>
+            <span>CPI Benchmark</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
           <Link
@@ -49,16 +52,25 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. DASHBOARD KPAIs */}
+      {/* 2. DASHBOARD KPAIs with informative Tooltips */}
       <KpaiSection />
 
-      {/* 3. APIX SUMMARY & INTERACTIVE GRAPH */}
+      {/* 3. APIX SUMMARY & INTERACTIVE GRAPH (Filters: 3M, 6M, 1Y, FY, ALL) */}
       <ApixOverviewChart />
 
-      {/* 4. SHARED AUTHENTIC INDIA MAP + ROUTE DETAILS PANEL */}
+      {/* 4. PRICE TREND GRAPH */}
+      <PriceTrendChart />
+
+      {/* 5. VIBRANT GREEN-YELLOW-RED SECTOR TARIFF HEATMAP */}
+      <SectorHeatmap />
+
+      {/* 6. LEAD TIME ELASTICITY CURVE (45 DAYS TO 0 DAYS WITH ALL 24 ROUTES SELECTOR) */}
+      <LeadTimeElasticityChart />
+
+      {/* 7. SHARED AUTHENTIC INDIA MAP + ROUTE DETAILS PANEL */}
       <IndiaMap onSelectRoute={(id) => setSelectedRouteId(id)} />
 
-      {/* 5. ROUTE INSIGHTS & ANOMALIES (Section 17) */}
+      {/* 8. ROUTE INSIGHTS & ANOMALIES */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left: Top High-Frequency Trunk Corridors */}
         <div className="lg:col-span-8 intel-card p-6 sm:p-7 space-y-5">
@@ -74,68 +86,77 @@ export const DashboardPage: React.FC = () => {
             </div>
             <Link
               to="/routes"
-              className="text-xs font-semibold text-[#1769AA] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#1769AA] hover:text-[#12558A] flex items-center gap-1 cursor-pointer"
             >
-              <span>View All 24 Pairs</span>
-              <ArrowRight className="w-3 h-3" />
+              <span>View all 24 routes</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            {topRoutes.map((route) => {
-              const isAnomaly = route.isAnomaly;
-              return (
-                <div
-                  key={route.id}
-                  onClick={() => setSelectedRouteId(route.id)}
-                  className={`p-4 rounded-xl border transition-all cursor-pointer ${
-                    isAnomaly
-                      ? 'bg-rose-50/40 border-rose-200 hover:border-rose-300'
-                      : 'bg-[#F8FAFC] border-[#E2E8F0] hover:border-[#1769AA] hover:bg-white'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-[#172033] text-sm">
-                        {route.originCity} → {route.destCity}
-                      </span>
-                      {isAnomaly && (
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-100 text-[#DC2626] border border-rose-200 uppercase">
-                          Anomaly
-                        </span>
-                      )}
-                    </div>
-                    <span className={`text-xs font-bold ${route.changePercent >= 15 ? 'text-[#DC2626]' : 'text-[#1769AA]'}`}>
-                      {formatDelta(route.changePercent)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {topRoutes.map((route) => (
+              <div
+                key={route.id}
+                onClick={() => setSelectedRouteId(route.id)}
+                className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:border-[#1769AA] hover:bg-white transition-all cursor-pointer space-y-2 group shadow-2xs"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="font-extrabold text-[#172033] text-sm group-hover:text-[#1769AA] transition-colors">
+                      {route.originCity} ➔ {route.destCity}
+                    </span>
+                    <span className="text-[10px] text-[#94A3B8] font-mono block">
+                      {route.id} • {route.distanceKm} km
                     </span>
                   </div>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
+                      route.isAnomaly
+                        ? 'bg-rose-50 text-[#DC2626] border border-rose-200'
+                        : route.changePercent >= 10
+                        ? 'bg-amber-50 text-[#D97706] border border-amber-200'
+                        : 'bg-blue-50 text-[#1769AA] border border-blue-200'
+                    }`}
+                  >
+                    {route.isAnomaly ? 'Anomaly' : route.changePercent >= 10 ? 'Elevated' : 'Normal'}
+                  </span>
+                </div>
 
-                  <div className="flex justify-between items-baseline text-xs">
-                    <div className="text-[#64748B]">
-                      <div>{route.dominantCarrier}</div>
-                      <div className="text-[10px] text-[#94A3B8]">{route.observationsCount} quotes sampled</div>
+                <div className="flex items-baseline justify-between pt-1 border-t border-[#E2E8F0]/60">
+                  <div>
+                    <div className="text-[10px] text-[#64748B] uppercase font-semibold">Current Fare</div>
+                    <div className="text-xl font-black font-heading text-[#172033]">
+                      {formatINR(route.currentFare)}
                     </div>
-                    <div className="text-right">
-                      <div className="text-base font-extrabold text-[#172033]">{formatINR(route.currentFare)}</div>
-                      <div className="text-[10px] text-[#94A3B8]">Ref: {formatINR(route.referenceFare)}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] text-[#64748B] uppercase font-semibold">Shift</div>
+                    <div className={`text-xs font-bold ${route.changePercent >= 15 ? 'text-[#DC2626]' : 'text-[#1769AA]'}`}>
+                      {formatDelta(route.changePercent)}
                     </div>
                   </div>
                 </div>
-              );
-            })}
+
+                <div className="flex justify-between items-center text-[10px] text-[#64748B] pt-1">
+                  <span>Carrier: {route.dominantCarrier}</span>
+                  <span>Volatility: {route.volatilityIndex}/100</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Right: Key Anomaly & Volatility Triggers */}
-        <div className="lg:col-span-4 intel-card p-6 sm:p-7 space-y-5">
-          <div className="pb-3 border-b border-[#E2E8F0]">
-            <h3 className="text-lg font-bold font-heading text-[#172033] flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-[#DC2626]" />
-              <span>Active Yield Alerts</span>
-            </h3>
-            <p className="text-xs text-[#64748B]">
-              Statistical price deviations exceeding 2.8σ threshold.
-            </p>
+        {/* Right: Active Anomalies Column */}
+        <div className="lg:col-span-4 intel-card p-6 sm:p-7 space-y-4">
+          <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0]">
+            <div>
+              <h3 className="text-lg font-bold font-heading text-[#172033] flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-[#DC2626]" />
+                <span>Yield Anomaly Trigger</span>
+              </h3>
+              <p className="text-xs text-[#64748B]">Corridors violating standard variance.</p>
+            </div>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626] animate-pulse" />
           </div>
 
           <div className="space-y-3">
@@ -143,41 +164,43 @@ export const DashboardPage: React.FC = () => {
               <div
                 key={anom.id}
                 onClick={() => setSelectedRouteId(anom.id)}
-                className="p-4 rounded-xl bg-white border border-rose-200 hover:border-rose-300 shadow-xs cursor-pointer transition-all space-y-2"
+                className="p-4 rounded-xl bg-rose-50/70 border border-rose-200/80 hover:bg-rose-50 transition-all cursor-pointer space-y-2"
               >
-                <div className="flex justify-between items-center">
-                  <div className="font-extrabold text-[#172033] text-sm">
-                    {anom.origin} → {anom.destination}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="font-extrabold text-[#DC2626] text-sm">
+                      {anom.originCity} ➔ {anom.destCity}
+                    </span>
+                    <span className="text-[10px] text-[#64748B] block font-mono">
+                      Corridor {anom.id}
+                    </span>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full bg-rose-100 text-[#DC2626] font-bold text-xs">
-                    {formatDelta(anom.changePercent)}
+                  <span className="text-xs font-black text-[#DC2626] bg-white px-2 py-0.5 rounded border border-rose-200">
+                    +{anom.changePercent}%
                   </span>
                 </div>
-                <p className="text-xs text-[#64748B] leading-relaxed">
+
+                <p className="text-xs text-[#172033] leading-relaxed">
                   {anom.anomalyReason}
                 </p>
-                <div className="pt-2 border-t border-rose-100 flex justify-between items-center text-xs">
-                  <span className="text-[#64748B]">Current: <strong className="text-[#172033]">{formatINR(anom.currentFare)}</strong></span>
-                  <span className="text-[#1769AA] font-bold text-[11px] flex items-center gap-0.5 hover:underline">
-                    Inspect Corridor ➔
-                  </span>
+
+                <div className="flex justify-between items-center text-[10px] text-[#64748B] pt-1 border-t border-rose-200/60 font-semibold">
+                  <span>Current: {formatINR(anom.currentFare)}</span>
+                  <span>Ref: {formatINR(anom.referenceFare)}</span>
+                  <span className="text-[#DC2626] font-bold">Inspect Dossier →</span>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Quick Quality Note */}
-          <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center gap-3 text-xs">
-            <ShieldCheck className="w-5 h-5 text-[#16A34A] shrink-0" />
-            <div>
-              <div className="font-semibold text-[#172033]">91% Data Confidence</div>
-              <div className="text-[#64748B] text-[11px]">Multi-carrier automated verification</div>
-            </div>
+          <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#64748B] leading-relaxed">
+            <span className="font-bold text-[#172033]">Algorithmic Scrubbing: </span>
+            Anomalies are detected by real-time z-score estimation against 60-day historical time-series distributions.
           </div>
         </div>
       </div>
 
-      {/* Global Route Intelligence Modal */}
+      {/* Intelligence Modal */}
       {selectedRouteId && (
         <RouteIntelligenceModal
           routeId={selectedRouteId}

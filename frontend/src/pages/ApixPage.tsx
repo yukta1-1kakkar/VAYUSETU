@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { INDEX_TIMELINE, ROUTE_WEIGHTS_DATA, DATA_QUALITY } from '../mock/airfareData';
+import { INDEX_TIMELINE, ROUTE_WEIGHTS_DATA } from '../mock/airfareData';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -10,20 +10,21 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from 'recharts';
-import { TrendingUp, Info, ShieldCheck, Layers, Calendar, ArrowUpRight, CheckCircle2, Cpu } from 'lucide-react';
-import { formatDelta } from '../utils/geo';
+import { TrendingUp, Layers, Calendar, ArrowUpRight, CheckCircle2, Cpu, Compass } from 'lucide-react';
+import { formatINR, formatDelta } from '../utils/geo';
 
 export const ApixPage: React.FC = () => {
-  const [filter, setFilter] = useState<'1M' | '3M' | '6M' | '1Y' | 'ALL'>('ALL');
+  // Filters: 3M, 6M, 1Y, FY, ALL (default 3M)
+  const [filter, setFilter] = useState<'3M' | '6M' | '1Y' | 'FY' | 'ALL'>('3M');
 
   const filteredData = React.useMemo(() => {
     switch (filter) {
-      case '1M':
-        return INDEX_TIMELINE.slice(-2);
       case '3M':
-        return INDEX_TIMELINE.slice(-4);
+        return INDEX_TIMELINE.slice(-3);
       case '6M':
-        return INDEX_TIMELINE.slice(-7);
+        return INDEX_TIMELINE.slice(-6);
+      case 'FY':
+        return INDEX_TIMELINE.filter(pt => pt.date.includes('/26'));
       case '1Y':
         return INDEX_TIMELINE.slice(-13);
       case 'ALL':
@@ -46,16 +47,26 @@ export const ApixPage: React.FC = () => {
             <span>SOVEREIGN BENCHMARK SERIES</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-[#172033] tracking-tight">
-            APIx — Airfare Price Index
+            APIx — Airfare Price Index (08/26)
           </h1>
           <p className="text-sm text-[#64748B] mt-1">
             India's continuous sovereign aviation price index, weighted by seat-kilometer volume across 24 core trunk and regional corridors.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-xs font-bold text-[#1769AA]">
-          <ShieldCheck className="w-4 h-4 text-[#1769AA]" />
-          <span>DATA CONFIDENCE: {DATA_QUALITY.overallConfidence}%</span>
+        {/* Hoverable Formulation Tooltip */}
+        <div className="relative group/form cursor-pointer">
+          <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-xs font-bold text-[#1769AA] hover:bg-blue-100/70 transition-colors">
+            <Compass className="w-4 h-4 text-[#1769AA]" />
+            <span>Formulation Info</span>
+          </div>
+
+          <div className="absolute top-11 right-0 z-50 w-72 p-3.5 rounded-xl bg-white border border-[#CBD5E1] shadow-xl text-[11px] text-[#172033] leading-relaxed opacity-0 pointer-events-none group-hover/form:opacity-100 group-hover/form:pointer-events-auto transition-opacity duration-150">
+            <div className="font-bold text-[#1769AA] border-b border-[#F1F5F9] pb-1 mb-1">
+              Laspeyres-Hedonic Index Formulation
+            </div>
+            Mathematical composite Laspeyres model hedonic-adjusted for advance booking horizons and route seat-kilometer weights.
+          </div>
         </div>
       </div>
 
@@ -78,7 +89,7 @@ export const ApixPage: React.FC = () => {
             100.0
           </div>
           <div className="text-xs text-[#64748B] mt-1">
-            Established Jan 2025 (Fixed Base)
+            Established 01/2025 (Fixed Base)
           </div>
         </div>
 
@@ -93,12 +104,12 @@ export const ApixPage: React.FC = () => {
         </div>
 
         <div className="intel-card p-5">
-          <div className="text-xs font-semibold text-[#64748B] uppercase">Statistical 95% CI</div>
+          <div className="text-xs font-semibold text-[#64748B] uppercase">National Median Tariff</div>
           <div className="text-4xl font-extrabold font-heading text-[#0F8B8D] mt-1">
-            ±1.98 pts
+            ₹5,420
           </div>
           <div className="text-xs text-[#64748B] mt-1">
-            Range: {currentPoint.lowerConfidence} – {currentPoint.upperConfidence}
+            Weighted across 24 Core Corridors
           </div>
         </div>
       </div>
@@ -111,12 +122,12 @@ export const ApixPage: React.FC = () => {
               APIx Historical Index Trajectory
             </h3>
             <p className="text-xs text-[#64748B] mt-0.5">
-              Time series from Jan 2025 baseline showing seasonal surges (festive, holidays) and off-season yield adjustments.
+              Time series from 01/25 baseline showing seasonal surges (festive, holidays) and off-season yield adjustments.
             </p>
           </div>
 
           <div className="flex items-center gap-1 p-1 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-medium">
-            {(['1M', '3M', '6M', '1Y', 'ALL'] as const).map((t) => (
+            {(['3M', '6M', '1Y', 'FY', 'ALL'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setFilter(t)}
@@ -139,10 +150,6 @@ export const ApixPage: React.FC = () => {
                 <linearGradient id="apixPageGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#1769AA" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="#1769AA" stopOpacity={0.01} />
-                </linearGradient>
-                <linearGradient id="apixPageBand" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0F8B8D" stopOpacity={0.14} />
-                  <stop offset="100%" stopColor="#0F8B8D" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
@@ -176,7 +183,6 @@ export const ApixPage: React.FC = () => {
                 }}
               />
               <ReferenceLine y={100} stroke="#94A3B8" strokeDasharray="4 4" label={{ value: 'Base 100 Benchmark', fill: '#94A3B8', fontSize: 11 }} />
-              <Area type="monotone" dataKey="upperConfidence" stroke="none" fill="url(#apixPageBand)" name="95% CI" />
               <Area type="monotone" dataKey="indexValue" stroke="#1769AA" strokeWidth={3} fill="url(#apixPageGradient)" name="APIx" />
             </AreaChart>
           </ResponsiveContainer>
@@ -188,7 +194,7 @@ export const ApixPage: React.FC = () => {
         {/* Monthly Breakdown Table */}
         <div className="lg:col-span-6 intel-card p-6 space-y-4">
           <h3 className="text-lg font-bold font-heading text-[#172033] pb-2 border-b border-[#E2E8F0]">
-            Recent Monthly Performance Ledger
+            Recent Monthly Performance Ledger (FY 2026)
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
@@ -197,7 +203,7 @@ export const ApixPage: React.FC = () => {
                   <th className="py-2.5">Period</th>
                   <th className="py-2.5">APIx Value</th>
                   <th className="py-2.5">MoM Shift</th>
-                  <th className="py-2.5">Confidence Band</th>
+                  <th className="py-2.5">Daily Volume</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F1F5F9]">
@@ -210,8 +216,8 @@ export const ApixPage: React.FC = () => {
                         {pt.monthlyChange >= 0 ? `+${pt.monthlyChange}%` : `${pt.monthlyChange}%`}
                       </span>
                     </td>
-                    <td className="py-2.5 text-[#94A3B8] font-mono">
-                      {pt.lowerConfidence} – {pt.upperConfidence}
+                    <td className="py-2.5 text-[#64748B] font-mono">
+                      {pt.observations.toLocaleString()} quotes
                     </td>
                   </tr>
                 ))}

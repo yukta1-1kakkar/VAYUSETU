@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Activity, Layers, Menu, X, ShieldCheck, Database, Compass, BarChart2, GitFork, Cpu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { VayuSetuLogo } from './VayuSetuLogo';
 
 export const Navbar: React.FC = () => {
@@ -21,15 +21,12 @@ export const Navbar: React.FC = () => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Clean 4 Core Tabs
   const navLinks = [
     { to: '/', label: 'Dashboard' },
     { to: '/index', label: 'APIx' },
     { to: '/routes', label: 'Routes' },
-    { to: '/analytics', label: 'Analytics' },
     { to: '/cpi', label: 'CPI' },
-    { to: '/data-quality', label: 'Data Quality' },
-    { to: '/data-sources', label: 'Data Sources' },
-    { to: '/methodology', label: 'Methodology' },
   ];
 
   return (
@@ -49,17 +46,17 @@ export const Navbar: React.FC = () => {
           </span>
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1">
+        {/* Desktop Navigation Links (4 core tabs) */}
+        <nav className="hidden md:flex items-center gap-1.5">
           {navLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               end={link.to === '/'}
               className={({ isActive }) =>
-                `px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                `px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                   isActive
-                    ? 'bg-[#1769AA] text-white shadow-sm'
+                    ? 'bg-[#1769AA] text-white shadow-xs'
                     : 'text-[#64748B] hover:text-[#172033] hover:bg-[#F1F5F9]'
                 }`
               }
@@ -69,18 +66,19 @@ export const Navbar: React.FC = () => {
           ))}
         </nav>
 
-        {/* Right Live Telemetry Badge (No Sound Button) */}
+        {/* Right Live Telemetry Badge */}
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-semibold text-[#172033]">
             <span className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" />
-            <span className="text-[#64748B] font-normal">STREAM:</span>
-            <span>24.8K OBS/DAY</span>
+            <span className="text-[#172033] font-bold">LIVE</span>
+            <span className="text-[#CBD5E1]">|</span>
+            <span className="text-[#64748B] font-mono text-[11px]">08/26</span>
           </div>
 
           {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl border border-[#E2E8F0] text-[#64748B] hover:text-[#172033] hover:bg-[#F8FAFC]"
+            className="md:hidden p-2 rounded-xl border border-[#E2E8F0] text-[#64748B] hover:text-[#172033] hover:bg-[#F8FAFC]"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -90,16 +88,16 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-[#E2E8F0] px-4 pt-2 pb-4 space-y-1 shadow-lg">
+        <div className="md:hidden bg-white border-b border-[#E2E8F0] px-4 pt-2 pb-4 space-y-1.5 shadow-lg">
           {navLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               end={link.to === '/'}
               className={({ isActive }) =>
-                `block px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
+                `block px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all ${
                   isActive
-                    ? 'bg-[#1769AA] text-white font-bold'
+                    ? 'bg-[#1769AA] text-white'
                     : 'text-[#64748B] hover:text-[#172033] hover:bg-[#F1F5F9]'
                 }`
               }

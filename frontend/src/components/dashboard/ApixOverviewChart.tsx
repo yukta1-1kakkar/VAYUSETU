@@ -10,22 +10,27 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from 'recharts';
-import { TrendingUp, Calendar, Info } from 'lucide-react';
+import { TrendingUp, Info } from 'lucide-react';
 
 export const ApixOverviewChart: React.FC<{
   showFullDetails?: boolean;
 }> = ({ showFullDetails = false }) => {
-  const [filter, setFilter] = useState<'1M' | '3M' | '6M' | '1Y' | 'ALL'>('1Y');
+  // Filters: 3M, 6M, 1Y, FY, ALL (default 3M)
+  const [filter, setFilter] = useState<'3M' | '6M' | '1Y' | 'FY' | 'ALL'>('3M');
 
   const filteredData = React.useMemo(() => {
     switch (filter) {
-      case '1M':
-        return INDEX_TIMELINE.slice(-2);
       case '3M':
-        return INDEX_TIMELINE.slice(-4);
+        // Last 3 months (06/26, 07/26, 08/26)
+        return INDEX_TIMELINE.slice(-3);
       case '6M':
-        return INDEX_TIMELINE.slice(-7);
+        // Last 6 months (03/26 to 08/26)
+        return INDEX_TIMELINE.slice(-6);
+      case 'FY':
+        // Financial Year (From 01/26 to 08/26)
+        return INDEX_TIMELINE.filter(pt => pt.date.includes('/26'));
       case '1Y':
+        // 1 Year View (12 months from 08/25 to 08/26)
         return INDEX_TIMELINE.slice(-13);
       case 'ALL':
       default:
@@ -52,17 +57,17 @@ export const ApixOverviewChart: React.FC<{
             </span>
             <span className="inline-flex items-center gap-0.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-[#DC2626] border border-rose-100">
               <TrendingUp className="w-3 h-3" />
-              +{momChange}% MoM
+              +{momChange}% MoM (08/26)
             </span>
             <span className="text-xs text-[#64748B] hidden md:inline">
-              Base 100.0 (Jan 2025)
+              Base 100.0 (01/25)
             </span>
           </div>
         </div>
 
-        {/* Timeframe Filters */}
+        {/* Timeframe Filters: 3M, 6M, 1Y, FY, ALL */}
         <div className="flex items-center gap-1 p-1 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-medium">
-          {(['1M', '3M', '6M', '1Y', 'ALL'] as const).map((t) => (
+          {(['3M', '6M', '1Y', 'FY', 'ALL'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setFilter(t)}
@@ -87,10 +92,6 @@ export const ApixOverviewChart: React.FC<{
                 <stop offset="5%" stopColor="#1769AA" stopOpacity={0.20} />
                 <stop offset="95%" stopColor="#1769AA" stopOpacity={0.01} />
               </linearGradient>
-              <linearGradient id="apixConfidence" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0F8B8D" stopOpacity={0.12} />
-                <stop offset="100%" stopColor="#0F8B8D" stopOpacity={0.03} />
-              </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
             <XAxis
@@ -101,7 +102,7 @@ export const ApixOverviewChart: React.FC<{
               axisLine={{ stroke: '#E2E8F0' }}
             />
             <YAxis
-              domain={[95, 'auto']}
+              domain={[98, 'auto']}
               stroke="#94A3B8"
               tick={{ fontSize: 11, fill: '#64748B' }}
               tickLine={false}
@@ -114,7 +115,7 @@ export const ApixOverviewChart: React.FC<{
                   return (
                     <div className="bg-white p-3.5 rounded-xl border border-[#CBD5E1] shadow-lg text-xs space-y-1.5 min-w-[170px]">
                       <div className="font-semibold text-[#172033] border-b border-[#F1F5F9] pb-1">
-                        {label}
+                        Period: {label}
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-[#64748B]">APIx Value:</span>
@@ -127,8 +128,8 @@ export const ApixOverviewChart: React.FC<{
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-[10px] text-[#94A3B8] pt-1">
-                        <span>Confidence:</span>
-                        <span>{data.lowerConfidence} – {data.upperConfidence}</span>
+                        <span>Quotes Sampled:</span>
+                        <span>{data.observations.toLocaleString()}</span>
                       </div>
                     </div>
                   );
@@ -137,27 +138,33 @@ export const ApixOverviewChart: React.FC<{
               }}
             />
             <ReferenceLine y={100} stroke="#94A3B8" strokeDasharray="4 4" label={{ value: 'Base 100', fill: '#94A3B8', fontSize: 10, position: 'insideBottomRight' }} />
-            <Area type="monotone" dataKey="upperConfidence" stroke="none" fill="url(#apixConfidence)" name="95% CI" />
             <Area type="monotone" dataKey="indexValue" stroke="#1769AA" strokeWidth={2.5} fill="url(#apixGradient)" name="APIx" />
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Chart Footer Info */}
+      {/* Chart Footer Info with Hoverable Tooltip */}
       <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#F1F5F9] text-xs text-[#64748B]">
         <div className="flex items-center gap-5">
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-1 bg-[#1769AA] rounded-full" />
-            <span className="font-medium text-[#172033]">APIx Primary Index</span>
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-3 h-2 bg-teal-100 border border-teal-300 rounded-sm" />
-            <span>95% Confidence Interval</span>
+            <span className="font-medium text-[#172033]">APIx Primary Sovereign Index</span>
           </span>
         </div>
-        <div className="flex items-center gap-1 text-[#64748B] text-[11px]">
-          <Info className="w-3.5 h-3.5 text-[#94A3B8]" />
-          <span>Calculated across 24 weighted trunk and regional city pairs</span>
+
+        {/* Hoverable Methodology Tooltip */}
+        <div className="relative group/tip cursor-pointer">
+          <div className="flex items-center gap-1 text-[#64748B] hover:text-[#1769AA] text-xs font-semibold transition-colors">
+            <Info className="w-3.5 h-3.5 text-[#1769AA]" />
+            <span>Index Methodology</span>
+          </div>
+
+          <div className="absolute bottom-6 right-0 z-50 w-64 p-3 rounded-xl bg-white border border-[#CBD5E1] shadow-xl text-[11px] text-[#172033] leading-relaxed opacity-0 pointer-events-none group-hover/tip:opacity-100 group-hover/tip:pointer-events-auto transition-opacity duration-150">
+            <div className="font-bold text-[#1769AA] border-b border-[#F1F5F9] pb-1 mb-1">
+              Methodology & Basket
+            </div>
+            Continuous geometric formulation weighted by passenger-kilometer volume across 24 monitored trunk and regional city pairs.
+          </div>
         </div>
       </div>
     </div>

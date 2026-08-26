@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { KPAI_METRICS } from '../../mock/airfareData';
-import { Plane, GitFork, Building2, Database, ShieldCheck, AlertTriangle, TrendingUp, TrendingDown, ArrowUpRight } from 'lucide-react';
+import { Plane, GitFork, Building2, Database, AlertTriangle, TrendingUp, ArrowUpRight, HelpCircle } from 'lucide-react';
 import type { KpaMetric } from '../../types';
 
 export const KpaiSection: React.FC = () => {
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+
   const getIcon = (type: KpaMetric['iconType']) => {
     switch (type) {
       case 'plane':
@@ -14,8 +16,8 @@ export const KpaiSection: React.FC = () => {
         return <Building2 className="w-5 h-5 text-[#8B5CF6]" />;
       case 'database':
         return <Database className="w-5 h-5 text-[#0F8B8D]" />;
-      case 'shield':
-        return <ShieldCheck className="w-5 h-5 text-[#16A34A]" />;
+      case 'trend':
+        return <TrendingUp className="w-5 h-5 text-[#16A34A]" />;
       case 'alert':
         return <AlertTriangle className="w-5 h-5 text-[#DC2626]" />;
       default:
@@ -33,7 +35,7 @@ export const KpaiSection: React.FC = () => {
         return 'bg-purple-50 border-purple-100';
       case 'database':
         return 'bg-teal-50 border-teal-100';
-      case 'shield':
+      case 'trend':
         return 'bg-emerald-50 border-emerald-100';
       case 'alert':
         return 'bg-rose-50 border-rose-100';
@@ -49,13 +51,14 @@ export const KpaiSection: React.FC = () => {
           return (
             <div
               key={kpai.id}
-              className="intel-card p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200 group"
+              className="intel-card p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200 group relative"
             >
-              {/* Header with Icon and Label */}
+              {/* Header with Title and Icon */}
               <div className="flex items-start justify-between gap-2 mb-3">
                 <span className="text-xs font-semibold text-[#64748B] tracking-wide uppercase leading-tight">
                   {kpai.title}
                 </span>
+
                 <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${getIconBg(kpai.iconType)} transition-transform group-hover:scale-105`}>
                   {getIcon(kpai.iconType)}
                 </div>
@@ -68,40 +71,66 @@ export const KpaiSection: React.FC = () => {
                 </div>
               </div>
 
-              {/* Trend / Subtitle Bottom Row */}
-              <div className="mt-3 pt-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-xs">
-                {kpai.trend && (
-                  <div className="flex items-center gap-1">
+              {/* Bottom Row with Trend on Left and Tooltip in the Bottom Right Corner */}
+              <div className="mt-3 pt-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-xs gap-1">
+                {kpai.trend ? (
+                  <div className="flex items-center gap-1 min-w-0">
                     {kpai.trendType === 'positive' && (
-                      <span className="inline-flex items-center gap-0.5 text-[#16A34A] font-semibold">
-                        <TrendingUp className="w-3.5 h-3.5" />
-                        {kpai.trend}
+                      <span className="inline-flex items-center gap-0.5 text-[#16A34A] font-semibold truncate">
+                        <TrendingUp className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">{kpai.trend}</span>
                       </span>
                     )}
                     {kpai.trendType === 'negative' && (
-                      <span className="inline-flex items-center gap-0.5 text-[#DC2626] font-semibold">
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                        {kpai.trend}
+                      <span className="inline-flex items-center gap-0.5 text-[#DC2626] font-semibold truncate">
+                        <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">{kpai.trend}</span>
                       </span>
                     )}
                     {kpai.trendType === 'alert' && (
-                      <span className="inline-flex items-center gap-0.5 text-[#DC2626] font-bold animate-pulse">
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        {kpai.trend}
+                      <span className="inline-flex items-center gap-0.5 text-[#DC2626] font-bold animate-pulse truncate">
+                        <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">{kpai.trend}</span>
                       </span>
                     )}
                     {kpai.trendType === 'neutral' && (
-                      <span className="text-[#64748B] font-medium">
+                      <span className="text-[#64748B] font-medium truncate">
                         {kpai.trend}
                       </span>
                     )}
                   </div>
+                ) : (
+                  <div />
                 )}
-                {kpai.subtitle && (
-                  <span className="text-[11px] text-[#94A3B8] font-normal truncate ml-auto">
-                    {kpai.subtitle}
-                  </span>
-                )}
+
+                {/* Tooltip trigger in Bottom Right Corner */}
+                <div className="relative shrink-0 ml-auto">
+                  <button
+                    type="button"
+                    onMouseEnter={() => setActiveTooltip(kpai.id)}
+                    onMouseLeave={() => setActiveTooltip(null)}
+                    onClick={() => setActiveTooltip(activeTooltip === kpai.id ? null : kpai.id)}
+                    className="text-[#94A3B8] hover:text-[#1769AA] cursor-pointer transition-colors p-1 rounded-md hover:bg-slate-100 flex items-center justify-center"
+                    aria-label={`Definition for ${kpai.title}`}
+                  >
+                    <HelpCircle className="w-3.5 h-3.5" />
+                  </button>
+
+                  {/* Popover Definition Tooltip aligned to bottom right */}
+                  {activeTooltip === kpai.id && (
+                    <div className="absolute bottom-7 right-0 z-50 w-60 p-3.5 rounded-xl bg-white border border-[#CBD5E1] shadow-2xl text-[11px] text-[#172033] leading-relaxed pointer-events-none animate-fadeIn">
+                      <div className="font-bold text-[#1769AA] border-b border-[#F1F5F9] pb-1 mb-1.5 flex items-center justify-between">
+                        <span>{kpai.title}</span>
+                      </div>
+                      <p className="text-[#64748B]">{kpai.tooltip}</p>
+                      {kpai.subtitle && (
+                        <div className="mt-1.5 pt-1.5 border-t border-[#F1F5F9] text-[10px] text-[#94A3B8] font-mono">
+                          {kpai.subtitle}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           );

@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { Navbar } from './components/common/Navbar';
 import { TelemetryTicker } from './components/common/TelemetryTicker';
 import { VayuSetuLogo } from './components/common/VayuSetuLogo';
@@ -8,11 +8,7 @@ import { VayuSetuIntro } from './components/intro/VayuSetuIntro';
 import { DashboardPage } from './pages/DashboardPage';
 import { ApixPage } from './pages/ApixPage';
 import { RoutesPage } from './pages/RoutesPage';
-import { AnalyticsPage } from './pages/AnalyticsPage';
 import { CpiPage } from './pages/CpiPage';
-import { DataQualityPage } from './pages/DataQualityPage';
-import { DataSourcesPage } from './pages/DataSourcesPage';
-import { MethodologyPage } from './pages/MethodologyPage';
 import { Play } from 'lucide-react';
 
 // Scroll to top automatically upon route navigation
@@ -29,7 +25,6 @@ function ScrollToTop() {
 export function App() {
   // Show intro animation on initial page load; allow manual replay
   const [showIntro, setShowIntro] = useState<boolean>(() => {
-    // Check if user has already seen the intro in current session
     return !sessionStorage.getItem('vayusetu_intro_played');
   });
 
@@ -54,7 +49,7 @@ export function App() {
       </AnimatePresence>
 
       <div className="min-h-screen bg-[#F6F8FB] text-[#172033] font-sans antialiased flex flex-col selection:bg-[#1769AA]/15 selection:text-[#1769AA]">
-        {/* Sticky Professional Light Navbar */}
+        {/* Sticky Professional Light Navbar (4 Core Tabs) */}
         <Navbar />
 
         {/* Live Marquee Ticker below header */}
@@ -62,18 +57,18 @@ export function App() {
           <TelemetryTicker />
         </div>
 
-        {/* Main Content Area with clean responsive layout */}
+        {/* Main Content Area */}
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8">
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/dashboard" element={<Navigate to="/" replace />} />
             <Route path="/index" element={<ApixPage />} />
             <Route path="/routes" element={<RoutesPage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/cpi" element={<CpiPage />} />
-            <Route path="/data-quality" element={<DataQualityPage />} />
-            <Route path="/data-sources" element={<DataSourcesPage />} />
-            <Route path="/methodology" element={<MethodologyPage />} />
+            <Route path="/analytics" element={<Navigate to="/cpi" replace />} />
+            <Route path="/data-quality" element={<Navigate to="/index" replace />} />
+            <Route path="/data-sources" element={<Navigate to="/index" replace />} />
+            <Route path="/methodology" element={<Navigate to="/index" replace />} />
             {/* Fallback to Dashboard */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
@@ -98,7 +93,7 @@ export function App() {
                 <span>Replay Intro</span>
               </button>
               <span>•</span>
-              <span>APIx Engine v2.4 • Ministry of Civil Aviation & DGCA Standards</span>
+              <span>APIx Engine v2.4 • Ministry of Civil Aviation Standards (08/2026)</span>
             </div>
           </div>
         </footer>

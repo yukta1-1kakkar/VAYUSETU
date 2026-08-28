@@ -9,11 +9,13 @@ from app.api.routes import router as routes_router
 from app.api.index import router as index_router
 from app.api.analytics import router as analytics_router
 from app.api.ingest import router as ingest_router
+from app.api.dashboard import router as dashboard_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Lifespan hook to create database tables on startup."""
-    Base.metadata.create_all(bind=engine)
+    """Create local SQLite tables; cloud PostgreSQL uses Prisma migrations."""
+    if engine.dialect.name == "sqlite":
+        Base.metadata.create_all(bind=engine)
     yield
 
 app = FastAPI(
@@ -50,6 +52,7 @@ app.include_router(routes_router)
 app.include_router(index_router)
 app.include_router(analytics_router)
 app.include_router(ingest_router)
+app.include_router(dashboard_router)
 
 # Also mount under /api prefix
 app.include_router(health_router, prefix="/api")
@@ -57,6 +60,7 @@ app.include_router(routes_router, prefix="/api")
 app.include_router(index_router, prefix="/api")
 app.include_router(analytics_router, prefix="/api")
 app.include_router(ingest_router, prefix="/api")
+app.include_router(dashboard_router, prefix="/api")
 
 @app.get("/", tags=["Root"], summary="API Root Overview")
 def root():

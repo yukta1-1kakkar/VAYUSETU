@@ -28,6 +28,22 @@ export const CpiComparisonChart: React.FC = () => {
     }
   }, [timeframe]);
 
+  if (!CPI_DATA_SERIES.length) {
+    return <div className="intel-card p-8 text-center"><BarChart3 className="mx-auto h-10 w-10 text-[#0F8B8D]" /><h3 className="mt-3 text-xl font-bold text-[#172033]">Official CPI reference series not loaded</h3><p className="mt-2 text-sm text-[#64748B]">Load real MoSPI headline and Transport &amp; Communication index values into PostgreSQL to enable this comparison. No substitute values are displayed.</p></div>;
+  }
+
+  const latest = CPI_DATA_SERIES[CPI_DATA_SERIES.length - 1];
+  const correlation = (() => {
+    if (CPI_DATA_SERIES.length < 2) return null;
+    const xs = CPI_DATA_SERIES.map((point) => point.airfareIndex);
+    const ys = CPI_DATA_SERIES.map((point) => point.cpiGeneral);
+    const xMean = xs.reduce((sum, value) => sum + value, 0) / xs.length;
+    const yMean = ys.reduce((sum, value) => sum + value, 0) / ys.length;
+    const numerator = xs.reduce((sum, value, index) => sum + (value - xMean) * (ys[index] - yMean), 0);
+    const denominator = Math.sqrt(xs.reduce((sum, value) => sum + (value - xMean) ** 2, 0) * ys.reduce((sum, value) => sum + (value - yMean) ** 2, 0));
+    return denominator ? numerator / denominator : null;
+  })();
+
   return (
     <div className="intel-card p-6 sm:p-8 w-full space-y-6">
       {/* Header and Filter Controls */}
@@ -67,26 +83,26 @@ export const CpiComparisonChart: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
           <div className="text-xs text-[#64748B] font-medium uppercase">APIx Index Value</div>
-          <div className="text-2xl font-extrabold text-[#1769AA] mt-1">108.4</div>
-          <div className="text-[11px] text-[#16A34A] font-semibold mt-0.5">+8.4% Cumulative</div>
+          <div className="text-2xl font-extrabold text-[#1769AA] mt-1">{latest.airfareIndex}</div>
+          <div className="text-[11px] text-[#16A34A] font-semibold mt-0.5">Latest persisted index</div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
           <div className="text-xs text-[#64748B] font-medium uppercase">CPI General (MoSPI)</div>
-          <div className="text-2xl font-extrabold text-[#0F8B8D] mt-1">129.2</div>
+          <div className="text-2xl font-extrabold text-[#0F8B8D] mt-1">{latest.cpiGeneral}</div>
           <div className="text-[11px] text-[#64748B] mt-0.5">Base 100 benchmark (2012)</div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
           <div className="text-xs text-[#64748B] font-medium uppercase">CPI Transport Component</div>
-          <div className="text-2xl font-extrabold text-[#6366F1] mt-1">122.6</div>
+          <div className="text-2xl font-extrabold text-[#6366F1] mt-1">{latest.cpiTransport}</div>
           <div className="text-[11px] text-[#64748B] mt-0.5">Direct mobility basket</div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
           <div className="text-xs text-[#64748B] font-medium uppercase">Observed Correlation</div>
-          <div className="text-2xl font-extrabold text-[#172033] mt-1">+0.74 r</div>
-          <div className="text-[11px] text-[#0F8B8D] font-semibold mt-0.5">Statistically Significant</div>
+          <div className="text-2xl font-extrabold text-[#172033] mt-1">{correlation === null ? 'Insufficient data' : `${correlation >= 0 ? '+' : ''}${correlation.toFixed(2)} r`}</div>
+          <div className="text-[11px] text-[#0F8B8D] font-semibold mt-0.5">Calculated from loaded observations</div>
         </div>
       </div>
 
@@ -176,7 +192,7 @@ export const CpiComparisonChart: React.FC = () => {
         <HelpCircle className="w-4 h-4 text-[#1769AA] shrink-0 mt-0.5" />
         <div className="leading-relaxed">
           <span className="font-semibold text-[#1769AA]">Analytical Correlation Note: </span>
-          The correlation coefficient (+0.74) is provided for macroeconomic trend benchmarking only. 
+          The calculated correlation coefficient is provided for macroeconomic trend benchmarking only.
           Airfare movements reflect immediate supply-demand shifts and dynamic revenue algorithms, whereas official CPI tracks a broader fixed consumer expenditure basket. Correlation is measured for analytical comparison and does not imply direct causation.
         </div>
       </div>

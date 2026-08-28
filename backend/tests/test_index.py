@@ -65,13 +65,12 @@ def test_index_calculation_methodology(db_session):
     base_d = date(2026, 8, 1)
     target_d = date(2026, 8, 8)
 
-    # Base Date Observations: DEL-BOM = 5000, BLR-DEL = 4000
-    # Base Index = 0.6 * 5000 + 0.4 * 4000 = 3000 + 1600 = 4600.0
+    # Base Date Observations: DEL-BOM = 5000, BLR-DEL = 4000 (APIx = 100)
     f1 = FareObservation(route_id="DEL-BOM", airline="IndiGo", travel_date=base_d + timedelta(days=7), observation_date=base_d, advance_purchase_days=7, fare=5000.0, source="mock")
     f2 = FareObservation(route_id="BLR-DEL", airline="Air India", travel_date=base_d + timedelta(days=7), observation_date=base_d, advance_purchase_days=7, fare=4000.0, source="mock")
 
-    # Target Date Observations: DEL-BOM = 5500, BLR-DEL = 4500
-    # Target Index = 0.6 * 5500 + 0.4 * 4500 = 3300 + 1800 = 5100.0
+    # Price relatives: DEL-BOM=1.10, BLR-DEL=1.125
+    # APIx = 100 * (0.6*1.10 + 0.4*1.125) = 111.0
     f3 = FareObservation(route_id="DEL-BOM", airline="IndiGo", travel_date=target_d + timedelta(days=7), observation_date=target_d, advance_purchase_days=7, fare=5500.0, source="mock")
     f4 = FareObservation(route_id="BLR-DEL", airline="Air India", travel_date=target_d + timedelta(days=7), observation_date=target_d, advance_purchase_days=7, fare=4500.0, source="mock")
 
@@ -79,12 +78,32 @@ def test_index_calculation_methodology(db_session):
     db_session.commit()
 
     res = calculate_index(db_session, base_date=base_d, target_date=target_d, advance_purchase_days=7)
-    assert res.index == 5100.0
-    assert res.base_index == 4600.0
-    # % Change = ((5100 - 4600) / 4600) * 100 = 10.87%
-    assert res.pct_change == 10.87
+    assert res.index == 111.0
+    assert res.base_index == 100.0
+    assert res.pct_change == 11.0
     assert res.coverage_weight == 1.0
     assert res.components_count == 2
+    assert round(sum(component.weighted_fare for component in res.components), 2) == 111.0
+
+
+def test_index_uses_same_route_basket_in_base_and_target(db_session):
+    db_session.add_all([
+        RouteWeight(route_id="DEL-BOM", origin="DEL", destination="BOM", total_passengers=60, weight=0.6),
+        RouteWeight(route_id="BLR-DEL", origin="BLR", destination="DEL", total_passengers=40, weight=0.4),
+    ])
+    base_d, target_d = date(2026, 8, 1), date(2026, 8, 8)
+    db_session.add_all([
+        FareObservation(route_id="DEL-BOM", airline="A", travel_date=base_d + timedelta(days=7), observation_date=base_d, advance_purchase_days=7, fare=5000, source="test"),
+        FareObservation(route_id="BLR-DEL", airline="B", travel_date=base_d + timedelta(days=7), observation_date=base_d, advance_purchase_days=7, fare=4000, source="test"),
+        FareObservation(route_id="DEL-BOM", airline="A", travel_date=target_d + timedelta(days=7), observation_date=target_d, advance_purchase_days=7, fare=5500, source="test"),
+    ])
+    db_session.commit()
+
+    result = calculate_index(db_session, base_date=base_d, target_date=target_d, advance_purchase_days=7)
+
+    assert result.index == 110.0
+    assert result.coverage_weight == 0.6
+    assert result.components_count == 1
 
 def test_anomaly_detection(db_session):
     r = RouteWeight(route_id="DEL-BOM", origin="DEL", destination="BOM", total_passengers=10000, weight=1.0)
@@ -111,13 +130,15 @@ def test_anomaly_detection(db_session):
     assert len(anomalies) >= 1
     assert any(a.fare == 15000.0 for a in anomalies)
 
-def test_api_endpoints(client):
+def test_api_endpoints(client, db_session):
     # Test /health
     resp = client.get("/health")
     assert resp.status_code == 200
     assert resp.json()["status"] == "ok"
 
-    # Ingest Fare
+    # Ingest Fare against a configured official basket route.
+    db_session.add(RouteWeight(route_id="DEL-BOM", origin="DEL", destination="BOM", total_passengers=1, weight=1.0))
+    db_session.commit()
     payload = {
         "route_id": "DEL-BOM",
         "airline": "IndiGo",
@@ -148,7 +169,7 @@ def test_api_endpoints(client):
     # Test /index
     index_resp = client.get("/index?advance_purchase=7")
     assert index_resp.status_code == 200
-    assert index_resp.json()["index"] == 4850.0
+    assert index_resp.json()["index"] == 100.0
 
     # Test /analytics
     analytics_resp = client.get("/analytics")

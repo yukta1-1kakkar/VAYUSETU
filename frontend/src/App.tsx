@@ -6,6 +6,7 @@ import { Navbar } from './components/common/Navbar';
 import { TelemetryTicker } from './components/common/TelemetryTicker';
 import { VayuSetuLogo } from './components/common/VayuSetuLogo';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { LiveDataGate } from './components/LiveDataGate';
 import { VayuSetuIntro } from './components/intro/VayuSetuIntro';
 import type { Permission } from './constants/auth';
 import { AuthProvider } from './context/AuthContext';
@@ -43,7 +44,7 @@ function PortalLayout({ onReplayIntro }: { onReplayIntro: () => void }) {
             <div className="flex items-center gap-3"><VayuSetuLogo variant="horizontal" size="sm" showTagline={false} /><span className="text-[#CBD5E1]">|</span><span>Sovereign Airfare Intelligence & Price Indexing</span></div>
             <div className="flex items-center gap-4 text-[11px] text-[#94A3B8]">
               <button onClick={onReplayIntro} className="flex cursor-pointer items-center gap-1 transition-colors hover:text-[#1769AA]" title="Replay cinematic intro animation"><Play className="h-3 w-3" /> Replay Intro</button>
-              <span>•</span><span>APIx Engine v2.4 • Ministry of Civil Aviation Standards (08/2026)</span>
+              <span>•</span><span>VAYUSETU APIx Research Prototype • 08/2026</span>
             </div>
           </div>
         </footer>
@@ -58,7 +59,7 @@ function PortalRoutes({ onReplayIntro }: { onReplayIntro: () => void }) {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route element={<ProtectedRoute><PortalLayout onReplayIntro={onReplayIntro} /></ProtectedRoute>}>
+      <Route element={<ProtectedRoute><LiveDataGate><PortalLayout onReplayIntro={onReplayIntro} /></LiveDataGate></ProtectedRoute>}>
         <Route index element={modulePage('dashboard', <DashboardPage />)} />
         <Route path="dashboard" element={<Navigate to="/" replace />} />
         <Route path="index" element={modulePage('airfare-index', <ApixPage />)} />

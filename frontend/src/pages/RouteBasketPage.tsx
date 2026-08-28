@@ -37,7 +37,7 @@ import {
   projectLngLatToMap,
 } from '../components/india-map/mapData';
 import { useAuth } from '../context/AuthContext';
-import { BASKET_AIRPORTS, INITIAL_ROUTE_BASKET } from '../mock/routeBasketData';
+import { AIRPORTS, ROUTE_WEIGHTS_DATA } from '../mock/airfareData';
 import type { RouteBasketItem, RouteBasketStatus } from '../types';
 
 type StatusFilter = 'All' | RouteBasketStatus;
@@ -82,14 +82,25 @@ function StatusChip({ status }: { status: RouteBasketStatus }) {
 export function RouteBasketPage() {
   const { user } = useAuth();
   const canEdit = user?.role === 'MOSPI_ADMIN';
-  const [routes, setRoutes] = useState<RouteBasketItem[]>(INITIAL_ROUTE_BASKET);
+  const basketAirports = Object.values(AIRPORTS);
+  const [routes, setRoutes] = useState<RouteBasketItem[]>(() => ROUTE_WEIGHTS_DATA.map((route) => ({
+    id: `basket-${route.routeId}`,
+    route: route.routeId,
+    originCode: route.origin,
+    destinationCode: route.destination,
+    originCity: route.originCity,
+    destinationCity: route.destCity,
+    weight: route.weight,
+    status: 'Active',
+    lastUpdated: formatDate(),
+  })));
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All');
   const [weightSort, setWeightSort] = useState<WeightSort>('desc');
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [editorError, setEditorError] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<RouteBasketItem | null>(null);
-  const [basketUpdated, setBasketUpdated] = useState('27 Aug 2026');
+  const [basketUpdated, setBasketUpdated] = useState(formatDate());
   const [hoveredRoute, setHoveredRoute] = useState<RouteBasketItem | null>(null);
 
   const activeRoutes = useMemo(() => routes.filter((route) => route.status === 'Active'), [routes]);
@@ -154,8 +165,8 @@ export function RouteBasketPage() {
       return;
     }
 
-    const origin = BASKET_AIRPORTS.find((airport) => airport.code === editor.originCode);
-    const destination = BASKET_AIRPORTS.find((airport) => airport.code === editor.destinationCode);
+    const origin = basketAirports.find((airport) => airport.code === editor.originCode);
+    const destination = basketAirports.find((airport) => airport.code === editor.destinationCode);
     if (!origin || !destination) return;
 
     if (editor.mode === 'add') {
@@ -280,15 +291,15 @@ export function RouteBasketPage() {
             <g>{INDIA_STATES_PATHS.map((state) => <path key={state.stateCode} d={state.path} fill="#EEF5FB" stroke="#B8CADD" strokeWidth="1.2" />)}</g>
             <g>
               {routes.map((route) => {
-                const origin = BASKET_AIRPORTS.find((airport) => airport.code === route.originCode);
-                const destination = BASKET_AIRPORTS.find((airport) => airport.code === route.destinationCode);
+                const origin = basketAirports.find((airport) => airport.code === route.originCode);
+                const destination = basketAirports.find((airport) => airport.code === route.destinationCode);
                 if (!origin || !destination) return null;
                 const start = projectLngLatToMap(origin.lng, origin.lat);
                 const end = projectLngLatToMap(destination.lng, destination.lat);
                 const active = hoveredRoute?.id === route.id;
                 return <line key={route.id} x1={start.x} y1={start.y} x2={end.x} y2={end.y} stroke={active ? '#DC2626' : '#1769AA'} strokeWidth={active ? 4 + route.weight * 0.45 : 1.2 + route.weight * 0.38} strokeOpacity={route.status === 'Active' ? (active ? 1 : 0.62) : 0.18} strokeLinecap="round" onMouseEnter={() => setHoveredRoute(route)} onMouseLeave={() => setHoveredRoute(null)} className="cursor-pointer transition-all" />;
               })}
-              {BASKET_AIRPORTS.map((airport) => {
+              {basketAirports.map((airport) => {
                 const point = projectLngLatToMap(airport.lng, airport.lat);
                 return <g key={airport.code}><circle cx={point.x} cy={point.y} r="6" fill="#0A2540" stroke="white" strokeWidth="2" /><text x={point.x + 9} y={point.y - 8} fontSize="15" fontWeight="800" fill="#0A2540">{airport.code}</text></g>;
               })}
@@ -331,8 +342,8 @@ export function RouteBasketPage() {
           <form onSubmit={saveRoute} className="w-full max-w-lg rounded-3xl border border-white/70 bg-white p-6 shadow-2xl sm:p-8">
             <div className="mb-6 flex items-start justify-between"><div><div className="text-xs font-extrabold uppercase tracking-wider text-[#1769AA]">{editor.mode === 'add' ? 'New basket corridor' : 'Update basket corridor'}</div><h2 className="mt-1 font-heading text-2xl font-extrabold text-[#172033]">{editor.mode === 'add' ? 'Add Route' : `Edit ${editor.originCode} → ${editor.destinationCode}`}</h2></div><button type="button" onClick={() => setEditor(null)} className="rounded-xl p-2 text-[#64748B] hover:bg-[#F1F5F9]" aria-label="Close modal"><X className="h-5 w-5" /></button></div>
             <div className="grid gap-5 sm:grid-cols-2">
-              <label className="text-xs font-bold text-[#334155]">Origin City<select value={editor.originCode} disabled={editor.mode === 'edit'} onChange={(event) => setEditor({ ...editor, originCode: event.target.value })} className="mt-2 w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-3 text-sm outline-none focus:border-[#1769AA] disabled:opacity-60">{BASKET_AIRPORTS.map((airport) => <option key={airport.code} value={airport.code}>{airport.city} ({airport.code})</option>)}</select></label>
-              <label className="text-xs font-bold text-[#334155]">Destination City<select value={editor.destinationCode} disabled={editor.mode === 'edit'} onChange={(event) => setEditor({ ...editor, destinationCode: event.target.value })} className="mt-2 w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-3 text-sm outline-none focus:border-[#1769AA] disabled:opacity-60">{BASKET_AIRPORTS.map((airport) => <option key={airport.code} value={airport.code}>{airport.city} ({airport.code})</option>)}</select></label>
+              <label className="text-xs font-bold text-[#334155]">Origin City<select value={editor.originCode} disabled={editor.mode === 'edit'} onChange={(event) => setEditor({ ...editor, originCode: event.target.value })} className="mt-2 w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-3 text-sm outline-none focus:border-[#1769AA] disabled:opacity-60">{basketAirports.map((airport) => <option key={airport.code} value={airport.code}>{airport.city} ({airport.code})</option>)}</select></label>
+              <label className="text-xs font-bold text-[#334155]">Destination City<select value={editor.destinationCode} disabled={editor.mode === 'edit'} onChange={(event) => setEditor({ ...editor, destinationCode: event.target.value })} className="mt-2 w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-3 text-sm outline-none focus:border-[#1769AA] disabled:opacity-60">{basketAirports.map((airport) => <option key={airport.code} value={airport.code}>{airport.city} ({airport.code})</option>)}</select></label>
               <label className="text-xs font-bold text-[#334155]">Weight (%)<input type="number" min="0.01" max="100" step="0.01" value={editor.weight} onChange={(event) => setEditor({ ...editor, weight: event.target.value })} placeholder="e.g. 4.50" className="mt-2 w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-3 text-sm outline-none focus:border-[#1769AA]" /></label>
               <label className="text-xs font-bold text-[#334155]">Status<select value={editor.status} onChange={(event) => setEditor({ ...editor, status: event.target.value as RouteBasketStatus })} className="mt-2 w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-3 text-sm outline-none focus:border-[#1769AA]"><option>Active</option><option>Inactive</option></select></label>
             </div>

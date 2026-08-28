@@ -17,18 +17,22 @@ Passenger traffic weights are calculated by aggregating directional and bi-direc
 
 $$\\text{Weight}(r) = \\frac{\\text{Passengers}_r}{\\sum_{k \\in \\text{All Routes}} \\text{Passengers}_k}, \\quad \\sum_{r} \\text{Weight}(r) = 1.000000$$
 
-### 2. Weighted Arithmetic Mean Price Index
-For any target observation date $t$ and advance purchase window $d$ (e.g., 7 days):
+### 2. DGCA-Weighted Matched Price-Relative Index
+For target observation date $t$, base date $0$, and advance-purchase window $d$:
 
-$$\\text{Index}_{t, d} = \\frac{\\sum_{r \\in R_t} w_r \\cdot \\bar{P}_{r, t, d}}{\\sum_{r \\in R_t} w_r}$$
+$$\\text{APIx}_{t,d}=100\\sum_{r \\in M_t}\\tilde{w}_r\\left(\\frac{P_{r,t,d}}{P_{r,0,d}}\\right),\\qquad \\tilde{w}_r=\\frac{w_r}{\\sum_{k \\in M_t}w_k}$$
 
 Where:
-- $w_r$ = Normalized DGCA passenger weight for route $r$.
-- $\\bar{P}_{r, t, d}$ = Average observed fare across airlines for route $r$ on date $t$ with advance booking window $d$.
-- $R_t$ = Active subset of routes with fare observations on date $t$.
+- $w_r$ is the route's DGCA passenger-traffic weight.
+- $M_t$ is the subset of the top-24 basket observed in both base and target periods.
+- $P$ uses identical `(route, airline, source)` cohorts in both periods, preventing source-mix bias.
+- Weights are renormalized only over matched routes. `coverage_weight` reports their original DGCA share.
+- The base date therefore evaluates to 100. Unknown or unweighted routes do not enter APIx.
 
-### 3. Percentage Change (Inflation Rate)
-$$\\Delta \\% = \\left(\\frac{\\text{Index}_t - \\text{Index}_{\\text{base}}}{\\text{Index}_{\\text{base}}}\\right) \\times 100$$
+### 3. Percentage Change From Base
+Because the base is normalized to 100:
+
+$$\\Delta \\% = \\text{APIx}_t - 100$$
 
 ### 4. Anomaly Detection (Statistical Z-Score)
 Pricing anomalies and fare surges are flagged when:
@@ -57,11 +61,11 @@ VAYUSETU/backend/
 ?   ?   ??? cleaner.py              # City name standardization & traffic aggregation
 ?   ?   ??? route_weights.py        # DGCA traffic weights computation (sum=1.0)
 ?   ?   ??? fare_adapter.py         # Ingestion, validation & upserting for scrapers
-?   ?   ??? index_engine.py         # Weighted Arithmetic Mean Price Index engine
+?   ?   ??? index_engine.py         # DGCA-weighted matched price-relative APIx engine
 ?   ?   ??? analytics.py            # 7-day changes, rolling mean, Z-score anomalies
 ?   ??? database/
 ?   ?   ??? __init__.py
-?   ?   ??? db.py                   # SQLite engine, sessionmaker & path handling
+?   ?   ??? db.py                   # PostgreSQL/SQLite engine and session handling
 ?   ?   ??? models.py               # RouteWeight, FareObservation, CPIReference
 ?   ??? schemas/
 ?       ??? __init__.py
@@ -95,9 +99,13 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 3. Initialize SQLite Database Tables
+### 3. Apply the PostgreSQL Schema
 ```powershell
-python -c "from app.database.db import engine, Base; from app.database import models; Base.metadata.create_all(bind=engine)"
+npm install
+Copy-Item .env.example .env
+# Set DATABASE_URL and DIRECT_URL in .env, then:
+npm run db:validate
+npm run db:deploy
 ```
 
 ### 4. Run Pytest Suite
@@ -118,10 +126,10 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/health` | System health and SQLite database connectivity status |
+| `GET` | `/health` | System health and database connectivity status |
 | `GET` | `/routes` | Paginated list of DGCA routes with traffic weights (`?limit=50&search=DEL`) |
 | `GET` | `/routes/{route_id}` | Detailed weight and passenger statistics for a specific route |
-| `GET` | `/index` | Compute Weighted Price Index (`?advance_purchase=7&target_date=YYYY-MM-DD`) |
+| `GET` | `/index` | Compute matched-basket APIx (`?advance_purchase=7&target_date=YYYY-MM-DD`) |
 | `GET` | `/index/history` | Historical daily price index time-series points |
 | `GET` | `/analytics` | 7-day route price changes, overall index trend, rolling mean, anomalies |
 | `GET` | `/fare-status` | Database summary: total observations, active routes, date range |
@@ -182,3 +190,31 @@ Place your DGCA `.xlsx` files inside `data/raw/`:
 1. **City-Pair Files** (e.g. `DOM CITYPAIR DATA, JAN 2026.xlsx`): Header at row 2, filters out subtotals/totals automatically.
 2. **Airline Files** (e.g. `indigo26.xlsx`, `Air India26.xlsx`): Parses first section (*Scheduled Domestic Services*), reads 17 DGCA columns, stops at `MONTH == "TOTAL"`.
 3. Recompute anytime via `POST /ingest/compute-weights`.
+
+---
+
+## Cloud PostgreSQL, Prisma and scraper ETL
+
+Prisma manages the PostgreSQL schema and production migrations. FastAPI and
+the ETL use SQLAlchemy against the same `DATABASE_URL`.
+
+```powershell
+cd backend
+npm install
+Copy-Item .env.example .env
+# Put the hosted PostgreSQL URL in .env, then:
+npm run db:validate
+npm run db:deploy
+python -m pip install -r requirements.txt
+python -m app.etl.scraper_pipeline --input-dir ..\scraper --dry-run
+python -m app.etl.scraper_pipeline --input-dir ..\scraper
+```
+
+For Neon or Supabase, use the pooled runtime URL as `DATABASE_URL` and the
+direct URL as `DIRECT_URL`. Never commit either credential. The ETL stores one
+deduplicated snapshot per offer and observation date, enabling daily 30-day
+backtesting while retaining raw and rejected records for audit.
+
+The frontend reads `GET /api/dashboard/live` and refreshes every 60 seconds.
+For a deployed backend, set `VITE_API_URL` in `frontend/.env` to its `/api`
+URL before building the frontend. Airfare metrics never fall back to demo data.

@@ -1,3 +1,5 @@
+import type { Airport, FlightRoute, RouteWeight } from '../../types';
+
 // One Shared Source of Truth for India Geographic Geometry & Coordinates
 export interface IndiaStatePath {
   name: string;
@@ -494,6 +496,53 @@ export const TOP_6_ROUTES: MapRouteArc[] = [
     dominantCarrier: 'Akasa Air / IndiGo',
   },
 ];
+
+/** Replace legacy map metrics with the current backend response before mount. */
+export function applyLiveMapData(
+  airports: Record<string, Airport>,
+  routes: FlightRoute[],
+  weights: RouteWeight[],
+  apix: number,
+) {
+  const weightByRoute = new Map(weights.map((weight) => [weight.routeId, weight.weight]));
+  AVIATION_HUBS.splice(0, AVIATION_HUBS.length, ...Object.values(airports).map((airport) => ({
+    id: `hub-${airport.code.toLowerCase()}`,
+    name: airport.name,
+    city: airport.city,
+    code: airport.code,
+    state: airport.state,
+    region: 'Central' as const,
+    lat: airport.lat,
+    lng: airport.lng,
+    avgFare: airport.avgFare,
+    apix,
+    activeRoutes: airport.activeRoutesCount,
+    dailyTraffic: airport.dailyFlights,
+    volatility: `${Math.abs(airport.indexMovement).toFixed(1)}%`,
+    anomalyStatus: Math.abs(airport.indexMovement) >= 20 ? 'Critical Anomaly' as const : Math.abs(airport.indexMovement) >= 10 ? 'Elevated' as const : 'Normal' as const,
+    isTop6: routes.slice(0, 6).some((route) => route.origin === airport.code || route.destination === airport.code),
+    notes: `Live aggregate from ${airport.activeRoutesCount} persisted route${airport.activeRoutesCount === 1 ? '' : 's'}.`,
+  })));
+  TOP_6_ROUTES.splice(0, TOP_6_ROUTES.length, ...routes.map((route) => ({
+    id: route.id,
+    originCode: route.origin,
+    destCode: route.destination,
+    originCity: route.originCity,
+    destCity: route.destCity,
+    currentFare: route.currentFare,
+    historicalAvg: route.historicalAvg,
+    fareChange: route.changePercent,
+    status: route.isAnomaly ? 'anomaly' as const : Math.abs(route.changePercent) >= 10 ? 'elevated' as const : 'normal' as const,
+    distanceKm: route.distanceKm,
+    weeklyFlights: route.weeklyFrequency,
+    weight: weightByRoute.get(route.id) ?? 0,
+    volatility: route.volatilityIndex,
+    observations: route.observationsCount,
+    dominantCarrier: route.dominantCarrier,
+    anomalyReason: route.anomalyReason,
+    historicalData: route.historicalData,
+  })));
+}
 
 export const INDIA_STATES_PATHS: IndiaStatePath[] = [
   {

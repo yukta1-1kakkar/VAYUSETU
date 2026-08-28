@@ -17,10 +17,10 @@ def get_airfare_index(
     db: Session = Depends(get_db)
 ):
     """
-    Calculate the Weighted Arithmetic Mean Airfare Price Index for India:
-    - Weights: Normalized DGCA domestic passenger traffic
-    - Price: Average observed airfare across airlines for each city pair
-    - Returns current index, base comparison index, percentage change, and route components.
+    Calculate APIx = 100 × Σ(normalized DGCA weight × route price relative).
+    Routes must have clean fares in both the base and target periods. Official
+    weights are renormalized over that matched basket, and coverage reports the
+    original DGCA weight represented before renormalization.
     """
     return calculate_index(
         db=db,

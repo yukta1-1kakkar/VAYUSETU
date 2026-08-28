@@ -19,7 +19,11 @@ def get_route_change(db: Session, route_id: str, days: int = 7) -> Optional[Rout
     """
     latest_date = (
         db.query(func.max(FareObservation.observation_date))
-        .filter(FareObservation.route_id == route_id)
+        .filter(
+            FareObservation.route_id == route_id,
+            FareObservation.cleaning_status == "clean",
+            FareObservation.fare.is_not(None),
+        )
         .scalar()
     )
     if not latest_date:
@@ -29,14 +33,24 @@ def get_route_change(db: Session, route_id: str, days: int = 7) -> Optional[Rout
     
     curr_avg = (
         db.query(func.avg(FareObservation.fare))
-        .filter(FareObservation.route_id == route_id, FareObservation.observation_date == latest_date)
+        .filter(
+            FareObservation.route_id == route_id,
+            FareObservation.observation_date == latest_date,
+            FareObservation.cleaning_status == "clean",
+            FareObservation.fare.is_not(None),
+        )
         .scalar()
     )
     
     # Try finding exact past date or nearest previous observation
     past_avg = (
         db.query(func.avg(FareObservation.fare))
-        .filter(FareObservation.route_id == route_id, FareObservation.observation_date <= past_date)
+        .filter(
+            FareObservation.route_id == route_id,
+            FareObservation.observation_date <= past_date,
+            FareObservation.cleaning_status == "clean",
+            FareObservation.fare.is_not(None),
+        )
         .order_by(FareObservation.observation_date.desc())
         .scalar()
     )
@@ -56,14 +70,21 @@ def get_overall_change(db: Session, days: int = 7) -> Optional[float]:
     """
     Calculate overall percentage change in the Weighted Price Index over the last N days.
     """
-    latest_date = db.query(func.max(FareObservation.observation_date)).scalar()
+    latest_date = db.query(func.max(FareObservation.observation_date)).filter(
+        FareObservation.cleaning_status == "clean",
+        FareObservation.fare.is_not(None),
+    ).scalar()
     if not latest_date:
         return None
         
     past_date = latest_date - timedelta(days=days)
     earliest_past_date = (
         db.query(func.max(FareObservation.observation_date))
-        .filter(FareObservation.observation_date <= past_date)
+        .filter(
+            FareObservation.observation_date <= past_date,
+            FareObservation.cleaning_status == "clean",
+            FareObservation.fare.is_not(None),
+        )
         .scalar()
     )
     
@@ -81,12 +102,19 @@ def get_rolling_mean(db: Session, route_id: Optional[str] = None, window: int = 
     """
     Compute the rolling N-day average fare for a route or network-wide.
     """
-    latest_date = db.query(func.max(FareObservation.observation_date)).scalar()
+    latest_date = db.query(func.max(FareObservation.observation_date)).filter(
+        FareObservation.cleaning_status == "clean",
+        FareObservation.fare.is_not(None),
+    ).scalar()
     if not latest_date:
         return None
         
     start_date = latest_date - timedelta(days=window)
-    query = db.query(func.avg(FareObservation.fare)).filter(FareObservation.observation_date >= start_date)
+    query = db.query(func.avg(FareObservation.fare)).filter(
+        FareObservation.observation_date >= start_date,
+        FareObservation.cleaning_status == "clean",
+        FareObservation.fare.is_not(None),
+    )
     
     if route_id:
         query = query.filter(FareObservation.route_id == route_id)
@@ -103,7 +131,7 @@ def detect_anomalies(
     Detect pricing anomalies using statistical Z-Score (|Z| > threshold).
     Z = (Fare - Mean) / StdDev
     """
-    query = db.query(FareObservation)
+    query = db.query(FareObservation).filter(FareObservation.fare.is_not(None))
     if route_id:
         query = query.filter(FareObservation.route_id == route_id)
         

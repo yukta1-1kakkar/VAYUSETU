@@ -32,7 +32,7 @@ export interface FlightRoute {
   observationsCount: number;
   volatilityIndex: number; // 0-100
   dominantCarrier: string;
-  primaryAirline: 'IndiGo' | 'Air India' | 'Akasa Air' | 'SpiceJet' | 'Vistara' | 'Alliance Air';
+  primaryAirline: string;
   sectorType: 'Metro-Metro' | 'Metro-Tier2' | 'Tier2-Tier2' | 'Leisure';
   distanceKm: number;
   weeklyFrequency: number;

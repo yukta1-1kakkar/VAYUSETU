@@ -31,13 +31,13 @@ class IndexComponentSchema(BaseModel):
     destination: str
     weight: float
     avg_fare: float
-    weighted_fare: float
+    weighted_fare: float = Field(..., description="Route contribution to APIx in index points")
     observation_count: int
 
 class IndexResponse(BaseModel):
-    index: float = Field(..., description="Weighted Arithmetic Mean Airfare Price Index for target date")
-    base_index: Optional[float] = Field(None, description="Airfare Price Index on base date")
-    pct_change: Optional[float] = Field(None, description="Percentage change in price index ((index - base) / base * 100)")
+    index: float = Field(..., description="DGCA-weighted price-relative APIx (base period = 100)")
+    base_index: Optional[float] = Field(None, description="Base-period APIx, equal to 100 when a matched basket exists")
+    pct_change: Optional[float] = Field(None, description="Percentage change from the base period, APIx - 100")
     target_date: date
     base_date: Optional[date] = None
     advance_purchase_days: int

@@ -33,6 +33,7 @@ export interface FlightRoute {
   volatilityIndex: number; // 0-100
   dominantCarrier: string;
   primaryAirline: string;
+  sources?: string[];
   sectorType: 'Metro-Metro' | 'Metro-Tier2' | 'Tier2-Tier2' | 'Leisure';
   distanceKm: number;
   weeklyFrequency: number;

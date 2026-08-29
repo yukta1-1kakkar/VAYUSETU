@@ -27,6 +27,8 @@ AIRPORT_REFERENCE = {
     "GOI": ("Goa", "Goa", 15.3808, 73.8314),
     "GOX": ("Goa", "Goa", 15.7443, 73.8606),
     "LKO": ("Lucknow", "Uttar Pradesh", 26.7606, 80.8893),
+    "SXR": ("Srinagar", "Jammu and Kashmir", 33.9871, 74.7743),
+    "PAT": ("Patna", "Bihar", 25.5913, 85.0880),
 }
 METROS = {"DEL", "BOM", "BLR", "HYD", "CCU", "MAA"}
 LEISURE = {"GOI", "GOX", "COK"}
@@ -117,6 +119,7 @@ def build_live_dashboard(db: Session) -> dict:
         change = ((current - baseline) / baseline * 100) if baseline else 0
         volatility = min(100, round((pstdev(all_fares) / mean(all_fares) * 100) if len(all_fares) > 1 and mean(all_fares) else 0))
         carriers = [name for name, _ in airlines.most_common(3)]
+        sources = sorted({row.source for row in rows if row.source})
         origin = _iata(rows, "origin", weight.origin)
         destination = _iata(rows, "destination", weight.destination)
         anomaly = abs(change) >= 20
@@ -131,6 +134,7 @@ def build_live_dashboard(db: Session) -> dict:
             "historicalAvg": round(mean(all_fares)), "minFare": round(min(all_fares)), "maxFare": round(max(all_fares)),
             "observationsCount": len(rows), "volatilityIndex": volatility,
             "dominantCarrier": " / ".join(carriers), "primaryAirline": carriers[0] if carriers else "Unknown",
+            "sources": sources,
             "sectorType": _sector(origin, destination), "distanceKm": _distance(origin, destination),
             "weeklyFrequency": 0, "historicalData": history,
         })

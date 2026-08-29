@@ -14,10 +14,8 @@ interface NavigationItem {
 
 const NAVIGATION: NavigationItem[] = [
   { to: '/', label: 'Dashboard', permission: 'dashboard' },
-  { to: '/index', label: 'Airfare Index', permission: 'airfare-index' },
-  { to: '/reports', label: 'Reports', permission: 'reports' },
-  { to: '/downloads', label: 'Downloads', permission: 'downloads' },
-  { to: '/cpi', label: 'Price Trends', permission: 'price-trends' },
+  { to: '/index', label: 'APIx', permission: 'airfare-index' },
+  { to: '/cpi', label: 'CPI', permission: 'price-trends' },
   { to: '/routes', label: 'Route Comparison', permission: 'route-comparison' },
   { to: '/lead-time-elasticity', label: 'Lead-Time Elasticity', permission: 'lead-time-elasticity' },
   { to: '/user-management', label: 'User Management', permission: 'user-management' },

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { FLIGHT_ROUTES, getLeadTimeCurveForRoute } from '../../mock/airfareData';
+import type { FlightRoute } from '../../types';
 import { formatINR } from '../../utils/geo';
 import {
   ResponsiveContainer,
@@ -14,6 +15,18 @@ import {
   Legend,
 } from 'recharts';
 import { Clock, Navigation, Search, CheckCircle2, AlertTriangle } from 'lucide-react';
+
+const DIRECT_AIRLINE_SOURCES = ['Akasa Air', 'Air India Express', 'SpiceJet'] as const;
+
+function fetchedAirlineLabel(route: FlightRoute) {
+  const directSources = DIRECT_AIRLINE_SOURCES.filter((airline) =>
+    route.sources?.includes(airline)
+    || route.dominantCarrier.includes(airline)
+    || route.primaryAirline === airline
+  );
+
+  return directSources.length ? directSources.join(' / ') : 'OTA data only';
+}
 
 export const LeadTimeElasticityChart: React.FC = () => {
   // All 24 routes + ALL option
@@ -64,14 +77,14 @@ export const LeadTimeElasticityChart: React.FC = () => {
                 <optgroup label="Top 6 Primary Trunk Corridors">
                   {FLIGHT_ROUTES.slice(0, 6).map((r) => (
                     <option key={r.id} value={r.id}>
-                      {r.id}: {r.originCity} ➔ {r.destCity} ({r.dominantCarrier})
+                      {r.id}: {r.originCity} ➔ {r.destCity} ({fetchedAirlineLabel(r)})
                     </option>
                   ))}
                 </optgroup>
                 <optgroup label="Arterial & Regional Corridors (7-24)">
                   {FLIGHT_ROUTES.slice(6).map((r) => (
                     <option key={r.id} value={r.id}>
-                      {r.id}: {r.originCity} ➔ {r.destCity} ({r.primaryAirline})
+                      {r.id}: {r.originCity} ➔ {r.destCity} ({fetchedAirlineLabel(r)})
                     </option>
                   ))}
                 </optgroup>
@@ -91,7 +104,7 @@ export const LeadTimeElasticityChart: React.FC = () => {
           <div className="flex items-center gap-2">
             <Navigation className="w-3.5 h-3.5 text-[#1769AA]" />
             <span className="font-bold text-[#172033]">{selectedRouteObj.originCity} ({selectedRouteObj.origin}) ➔ {selectedRouteObj.destCity} ({selectedRouteObj.destination})</span>
-            <span className="text-[#64748B]">({selectedRouteObj.distanceKm} km • {selectedRouteObj.dominantCarrier})</span>
+            <span className="text-[#64748B]">({selectedRouteObj.distanceKm} km • {fetchedAirlineLabel(selectedRouteObj)})</span>
           </div>
           <div className="flex items-center gap-4">
             <span>T+45 Fare: <strong className="text-[#16A34A]">{formatINR(advancePoint.avgFare)}</strong></span>

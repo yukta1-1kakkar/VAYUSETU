@@ -14,15 +14,9 @@ import {
 import {
   MapPin,
   Navigation,
-  Info,
   ArrowUpRight,
-  TrendingUp,
   AlertTriangle,
-  CheckCircle2,
-  Plane,
   Compass,
-  Layers,
-  Activity,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -30,7 +24,6 @@ import {
   Area,
   XAxis,
   YAxis,
-  Tooltip,
   CartesianGrid,
 } from 'recharts';
 
@@ -40,13 +33,32 @@ export interface IndiaMapProps {
   isIntroMode?: boolean;
 }
 
+function orientRouteFromHub(route: MapRouteArc, hubCode: string | null) {
+  const shouldReverse = hubCode === route.destCode;
+  return shouldReverse
+    ? {
+        originCode: route.destCode,
+        destCode: route.originCode,
+        originCity: route.destCity,
+        destCity: route.originCity,
+      }
+    : {
+        originCode: route.originCode,
+        destCode: route.destCode,
+        originCity: route.originCity,
+        destCity: route.destCity,
+      };
+}
+
 export const IndiaMap: React.FC<IndiaMapProps> = ({
   onSelectRoute,
   className = '',
-  isIntroMode = false,
+  isIntroMode: _isIntroMode = false,
 }) => {
   const [selectedRoute, setSelectedRoute] = useState<MapRouteArc>(TOP_6_ROUTES[0]);
   const [selectedHub, setSelectedHub] = useState<AviationHub>(AVIATION_HUBS[0]);
+  const [activeHubCode, setActiveHubCode] = useState<string | null>(null);
+  const [hasRouteSelection, setHasRouteSelection] = useState(false);
   const [hoveredHub, setHoveredHub] = useState<AviationHub | null>(null);
   const [hoveredRoute, setHoveredRoute] = useState<MapRouteArc | null>(null);
   const [hoveredState, setHoveredState] = useState<IndiaStatePath | null>(null);
@@ -54,7 +66,14 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
 
   // Compute exact coordinates on the SVG map using authentic D3 projection
   const projectedHubs = useMemo(() => {
-    return AVIATION_HUBS.map((hub) => {
+    return AVIATION_HUBS.filter((hub) =>
+      Number.isFinite(hub.lat)
+      && Number.isFinite(hub.lng)
+      && hub.lat >= 6
+      && hub.lat <= 38
+      && hub.lng >= 68
+      && hub.lng <= 98
+    ).map((hub) => {
       const { x, y } = projectLngLatToMap(hub.lng, hub.lat);
       return { ...hub, x, y };
     });
@@ -66,11 +85,31 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
     return true;
   });
 
+  const connectedRoutes = activeHubCode
+    ? TOP_6_ROUTES.filter((route) => route.originCode === activeHubCode || route.destCode === activeHubCode)
+    : [];
+  const selectedDirection = orientRouteFromHub(selectedRoute, activeHubCode);
+  const hoveredDirection = hoveredRoute ? orientRouteFromHub(hoveredRoute, activeHubCode) : null;
+
+  const handleHubClick = (hub: AviationHub) => {
+    if (activeHubCode === hub.code) {
+      setActiveHubCode(null);
+      setHasRouteSelection(false);
+      setHoveredRoute(null);
+      setHoveredHub(null);
+      return;
+    }
+
+    setActiveFilter('ALL');
+    setSelectedHub(hub);
+    setActiveHubCode(hub.code);
+    setHasRouteSelection(false);
+    setHoveredRoute(null);
+  };
+
   const handleRouteClick = (route: MapRouteArc) => {
     setSelectedRoute(route);
-    const originHub = projectedHubs.find((h) => h.code === route.originCode);
-    if (originHub) setSelectedHub(originHub);
-    if (onSelectRoute) onSelectRoute(route.id);
+    setHasRouteSelection(true);
   };
 
   return (
@@ -86,7 +125,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
             India Airfare Intelligence & Interactive Corridor Map
           </h3>
           <p className="text-xs text-[#64748B] mt-0.5">
-            Click any route line on the map to inspect live tariff telemetry, APIx impact, volatility, and historical price corridors.
+            Select a city node to reveal its connected corridors, then select a route to inspect its live telemetry and APIx impact.
           </p>
         </div>
 
@@ -101,7 +140,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                   : 'text-[#64748B] hover:text-[#172033]'
               }`}
             >
-              All 9 Hubs
+              All {projectedHubs.length} Hubs
             </button>
             <button
               onClick={() => setActiveFilter('TOP6')}
@@ -111,7 +150,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                   : 'text-[#64748B] hover:text-[#172033]'
               }`}
             >
-              Top 6 (Routes Active)
+              Top 6 Hubs
             </button>
             <button
               onClick={() => setActiveFilter('ANOMALIES')}
@@ -142,7 +181,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
             {hoveredState ? (
               <span className="font-semibold text-[#172033]">State: {hoveredState.name}</span>
             ) : (
-              <span>Click any route line or city marker to view live telemetry</span>
+              <span>{activeHubCode ? `Select one of the ${connectedRoutes.length} routes connected to ${activeHubCode}` : 'Select a city node to reveal its connected routes'}</span>
             )}
           </div>
 
@@ -150,7 +189,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
           {hoveredRoute && (
             <div className="absolute top-4 right-4 z-30 bg-white p-3.5 rounded-xl border border-[#CBD5E1] shadow-xl text-xs space-y-1 min-w-[210px] pointer-events-none animate-fadeIn">
               <div className="font-bold text-[#172033] flex items-center justify-between border-b border-[#F1F5F9] pb-1">
-                <span>{hoveredRoute.originCode} ➔ {hoveredRoute.destCode}</span>
+                <span>{hoveredDirection?.originCode} ➔ {hoveredDirection?.destCode}</span>
                 <span className={`px-1.5 py-0.2 rounded text-[10px] uppercase font-bold ${
                   hoveredRoute.status === 'anomaly'
                     ? 'bg-rose-50 text-[#DC2626] border border-rose-200'
@@ -214,7 +253,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
             <g className="states-layer">
               {INDIA_STATES_PATHS.map((state) => {
                 const isStateHovered = hoveredState?.name === state.name;
-                const isSelectedState = selectedHub.state.toLowerCase().includes(state.name.toLowerCase()) || state.name.toLowerCase().includes(selectedHub.state.toLowerCase());
+                const isSelectedState = Boolean(activeHubCode) && (selectedHub.state.toLowerCase().includes(state.name.toLowerCase()) || state.name.toLowerCase().includes(selectedHub.state.toLowerCase()));
 
                 return (
                   <path
@@ -238,7 +277,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                       const matchedHub = projectedHubs.find(
                         (h) => h.state.toLowerCase().includes(state.name.toLowerCase()) || state.name.toLowerCase().includes(h.state.toLowerCase())
                       );
-                      if (matchedHub) setSelectedHub(matchedHub);
+                      if (matchedHub) handleHubClick(matchedHub);
                     }}
                   >
                     <title>{state.name}</title>
@@ -249,12 +288,14 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
 
             {/* Smooth Clickable Flight Route Arcs (Strictly between Top 6 Hubs) */}
             <g className="routes-layer">
-              {TOP_6_ROUTES.map((route) => {
-                const fromHub = projectedHubs.find((h) => h.code === route.originCode);
-                const toHub = projectedHubs.find((h) => h.code === route.destCode);
-                if (!fromHub || !toHub) return null;
+              {connectedRoutes.map((route) => {
+                const canonicalFromHub = projectedHubs.find((h) => h.code === route.originCode);
+                const canonicalToHub = projectedHubs.find((h) => h.code === route.destCode);
+                if (!canonicalFromHub || !canonicalToHub) return null;
+                const fromHub = route.destCode === activeHubCode ? canonicalToHub : canonicalFromHub;
+                const toHub = route.destCode === activeHubCode ? canonicalFromHub : canonicalToHub;
 
-                const isRouteSelected = selectedRoute.id === route.id;
+                const isRouteSelected = hasRouteSelection && selectedRoute.id === route.id;
                 const isHovered = hoveredRoute?.id === route.id;
 
                 // Smooth quadratic curve control point
@@ -303,6 +344,8 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                       strokeDasharray={route.status === 'anomaly' ? 'none' : isRouteSelected ? 'none' : '4 3'}
                       strokeLinecap="round"
                       className="transition-all duration-200"
+                      onMouseEnter={() => setHoveredRoute(route)}
+                      onMouseLeave={() => setHoveredRoute(null)}
                       onClick={() => handleRouteClick(route)}
                     />
                   </g>
@@ -313,17 +356,13 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
             {/* Aviation Hub Beacons on Map */}
             <g className="beacons-layer">
               {displayedHubs.map((hub) => {
-                const isSelected = selectedHub.id === hub.id || selectedRoute.originCode === hub.code || selectedRoute.destCode === hub.code;
-                const isHovered = hoveredHub?.id === hub.id;
-
+                const isSelected = activeHubCode === hub.code || (hasRouteSelection && (selectedRoute.originCode === hub.code || selectedRoute.destCode === hub.code));
                 return (
                   <g
                     key={`hub-beacon-${hub.id}`}
                     className="cursor-pointer"
                     onClick={() => {
-                      setSelectedHub(hub);
-                      const matchingRoute = TOP_6_ROUTES.find((r) => r.originCode === hub.code || r.destCode === hub.code);
-                      if (matchingRoute) setSelectedRoute(matchingRoute);
+                      handleHubClick(hub);
                     }}
                   >
                     {/* Pulse Ring for Selected / Anomaly */}
@@ -375,7 +414,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
 
           {/* Interactive HTML Location Pills */}
           {displayedHubs.map((hub) => {
-            const isSelected = selectedHub.id === hub.id || selectedRoute.originCode === hub.code || selectedRoute.destCode === hub.code;
+            const isSelected = activeHubCode === hub.code || (hasRouteSelection && (selectedRoute.originCode === hub.code || selectedRoute.destCode === hub.code));
             const isHovered = hoveredHub?.id === hub.id;
             const leftPercent = (hub.x / INDIA_SVG_WIDTH) * 100;
             const topPercent = (hub.y / INDIA_SVG_HEIGHT) * 100;
@@ -391,9 +430,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                 onMouseEnter={() => setHoveredHub(hub)}
                 onMouseLeave={() => setHoveredHub(null)}
                 onClick={() => {
-                  setSelectedHub(hub);
-                  const matchingRoute = TOP_6_ROUTES.find((r) => r.originCode === hub.code || r.destCode === hub.code);
-                  if (matchingRoute) setSelectedRoute(matchingRoute);
+                  handleHubClick(hub);
                 }}
                 className={`absolute z-30 cursor-pointer select-none transition-all duration-150 ${
                   isSelected || isHovered ? 'scale-110 z-40' : 'scale-95 hover:scale-105'
@@ -428,6 +465,22 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
 
         {/* Right Column: Route Details & Corridor Intelligence Panel */}
         <div className="lg:col-span-4 space-y-4">
+          {!hasRouteSelection ? (
+            <div className="flex min-h-[420px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-8 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-[#1769AA]">
+                <MapPin className="h-7 w-7" />
+              </div>
+              <h4 className="mt-5 font-heading text-xl font-extrabold text-[#172033]">
+                {activeHubCode ? `Choose a ${activeHubCode} corridor` : 'Select a city node'}
+              </h4>
+              <p className="mt-2 max-w-xs text-xs leading-6 text-[#64748B]">
+                {activeHubCode
+                  ? `The map is showing every available route connected to ${selectedHub.city}. Click a route line to load its complete corridor intelligence.`
+                  : 'Start by selecting any airport node on the map. Its connected routes will appear without cluttering the national view.'}
+              </p>
+            </div>
+          ) : (
+          <>
           <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
             <span className="text-xs font-bold text-[#1769AA] uppercase tracking-wider flex items-center gap-1.5">
               <Navigation className="w-3.5 h-3.5" />
@@ -457,12 +510,12 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                   Selected Corridor
                 </div>
                 <h4 className="text-2xl font-black font-heading text-[#172033] flex items-center gap-2 mt-0.5">
-                  <span>{selectedRoute.originCity}</span>
+                  <span>{selectedDirection.originCity}</span>
                   <span className="text-[#1769AA]">→</span>
-                  <span>{selectedRoute.destCity}</span>
+                  <span>{selectedDirection.destCity}</span>
                 </h4>
                 <div className="text-xs text-[#64748B] mt-0.5">
-                  {selectedRoute.id} • {selectedRoute.distanceKm} km • {selectedRoute.weeklyFlights} flights/week
+                  {selectedDirection.originCode}-{selectedDirection.destCode} • {selectedRoute.distanceKm} km • {selectedRoute.weeklyFlights} flights/week
                 </div>
               </div>
             </div>
@@ -575,10 +628,12 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
               }}
               className="mt-4 w-full py-2.5 rounded-xl bg-[#1769AA] hover:bg-[#12558A] text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm"
             >
-              <span>OPEN FULL {selectedRoute.id} INTELLIGENCE DOSSIER</span>
+              <span>OPEN FULL {selectedDirection.originCode}-{selectedDirection.destCode} INTELLIGENCE DOSSIER</span>
               <ArrowUpRight className="w-4 h-4" />
             </button>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>

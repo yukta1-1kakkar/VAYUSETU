@@ -32,7 +32,7 @@ export interface FlightRoute {
   observationsCount: number;
   volatilityIndex: number; // 0-100
   dominantCarrier: string;
-  primaryAirline: 'IndiGo' | 'Air India' | 'Akasa Air' | 'SpiceJet' | 'Vistara' | 'Alliance Air';
+  primaryAirline: string;
   sectorType: 'Metro-Metro' | 'Metro-Tier2' | 'Tier2-Tier2' | 'Leisure';
   distanceKm: number;
   weeklyFrequency: number;
@@ -74,6 +74,36 @@ export interface RouteWeight {
   paxPerMonth: string;
   carrierShare: string;
   status: 'normal' | 'elevated' | 'anomaly';
+}
+
+export type RouteBasketStatus = 'Active' | 'Inactive';
+
+export interface RouteBasketItem {
+  id: string;
+  route: string;
+  originCode: string;
+  destinationCode: string;
+  originCity: string;
+  destinationCity: string;
+  weight: number;
+  status: RouteBasketStatus;
+  lastUpdated: string;
+}
+
+export type GovernmentOrganization = 'MoSPI' | 'NSO' | 'RBI';
+export type GovernmentUserRole = 'MoSPI Admin' | 'NSO Official' | 'RBI Analyst';
+export type AccountStatus = 'Active' | 'Inactive';
+
+export interface GovernmentUser {
+  id: string;
+  name: string;
+  email: string;
+  organization: GovernmentOrganization;
+  role: GovernmentUserRole;
+  status: AccountStatus;
+  lastLogin: string | null;
+  createdOn: string;
+  lastUpdated: string;
 }
 
 export interface KpaMetric {

@@ -24,13 +24,14 @@ export const LeadTimeElasticityChart: React.FC = () => {
     return FLIGHT_ROUTES.find((r) => r.id === selectedRouteId) || null;
   }, [selectedRouteId]);
 
-  // Compute curve from 45 days to 0 days dynamically for the selected corridor
+  // Backend averages for the five collection windows in the problem statement.
   const elasticityData = useMemo(() => {
     return getLeadTimeCurveForRoute(selectedRouteId);
   }, [selectedRouteId]);
 
-  const sameDayPoint = elasticityData[elasticityData.length - 1];
+  const shortLeadPoint = elasticityData[elasticityData.length - 1];
   const advancePoint = elasticityData[0];
+  const risesTowardDeparture = shortLeadPoint.avgFare >= advancePoint.avgFare;
 
   return (
     <div className="intel-card p-6 sm:p-7 w-full space-y-6">
@@ -42,10 +43,10 @@ export const LeadTimeElasticityChart: React.FC = () => {
             <span>DYNAMIC YIELD MANAGEMENT</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-extrabold font-heading text-[#172033]">
-            Lead Time Elasticity Curve (45 Days → 0 Days)
+            Lead Time Elasticity Curve (T+45 → T+1)
           </h3>
           <p className="text-xs text-[#64748B] mt-0.5">
-            Empirical fare escalation curve mapping price multipliers across booking advance windows (D-45 Advance to D-0 Same-Day) for all 24 monitored corridors.
+            Observed mean fares for the T+45, T+30, T+15, T+7 and T+1 collection windows.
           </p>
         </div>
 
@@ -78,8 +79,8 @@ export const LeadTimeElasticityChart: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-xs font-bold text-[#DC2626]">
-            <span>D-0 Markup: +{sameDayPoint.markupPercent}%</span>
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold ${risesTowardDeparture ? 'bg-rose-50 border-rose-200 text-[#DC2626]' : 'bg-amber-50 border-amber-200 text-[#B45309]'}`}>
+            <span>T+1 difference: {shortLeadPoint.markupPercent >= 0 ? '+' : ''}{shortLeadPoint.markupPercent}%</span>
           </div>
         </div>
       </div>
@@ -93,9 +94,9 @@ export const LeadTimeElasticityChart: React.FC = () => {
             <span className="text-[#64748B]">({selectedRouteObj.distanceKm} km • {selectedRouteObj.dominantCarrier})</span>
           </div>
           <div className="flex items-center gap-4">
-            <span>D-45 Base: <strong className="text-[#16A34A]">{formatINR(advancePoint.avgFare)}</strong></span>
+            <span>T+45 Fare: <strong className="text-[#16A34A]">{formatINR(advancePoint.avgFare)}</strong></span>
             <span>Equilibrium Base: <strong className="text-[#1769AA]">{formatINR(selectedRouteObj.referenceFare)}</strong></span>
-            <span>D-0 Surge: <strong className="text-[#DC2626]">{formatINR(sameDayPoint.avgFare)}</strong></span>
+            <span>T+1 Fare: <strong className="text-[#DC2626]">{formatINR(shortLeadPoint.avgFare)}</strong></span>
           </div>
         </div>
       )}
@@ -136,7 +137,7 @@ export const LeadTimeElasticityChart: React.FC = () => {
                         <span className="text-[#64748B] font-normal">{data.daysAdvance}</span>
                       </div>
                       <div className="flex justify-between items-center text-[#1769AA]">
-                        <span>Expected Fare:</span>
+                        <span>Comparable Fare:</span>
                         <span className="font-bold text-sm">{formatINR(data.avgFare)}</span>
                       </div>
                       <div className="flex justify-between items-center text-[#0F8B8D]">
@@ -151,7 +152,7 @@ export const LeadTimeElasticityChart: React.FC = () => {
                       </div>
                       <div className="flex justify-between items-center text-[10px] text-[#94A3B8] pt-1">
                         <span>Volatility: {data.volatility}/100</span>
-                        <span>{data.seatInventoryShare}% seats sold</span>
+                        <span>{data.seatInventoryShare}% of clean observations</span>
                       </div>
                     </div>
                   );
@@ -197,7 +198,7 @@ export const LeadTimeElasticityChart: React.FC = () => {
             <span>45 → 14 Days (Green • Early-Bird Advantage)</span>
           </div>
           <span className="text-[#64748B] text-[11px] mt-1 block">
-            Carrier capacity release pricing offering up to ~28% discount vs base tariff.
+            Matched route/carrier observations collected in the longer advance-purchase windows.
           </span>
         </div>
 
@@ -207,17 +208,17 @@ export const LeadTimeElasticityChart: React.FC = () => {
             <span>13 → 4 Days (Yellow • Equilibrium & Moderate Yield)</span>
           </div>
           <span className="text-[#64748B] text-[11px] mt-1 block">
-            Optimal planning trade-off window where pricing aligns closely with reference index.
+            Observed intermediate booking windows; no synthetic price curve is applied.
           </span>
         </div>
 
         <div className="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200">
           <div className="flex items-center gap-1.5 font-bold text-[#DC2626]">
             <span className="w-2 h-2 rounded-full bg-[#DC2626]" />
-            <span>3 → 0 Days (Red • Last-Minute Surge)</span>
+            <span>T+7 → T+1 (Observed short-lead windows)</span>
           </div>
           <span className="text-[#64748B] text-[11px] mt-1 block">
-            Steep exponential price escalation (+72% to +125%) as automated bucket closing triggers.
+            {risesTowardDeparture ? 'The matched-cohort data currently rises toward departure.' : 'The current matched-cohort data is inverted; date-specific demand or incomplete comparable inventory can cause this.'}
           </span>
         </div>
       </div>

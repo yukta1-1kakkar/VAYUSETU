@@ -33,17 +33,17 @@ export const MethodologyPage: React.FC = () => {
     },
     {
       step: '05',
-      title: 'Route Weighting (Passenger-KM Matrix)',
+      title: 'Route Weighting (DGCA Passenger Traffic)',
       icon: Layers,
-      desc: 'Dynamic weighting based on historical seat-kilometer capacity and DGCA passenger volume distribution across 24 monitored corridors.',
-      details: 'High-density trunk corridors (e.g., DEL-BOM 16.4%, DEL-BLR 13.2%) are weighted proportionately to prevent regional skew.'
+      desc: 'Weighting based on DGCA passenger-traffic distribution across the 24 monitored corridors.',
+      details: 'Available DGCA weights are renormalized across routes observed in both the base and target periods.'
     },
     {
       step: '06',
-      title: 'APIx Calculation (Laspeyres-Hedonic Hybrid)',
+      title: 'APIx Calculation (Matched Price Relatives)',
       icon: Calculator,
-      desc: 'Synthesizing normalized weighted prices against the fixed baseline (100.0 established in January 2025).',
-      details: 'Formula: APIx_t = Σ (w_i × (P_{i,t} / P_{i,0})) × 100 with continuous chained quality adjustments.'
+      desc: 'Combining matched route price relatives against the earliest persisted observation date, normalized to 100.',
+      details: 'Formula: APIx_t = 100 × Σ (normalized w_i × P_i,t / P_i,0). No unimplemented hedonic adjustment is claimed.'
     },
     {
       step: '07',
@@ -72,7 +72,7 @@ export const MethodologyPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-xs font-bold text-[#1769AA]">
-          <span>LASPEYRES-HEDONIC HYBRID PIPELINE</span>
+          <span>DGCA-WEIGHTED MATCHED-BASKET PIPELINE</span>
         </div>
       </div>
 
@@ -127,9 +127,9 @@ export const MethodologyPage: React.FC = () => {
             APIx_t = [ Σ_i ( W_i × ( P_i,t / P_i,0 ) ) ] × 100
           </div>
           <div className="text-[#64748B] text-[11px] pt-2 border-t border-[#F1F5F9] space-y-1">
-            <div>• <strong>W_i:</strong> Passenger-Kilometer weight of corridor i normalized across total national seat capacity.</div>
-            <div>• <strong>P_i,t:</strong> Time-smoothed geometric mean fare for corridor i in period t.</div>
-            <div>• <strong>P_i,0:</strong> Fixed baseline reference fare established in benchmark period (Jan 2025 = 100.0).</div>
+            <div>• <strong>W_i:</strong> DGCA passenger-traffic weight of route i, renormalized over matched routes.</div>
+            <div>• <strong>P_i,t:</strong> Mean valid fare for matched airline/source cohorts on route i in period t.</div>
+            <div>• <strong>P_i,0:</strong> Mean valid matched-cohort fare on the earliest persisted base date.</div>
           </div>
         </div>
       </div>

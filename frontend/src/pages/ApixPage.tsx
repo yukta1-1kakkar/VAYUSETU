@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { INDEX_TIMELINE, ROUTE_WEIGHTS_DATA } from '../mock/airfareData';
+import { FLIGHT_ROUTES, INDEX_TIMELINE, ROUTE_WEIGHTS_DATA } from '../mock/airfareData';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -8,7 +8,6 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  ReferenceLine,
 } from 'recharts';
 import { TrendingUp, Layers, Calendar, ArrowUpRight, CheckCircle2, Cpu, Compass } from 'lucide-react';
 import { formatINR, formatDelta } from '../utils/geo';
@@ -34,8 +33,10 @@ export const ApixPage: React.FC = () => {
   }, [filter]);
 
   const currentPoint = INDEX_TIMELINE[INDEX_TIMELINE.length - 1];
-  const previousPoint = INDEX_TIMELINE[INDEX_TIMELINE.length - 2];
+  const previousPoint = INDEX_TIMELINE[INDEX_TIMELINE.length - 2] ?? currentPoint;
   const momGrowth = ((currentPoint.indexValue - previousPoint.indexValue) / previousPoint.indexValue * 100).toFixed(2);
+  const observedMeanFare = Math.round(FLIGHT_ROUTES.reduce((sum, route) => sum + route.currentFare, 0) / FLIGHT_ROUTES.length);
+  const monitoredAirlines = new Set(FLIGHT_ROUTES.map((route) => route.primaryAirline)).size;
 
   return (
     <div className="space-y-8 pb-16">
@@ -47,10 +48,10 @@ export const ApixPage: React.FC = () => {
             <span>SOVEREIGN BENCHMARK SERIES</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-[#172033] tracking-tight">
-            APIx — Airfare Price Index (08/26)
+            APIx — Airfare Price Index ({currentPoint.date})
           </h1>
           <p className="text-sm text-[#64748B] mt-1">
-            India's continuous sovereign aviation price index, weighted by seat-kilometer volume across 24 core trunk and regional corridors.
+            A high-frequency aviation price index weighted by DGCA passenger traffic across 24 representative domestic corridors.
           </p>
         </div>
 
@@ -63,9 +64,9 @@ export const ApixPage: React.FC = () => {
 
           <div className="absolute top-11 right-0 z-50 w-72 p-3.5 rounded-xl bg-white border border-[#CBD5E1] shadow-xl text-[11px] text-[#172033] leading-relaxed opacity-0 pointer-events-none group-hover/form:opacity-100 group-hover/form:pointer-events-auto transition-opacity duration-150">
             <div className="font-bold text-[#1769AA] border-b border-[#F1F5F9] pb-1 mb-1">
-              Laspeyres-Hedonic Index Formulation
+              DGCA-Weighted Price-Relative Formulation
             </div>
-            Mathematical composite Laspeyres model hedonic-adjusted for advance booking horizons and route seat-kilometer weights.
+            APIx = 100 × Σ(normalized DGCA route weight × target fare / base fare), using routes observed in both periods.
           </div>
         </div>
       </div>
@@ -84,12 +85,12 @@ export const ApixPage: React.FC = () => {
         </div>
 
         <div className="intel-card p-5">
-          <div className="text-xs font-semibold text-[#64748B] uppercase">Base Benchmark</div>
+          <div className="text-xs font-semibold text-[#64748B] uppercase">Routes in Calculation</div>
           <div className="text-4xl font-extrabold font-heading text-[#172033] mt-1">
-            100.0
+            {ROUTE_WEIGHTS_DATA.length}
           </div>
           <div className="text-xs text-[#64748B] mt-1">
-            Established 01/2025 (Fixed Base)
+            Routes with clean persisted quotes
           </div>
         </div>
 
@@ -99,17 +100,17 @@ export const ApixPage: React.FC = () => {
             {currentPoint.observations.toLocaleString()}
           </div>
           <div className="text-xs text-[#16A34A] font-semibold mt-1">
-            5 Verified Airlines Monitored
+            {monitoredAirlines} observed airlines
           </div>
         </div>
 
         <div className="intel-card p-5">
           <div className="text-xs font-semibold text-[#64748B] uppercase">National Median Tariff</div>
           <div className="text-4xl font-extrabold font-heading text-[#0F8B8D] mt-1">
-            ₹5,420
+            {formatINR(observedMeanFare)}
           </div>
           <div className="text-xs text-[#64748B] mt-1">
-            Weighted across 24 Core Corridors
+            Across {FLIGHT_ROUTES.length} routes with clean data
           </div>
         </div>
       </div>
@@ -122,7 +123,7 @@ export const ApixPage: React.FC = () => {
               APIx Historical Index Trajectory
             </h3>
             <p className="text-xs text-[#64748B] mt-0.5">
-              Time series from 01/25 baseline showing seasonal surges (festive, holidays) and off-season yield adjustments.
+              Persisted daily index series; the earliest available observation is normalized to 100.
             </p>
           </div>
 
@@ -182,7 +183,6 @@ export const ApixPage: React.FC = () => {
                   return null;
                 }}
               />
-              <ReferenceLine y={100} stroke="#94A3B8" strokeDasharray="4 4" label={{ value: 'Base 100 Benchmark', fill: '#94A3B8', fontSize: 11 }} />
               <Area type="monotone" dataKey="indexValue" stroke="#1769AA" strokeWidth={3} fill="url(#apixPageGradient)" name="APIx" />
             </AreaChart>
           </ResponsiveContainer>
@@ -194,7 +194,7 @@ export const ApixPage: React.FC = () => {
         {/* Monthly Breakdown Table */}
         <div className="lg:col-span-6 intel-card p-6 space-y-4">
           <h3 className="text-lg font-bold font-heading text-[#172033] pb-2 border-b border-[#E2E8F0]">
-            Recent Monthly Performance Ledger (FY 2026)
+            Recent Persisted Performance Ledger
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">

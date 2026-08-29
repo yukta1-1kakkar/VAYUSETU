@@ -1,0 +1,10 @@
+.env
+data/
+spice_data/
+*_raw_test_*.json
+*_normalized_test_*.json
+debug_*.png
+last_run_debug.png
+__pycache__/
+.pytest_cache/
+last_tpe_benchmark.json

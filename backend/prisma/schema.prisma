@@ -1,0 +1,130 @@
+datasource db {
+  provider = "postgresql"
+}
+
+model RouteWeight {
+  id               Int               @id @default(autoincrement())
+  routeId          String            @unique @map("route_id") @db.VarChar(50)
+  origin           String            @db.VarChar(50)
+  destination      String            @db.VarChar(50)
+  totalPassengers  Float             @default(0) @map("total_passengers")
+  weight           Float             @default(0)
+  updatedAt        DateTime?         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  fareObservations FareObservation[]
+
+  @@index([origin])
+  @@index([destination])
+  @@map("route_weights")
+}
+
+model ScrapeRun {
+  id                   String                @id @db.VarChar(36)
+  source               String                @db.VarChar(80)
+  sourceFile           String                @map("source_file") @db.VarChar(255)
+  fileChecksum         String                @map("file_checksum") @db.VarChar(64)
+  startedAt            DateTime              @default(now()) @map("started_at") @db.Timestamptz(6)
+  completedAt          DateTime?             @map("completed_at") @db.Timestamptz(6)
+  status               String                @default("running") @db.VarChar(30)
+  inputCount           Int                   @default(0) @map("input_count")
+  cleanCount           Int                   @default(0) @map("clean_count")
+  unavailableCount     Int                   @default(0) @map("unavailable_count")
+  outlierCount         Int                   @default(0) @map("outlier_count")
+  rejectedCount        Int                   @default(0) @map("rejected_count")
+  insertedCount        Int                   @default(0) @map("inserted_count")
+  updatedCount         Int                   @default(0) @map("updated_count")
+  fareObservations     FareObservation[]
+  rejectedObservations RejectedObservation[]
+
+  @@index([source])
+  @@index([fileChecksum])
+  @@map("scrape_runs")
+}
+
+model FareObservation {
+  id                  Int         @id @default(autoincrement())
+  observationId       String?     @map("observation_id") @db.VarChar(80)
+  recordFingerprint   String?     @unique @map("record_fingerprint") @db.VarChar(64)
+  scrapeRunId         String?     @map("scrape_run_id") @db.VarChar(36)
+  routeId             String      @map("route_id") @db.VarChar(50)
+  airline             String      @db.VarChar(80)
+  airlineCode         String?     @map("airline_code") @db.VarChar(10)
+  flightNumber        String?     @map("flight_number") @db.VarChar(80)
+  travelDate          DateTime    @map("travel_date") @db.Date
+  observationDate     DateTime    @map("observation_date") @db.Date
+  advancePurchaseDays Int         @map("advance_purchase_days")
+  collectedAt         DateTime?   @map("collected_at") @db.Timestamptz(6)
+  departureTime       DateTime?   @map("departure_time") @db.Timestamptz(6)
+  arrivalTime         DateTime?   @map("arrival_time") @db.Timestamptz(6)
+  tripType            String      @default("one_way") @map("trip_type") @db.VarChar(20)
+  cabin               String      @default("economy") @db.VarChar(30)
+  fareFamily          String?     @map("fare_family") @db.VarChar(80)
+  stops               Int?
+  durationMinutes     Int?        @map("duration_minutes")
+  fare                Float?
+  baseFare            Float?      @map("base_fare")
+  taxes               Float?
+  userDevelopmentFee  Float?      @map("user_development_fee")
+  convenienceFee      Float?      @map("convenience_fee")
+  mandatoryFees       Float?      @map("mandatory_fees")
+  currency            String      @default("INR") @db.VarChar(10)
+  source              String      @default("scraper") @db.VarChar(80)
+  sourceType          String?     @map("source_type") @db.VarChar(80)
+  sellerName          String?     @map("seller_name") @db.VarChar(100)
+  sourceUrl           String?     @map("source_url") @db.Text
+  availabilityStatus  String      @default("available") @map("availability_status") @db.VarChar(40)
+  seatsAvailable      Int?        @map("seats_available")
+  noFlights           Boolean?    @map("no_flights")
+  soldOut             Boolean?    @map("sold_out")
+  scrapeOutcome       String?     @map("scrape_outcome") @db.VarChar(80)
+  dataQualityScore    Float?      @map("data_quality_score")
+  cleaningStatus      String      @default("clean") @map("cleaning_status") @db.VarChar(30)
+  isOutlier           Boolean     @default(false) @map("is_outlier")
+  rejectionReason     String?     @map("rejection_reason") @db.Text
+  rawPayload          Json?       @map("raw_payload")
+  createdAt           DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  route               RouteWeight @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+  scrapeRun           ScrapeRun?  @relation(fields: [scrapeRunId], references: [id])
+
+  @@index([observationId])
+  @@index([scrapeRunId])
+  @@index([routeId])
+  @@index([airline])
+  @@index([airlineCode])
+  @@index([flightNumber])
+  @@index([travelDate])
+  @@index([observationDate])
+  @@index([advancePurchaseDays])
+  @@index([collectedAt])
+  @@index([availabilityStatus])
+  @@index([cleaningStatus])
+  @@index([isOutlier])
+  @@index([routeId, observationDate, advancePurchaseDays], map: "idx_route_obs_adv")
+  @@index([routeId, airline, travelDate, observationDate, advancePurchaseDays], map: "idx_route_airline_dates")
+  @@index([observationDate, advancePurchaseDays, cleaningStatus], map: "idx_clean_index_input")
+  @@map("fare_observations")
+}
+
+model RejectedObservation {
+  id          Int       @id @default(autoincrement())
+  scrapeRunId String    @map("scrape_run_id") @db.VarChar(36)
+  source      String?   @db.VarChar(80)
+  routeId     String?   @map("route_id") @db.VarChar(50)
+  reason      String    @db.Text
+  rawPayload  Json      @map("raw_payload")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  scrapeRun   ScrapeRun @relation(fields: [scrapeRunId], references: [id], onDelete: Cascade)
+
+  @@index([scrapeRunId])
+  @@map("rejected_observations")
+}
+
+model CPIReference {
+  id            Int    @id @default(autoincrement())
+  month         String @unique @db.VarChar(20)
+  combinedIndex Float  @map("combined_index")
+  transportIndex Float? @map("transport_index")
+  inflationPct  Float? @map("inflation_pct")
+
+  @@map("cpi_reference")
+}

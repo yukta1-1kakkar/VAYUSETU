@@ -15,17 +15,20 @@ export const SectorHeatmap: React.FC = () => {
     airline: string;
   } | null>(null);
 
-  // 6 Main Hubs for the Interactive Matrix Grid
-  const hubs = ['DEL', 'BOM', 'BLR', 'CCU', 'HYD', 'AMD', 'GOA'];
+  // Highest-coverage airports in the live route basket (real IATA codes).
+  const hubs = Array.from(new Set(FLIGHT_ROUTES.flatMap((route) => [route.origin, route.destination]))).slice(0, 7);
 
   // Matrix cell lookup helper
   const getMatrixCell = (origin: string, dest: string) => {
     if (origin === dest) return null;
-    const directRoute = FLIGHT_ROUTES.find(r => (r.origin === origin && r.destination === dest) || (r.origin === dest && r.destination === origin));
+    // Airfares are directional; never mirror A→B into B→A.
+    const directRoute = FLIGHT_ROUTES.find(r => r.origin === origin && r.destination === dest);
     if (!directRoute) return null;
 
     const change = directRoute.changePercent;
-    const indexScore = Math.round((directRoute.currentFare / directRoute.baselineFare) * 100);
+    const indexScore = directRoute.referenceFare > 0
+      ? Math.round((directRoute.currentFare / directRoute.referenceFare) * 100)
+      : 0;
     
     // Status color tiers
     const status: 'green' | 'yellow' | 'red' = change >= 15 ? 'red' : change >= 5 ? 'yellow' : 'green';

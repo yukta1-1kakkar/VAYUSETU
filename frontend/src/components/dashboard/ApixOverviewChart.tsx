@@ -8,7 +8,6 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  ReferenceLine,
 } from 'recharts';
 import { TrendingUp, Info } from 'lucide-react';
 
@@ -39,8 +38,8 @@ export const ApixOverviewChart: React.FC<{
   }, [filter]);
 
   const currentVal = INDEX_TIMELINE[INDEX_TIMELINE.length - 1].indexValue;
-  const prevVal = INDEX_TIMELINE[INDEX_TIMELINE.length - 2].indexValue;
-  const momChange = ((currentVal - prevVal) / prevVal * 100).toFixed(2);
+  const prevVal = INDEX_TIMELINE[INDEX_TIMELINE.length - 2]?.indexValue ?? currentVal;
+  const momChange = Number(((currentVal - prevVal) / prevVal * 100).toFixed(2));
 
   return (
     <div className="intel-card p-6 w-full space-y-5">
@@ -57,10 +56,7 @@ export const ApixOverviewChart: React.FC<{
             </span>
             <span className="inline-flex items-center gap-0.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-[#DC2626] border border-rose-100">
               <TrendingUp className="w-3 h-3" />
-              +{momChange}% MoM (08/26)
-            </span>
-            <span className="text-xs text-[#64748B] hidden md:inline">
-              Base 100.0 (01/25)
+              {momChange >= 0 ? '+' : ''}{momChange}% vs previous observation date
             </span>
           </div>
         </div>
@@ -137,7 +133,6 @@ export const ApixOverviewChart: React.FC<{
                 return null;
               }}
             />
-            <ReferenceLine y={100} stroke="#94A3B8" strokeDasharray="4 4" label={{ value: 'Base 100', fill: '#94A3B8', fontSize: 10, position: 'insideBottomRight' }} />
             <Area type="monotone" dataKey="indexValue" stroke="#1769AA" strokeWidth={2.5} fill="url(#apixGradient)" name="APIx" />
           </AreaChart>
         </ResponsiveContainer>
@@ -163,7 +158,7 @@ export const ApixOverviewChart: React.FC<{
             <div className="font-bold text-[#1769AA] border-b border-[#F1F5F9] pb-1 mb-1">
               Methodology & Basket
             </div>
-            Continuous geometric formulation weighted by passenger-kilometer volume across 24 monitored trunk and regional city pairs.
+            Matched-route price relatives weighted by normalized DGCA passenger traffic across the 24-route basket.
           </div>
         </div>
       </div>

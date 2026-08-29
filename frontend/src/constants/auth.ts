@@ -71,9 +71,18 @@ const ALL_PERMISSIONS: readonly Permission[] = [
 ];
 
 export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
-  NSO: ['dashboard', 'airfare-index', 'reports', 'downloads', 'route-basket', 'user-management'],
+  NSO: [
+    'dashboard',
+    'airfare-index',
+    'reports',
+    'downloads',
+    'price-trends',
+    'lead-time-elasticity',
+    'route-basket',
+  ],
   RBI: [
     'dashboard',
+    'airfare-index',
     'price-trends',
     'route-comparison',
     'lead-time-elasticity',

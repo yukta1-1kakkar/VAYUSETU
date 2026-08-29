@@ -1,8 +1,7 @@
 import React from 'react';
 import { CpiComparisonChart } from '../components/charts/CpiComparisonChart';
 import { CPI_DATA_SERIES } from '../mock/airfareData';
-import { BarChart3, TrendingUp, HelpCircle, ShieldCheck, ArrowRight, Layers, FileText } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { BarChart3 } from 'lucide-react';
 
 export const CpiPage: React.FC = () => {
   return (
@@ -22,13 +21,6 @@ export const CpiPage: React.FC = () => {
           </p>
         </div>
 
-        <Link
-          to="/analytics"
-          className="px-4 py-2 rounded-xl bg-white border border-[#CBD5E1] hover:border-[#1769AA] text-xs font-bold text-[#172033] flex items-center gap-1.5 shadow-xs"
-        >
-          <span>View All Analytics</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
       </div>
 
       {/* Main CPI Chart */}

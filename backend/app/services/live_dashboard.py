@@ -27,9 +27,13 @@ AIRPORT_REFERENCE = {
     "GOI": ("Goa", "Goa", 15.3808, 73.8314),
     "GOX": ("Goa", "Goa", 15.7443, 73.8606),
     "LKO": ("Lucknow", "Uttar Pradesh", 26.7606, 80.8893),
+    "SXR": ("Srinagar", "Jammu and Kashmir", 33.9871, 74.7743),
+    "PAT": ("Patna", "Bihar", 25.5913, 85.0880),
 }
 METROS = {"DEL", "BOM", "BLR", "HYD", "CCU", "MAA"}
 LEISURE = {"GOI", "GOX", "COK"}
+MONITORED_AIRLINES = ("Akasa Air", "Air India Express", "SpiceJet")
+MONITORED_OTAS = ("Yatra",)
 CITY_TO_IATA = {
     "DELHI": "DEL", "NEW DELHI": "DEL", "MUMBAI": "BOM", "BENGALURU": "BLR", "BANGALORE": "BLR",
     "HYDERABAD": "HYD", "KOLKATA": "CCU", "CHENNAI": "MAA", "AHMEDABAD": "AMD", "KOCHI": "COK",
@@ -117,6 +121,7 @@ def build_live_dashboard(db: Session) -> dict:
         change = ((current - baseline) / baseline * 100) if baseline else 0
         volatility = min(100, round((pstdev(all_fares) / mean(all_fares) * 100) if len(all_fares) > 1 and mean(all_fares) else 0))
         carriers = [name for name, _ in airlines.most_common(3)]
+        sources = sorted({row.source for row in rows if row.source})
         origin = _iata(rows, "origin", weight.origin)
         destination = _iata(rows, "destination", weight.destination)
         anomaly = abs(change) >= 20
@@ -131,6 +136,7 @@ def build_live_dashboard(db: Session) -> dict:
             "historicalAvg": round(mean(all_fares)), "minFare": round(min(all_fares)), "maxFare": round(max(all_fares)),
             "observationsCount": len(rows), "volatilityIndex": volatility,
             "dominantCarrier": " / ".join(carriers), "primaryAirline": carriers[0] if carriers else "Unknown",
+            "sources": sources,
             "sectorType": _sector(origin, destination), "distanceKm": _distance(origin, destination),
             "weeklyFrequency": 0, "historicalData": history,
         })
@@ -280,7 +286,7 @@ def build_live_dashboard(db: Session) -> dict:
         "overallConfidence": round(mean([coverage, completeness, freshness, consistency])), "coverage": coverage,
         "completeness": completeness, "freshness": freshness, "consistency": consistency,
         "totalDailyScrapes": len(by_date[max(by_date)]) if by_date else 0,
-        "verifiedCarriers": len({row.airline for row in observations}), "activeMonitoringNodes": len(by_route),
+        "verifiedCarriers": len(MONITORED_AIRLINES), "activeMonitoringNodes": len(by_route),
         "lastSyncTimestamp": latest_at.isoformat() if latest_at else "No observations",
     }
 
@@ -298,7 +304,7 @@ def build_live_dashboard(db: Session) -> dict:
     metrics = [
         {"id": "kpai-index", "title": "National Airfare Index (APIx)", "value": latest_index, "trend": f"{_round(latest_index - previous_index):+}% latest", "trendType": "neutral", "iconType": "plane", "subtitle": "Earliest persisted day = 100", "tooltip": "DGCA traffic-weighted index from clean persisted quotes."},
         {"id": "kpai-routes", "title": "Routes with Live Data", "value": len(by_route), "trend": f"{coverage}% basket coverage", "trendType": "positive", "iconType": "route", "subtitle": f"of {len(weights)} weighted city pairs", "tooltip": "Routes with at least one clean PostgreSQL observation."},
-        {"id": "kpai-airlines", "title": "Airlines Monitored", "value": quality["verifiedCarriers"], "trend": "Persisted observations", "trendType": "neutral", "iconType": "airline", "subtitle": ", ".join(sorted({r.airline for r in observations})) or "No data", "tooltip": "Unique carriers present in clean stored observations."},
+        {"id": "kpai-airlines", "title": "Airlines Monitored", "value": len(MONITORED_AIRLINES), "trend": f"{len(MONITORED_OTAS)} OTA monitored", "trendType": "neutral", "iconType": "airline", "subtitle": f"Airlines: {', '.join(MONITORED_AIRLINES)} • OTA: {', '.join(MONITORED_OTAS)}", "tooltip": "Configured direct airline and online travel aggregator sources. OTA-listed carrier names are not counted as separately monitored airline scrapers."},
         {"id": "kpai-records", "title": "Latest Daily Fare Records", "value": quality["totalDailyScrapes"], "trend": "Database count", "trendType": "positive", "iconType": "database", "subtitle": quality["lastSyncTimestamp"], "tooltip": "Clean quotes on the latest observation date."},
         {"id": "kpai-avg-fare", "title": "Observed Average Fare", "value": f"₹{avg_fare:,}", "trend": "All clean observations", "trendType": "neutral", "iconType": "trend", "subtitle": "INR total fare", "tooltip": "Mean total fare across clean persisted observations."},
         {"id": "kpai-anomalies", "title": "Active Anomalies", "value": len(anomalies), "trend": "20% baseline threshold", "trendType": "alert", "iconType": "alert", "subtitle": ", ".join(r["id"] for r in anomalies) or "None", "tooltip": "Routes whose latest mean differs from their earliest persisted mean by at least 20%."},

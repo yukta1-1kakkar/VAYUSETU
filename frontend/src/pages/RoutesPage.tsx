@@ -1,21 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { FLIGHT_ROUTES, ROUTE_WEIGHTS_DATA } from '../mock/airfareData';
-import { formatINR, formatDelta, formatCount } from '../utils/geo';
+import { formatINR, formatDelta } from '../utils/geo';
 import { RouteIntelligenceModal } from '../components/command-center/RouteIntelligenceModal';
 import {
   GitFork,
   Search,
-  Filter,
-  AlertTriangle,
   ArrowRight,
-  Plane,
-  Activity,
-  CheckCircle2,
   BarChart3,
-  Layers,
-  TrendingUp,
-  Percent,
-  Sliders,
   Building2,
   ChevronDown,
   ChevronUp
@@ -31,16 +22,48 @@ import {
   Cell,
 } from 'recharts';
 
+interface RouteAxisTickProps {
+  x?: number;
+  y?: number;
+  payload?: { value: string };
+}
+
+const RouteAxisTick: React.FC<RouteAxisTickProps> = ({ x = 0, y = 0, payload }) => (
+  <text
+    x={x - 8}
+    y={y}
+    dy="0.32em"
+    textAnchor="end"
+    fill="#172033"
+    fontSize="11"
+    fontWeight="600"
+    style={{ whiteSpace: 'nowrap' }}
+  >
+    {payload?.value}
+  </text>
+);
+
 export const RoutesPage: React.FC = () => {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ANOMALIES' | 'TRUNK'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ANOMALIES'>('ALL');
   const [airlineFilter, setAirlineFilter] = useState<string>('ALL');
+  const [otaFilter, setOtaFilter] = useState<string>('ALL');
   const [analyticsMetric, setAnalyticsMetric] = useState<'fare' | 'weight' | 'change' | 'volatility'>('fare');
   const [showAllRoutes, setShowAllRoutes] = useState<boolean>(false);
 
   // Available airline filter options
-  const airlines = ['ALL', 'IndiGo', 'Air India', 'Akasa Air', 'SpiceJet'];
+  const airlines = ['ALL', 'Akasa Air', 'Air India Express', 'SpiceJet'];
+  const otaSources = ['ALL', 'Yatra'];
+
+  const isCombinedView = airlineFilter === 'ALL' && otaFilter === 'ALL';
+  const activeDataView = isCombinedView
+    ? 'Combined — all airlines and OTA observations'
+    : airlineFilter !== 'ALL' && otaFilter !== 'ALL'
+      ? `${airlineFilter} via ${otaFilter}`
+      : airlineFilter !== 'ALL'
+        ? airlineFilter
+        : `${otaFilter} OTA`;
 
   // Filtered routes list based on search, status, and airline
   const filteredRoutes = useMemo(() => {
@@ -53,12 +76,12 @@ export const RoutesPage: React.FC = () => {
 
       if (!matchesSearch) return false;
       if (statusFilter === 'ANOMALIES' && !route.isAnomaly) return false;
-      if (statusFilter === 'TRUNK' && route.weeklyFrequency < 200) return false;
       if (airlineFilter !== 'ALL' && route.primaryAirline !== airlineFilter && !route.dominantCarrier.includes(airlineFilter)) return false;
+      if (otaFilter !== 'ALL' && !route.sources?.includes(otaFilter)) return false;
 
       return true;
     });
-  }, [searchTerm, statusFilter, airlineFilter]);
+  }, [searchTerm, statusFilter, airlineFilter, otaFilter]);
 
   // Displayed routes: Top 10 by default, with an option to see all 24
   const displayedRoutes = useMemo(() => {
@@ -89,6 +112,10 @@ export const RoutesPage: React.FC = () => {
     });
   }, [displayedRoutes]);
 
+  // Reserve a dedicated row for every route so Recharts never suppresses or
+  // wraps Y-axis labels when all 24 corridors are visible.
+  const chartHeight = Math.max(384, chartData.length * 34 + 32);
+
   return (
     <div className="space-y-8 pb-16">
       {/* Header */}
@@ -102,7 +129,7 @@ export const RoutesPage: React.FC = () => {
             Aviation Route Network & Tariffs (08/2026)
           </h1>
           <p className="text-sm text-[#64748B] mt-1">
-            Monitored high-frequency trunk and regional city pairs across India separated by airline with live fare quotes, volatility, and yield alerts.
+            Monitored city-pair corridors across India separated by airline, with live fare quotes, volatility, and yield alerts.
           </p>
         </div>
 
@@ -121,7 +148,7 @@ export const RoutesPage: React.FC = () => {
 
           {/* Status Tabs */}
           <div className="flex items-center gap-1 p-1 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-medium">
-            {(['ALL', 'ANOMALIES', 'TRUNK'] as const).map((st) => (
+            {(['ALL', 'ANOMALIES'] as const).map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
@@ -131,34 +158,52 @@ export const RoutesPage: React.FC = () => {
                     : 'text-[#64748B] hover:text-[#172033]'
                 }`}
               >
-                {st === 'ALL' ? 'All' : st === 'ANOMALIES' ? 'Anomalies' : 'Trunk'}
+                {st === 'ALL' ? 'All' : 'Anomalies'}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Airline Separation Filter Bar */}
+      {/* Airline and OTA Source Filter Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-white border border-[#E2E8F0] shadow-xs">
-        <div className="flex items-center gap-2 text-xs font-bold text-[#172033]">
-          <Building2 className="w-4 h-4 text-[#1769AA]" />
-          <span>FILTER BY AIRLINE:</span>
-        </div>
+        <div className="flex flex-1 flex-wrap items-center gap-x-8 gap-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="mr-1 flex items-center gap-2 text-xs font-bold text-[#172033]">
+              <Building2 className="w-4 h-4 text-[#1769AA]" />
+              <span>AIRLINE:</span>
+            </div>
+            {airlines.map((airline) => (
+              <button
+                key={airline}
+                onClick={() => setAirlineFilter(airline)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  airlineFilter === airline
+                    ? 'bg-[#1769AA] text-white shadow-xs'
+                    : 'bg-[#F8FAFC] text-[#64748B] hover:text-[#172033] border border-[#E2E8F0]'
+                }`}
+              >
+                {airline === 'ALL' ? 'All Airlines' : airline}
+              </button>
+            ))}
+          </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
-          {airlines.map((al) => (
-            <button
-              key={al}
-              onClick={() => setAirlineFilter(al)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                airlineFilter === al
-                  ? 'bg-[#1769AA] text-white shadow-xs'
-                  : 'bg-[#F8FAFC] text-[#64748B] hover:text-[#172033] border border-[#E2E8F0]'
-              }`}
-            >
-              {al === 'ALL' ? 'All Airlines' : al}
-            </button>
-          ))}
+          <div className="flex flex-wrap items-center gap-2 border-l border-[#E2E8F0] pl-8 max-sm:border-l-0 max-sm:pl-0">
+            <span className="mr-1 text-xs font-bold text-[#172033]">OTA:</span>
+            {otaSources.map((source) => (
+              <button
+                key={source}
+                onClick={() => setOtaFilter(source)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  otaFilter === source
+                    ? 'bg-[#0F8B8D] text-white shadow-xs'
+                    : 'bg-[#F8FAFC] text-[#64748B] hover:text-[#172033] border border-[#E2E8F0]'
+                }`}
+              >
+                {source === 'ALL' ? 'All OTAs' : source}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="text-xs text-[#64748B]">
@@ -228,12 +273,12 @@ export const RoutesPage: React.FC = () => {
         </div>
 
         {/* Horizontal Bar Chart (No "ROUTES" header in tooltip) */}
-        <div className="h-80 sm:h-96 w-full">
+        <div className="w-full" style={{ height: chartHeight }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
               layout="vertical"
-              margin={{ top: 10, right: 35, left: 35, bottom: 0 }}
+              margin={{ top: 10, right: 35, left: 12, bottom: 0 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
               <XAxis
@@ -255,8 +300,10 @@ export const RoutesPage: React.FC = () => {
               <YAxis
                 type="category"
                 dataKey="name"
+                width={100}
+                interval={0}
                 stroke="#94A3B8"
-                tick={{ fontSize: 11, fill: '#172033', fontWeight: 600 }}
+                tick={<RouteAxisTick />}
                 tickLine={false}
                 axisLine={{ stroke: '#E2E8F0' }}
               />
@@ -293,7 +340,7 @@ export const RoutesPage: React.FC = () => {
                           <span className="font-semibold text-[#172033]">{data.volatility}/100</span>
                         </div>
                         <div className="text-[10px] text-[#94A3B8] pt-1">
-                          Dominant Airline: {data.dominantCarrier}
+                          Data view: {activeDataView}
                         </div>
                       </div>
                     );
@@ -326,6 +373,13 @@ export const RoutesPage: React.FC = () => {
           </ResponsiveContainer>
         </div>
 
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-[#EDF2F7] pt-4 text-[11px] font-semibold text-[#64748B]">
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#94A3B8]">Route status colours</span>
+          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#1769AA]" /> Normal / stable corridor</span>
+          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#D97706]" /> Elevated fare movement</span>
+          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#DC2626]" /> Anomaly / high-yield alert</span>
+        </div>
+
         {/* Toggle Button: View Top 10 vs View All 24 */}
         <div className="flex justify-center pt-2">
           <button
@@ -351,7 +405,6 @@ export const RoutesPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {displayedRoutes.map((route) => {
-            const weightObj = ROUTE_WEIGHTS_DATA.find((w) => w.routeId === route.id);
             return (
               <div
                 key={route.id}
@@ -400,7 +453,7 @@ export const RoutesPage: React.FC = () => {
                 </div>
 
                 <div className="flex justify-between items-center text-[11px] text-[#64748B] pt-1">
-                  <span>Airline: <strong className="text-[#172033]">{route.primaryAirline}</strong></span>
+                  <span>Data: <strong className="text-[#172033]">{activeDataView}</strong></span>
                   <span>Volatility: <strong className="text-[#172033]">{route.volatilityIndex}/100</strong></span>
                 </div>
 
@@ -431,6 +484,7 @@ export const RoutesPage: React.FC = () => {
         <RouteIntelligenceModal
           routeId={selectedRouteId}
           onClose={() => setSelectedRouteId(null)}
+          dataViewLabel={isCombinedView ? activeDataView : undefined}
         />
       )}
     </div>

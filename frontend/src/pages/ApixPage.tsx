@@ -9,12 +9,13 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
-import { TrendingUp, Layers, Calendar, ArrowUpRight, CheckCircle2, Cpu, Compass } from 'lucide-react';
+import { TrendingUp, Layers, Calendar, ArrowUpRight, CheckCircle2, Cpu, Compass, X, Calculator, Database, ShieldCheck } from 'lucide-react';
 import { formatINR, formatDelta } from '../utils/geo';
 
 export const ApixPage: React.FC = () => {
   // Filters: 3M, 6M, 1Y, FY, ALL (default 3M)
   const [filter, setFilter] = useState<'3M' | '6M' | '1Y' | 'FY' | 'ALL'>('3M');
+  const [formulationOpen, setFormulationOpen] = useState(false);
 
   const filteredData = React.useMemo(() => {
     switch (filter) {
@@ -55,21 +56,82 @@ export const ApixPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Hoverable Formulation Tooltip */}
-        <div className="relative group/form cursor-pointer">
-          <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-xs font-bold text-[#1769AA] hover:bg-blue-100/70 transition-colors">
+        <button
+          type="button"
+          onClick={() => setFormulationOpen(true)}
+          className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-2 text-xs font-bold text-[#1769AA] transition-colors hover:bg-blue-100/70"
+        >
             <Compass className="w-4 h-4 text-[#1769AA]" />
             <span>Formulation Info</span>
-          </div>
-
-          <div className="absolute top-11 right-0 z-50 w-72 p-3.5 rounded-xl bg-white border border-[#CBD5E1] shadow-xl text-[11px] text-[#172033] leading-relaxed opacity-0 pointer-events-none group-hover/form:opacity-100 group-hover/form:pointer-events-auto transition-opacity duration-150">
-            <div className="font-bold text-[#1769AA] border-b border-[#F1F5F9] pb-1 mb-1">
-              DGCA-Weighted Price-Relative Formulation
-            </div>
-            APIx = 100 × Σ(normalized DGCA route weight × target fare / base fare), using routes observed in both periods.
-          </div>
-        </div>
+        </button>
       </div>
+
+      {formulationOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0F172A]/55 p-4 backdrop-blur-sm" role="presentation" onMouseDown={() => setFormulationOpen(false)}>
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="apix-formulation-title"
+            onMouseDown={(event) => event.stopPropagation()}
+            className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-[#CBD5E1] bg-[#F8FAFC] shadow-2xl"
+          >
+            <header className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[#E2E8F0] bg-white px-5 py-4 sm:px-7">
+              <div>
+                <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1769AA]"><Calculator className="h-4 w-4" /> Statistical methodology</div>
+                <h2 id="apix-formulation-title" className="font-heading text-2xl font-extrabold text-[#172033]">How VAYUSETU calculates APIx</h2>
+                <p className="mt-1 text-xs leading-5 text-[#64748B]">DGCA passenger-weighted matched price relatives, with movement measured from the first valid computed period.</p>
+              </div>
+              <button type="button" onClick={() => setFormulationOpen(false)} aria-label="Close formulation information" className="rounded-xl border border-[#E2E8F0] bg-white p-2 text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#172033]"><X className="h-5 w-5" /></button>
+            </header>
+
+            <div className="space-y-5 p-5 sm:p-7">
+              <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+                <div className="text-xs font-bold uppercase tracking-wider text-[#1769AA]">Primary weighted score</div>
+                <div className="mt-3 overflow-x-auto whitespace-nowrap font-mono text-lg font-extrabold text-[#172033] sm:text-xl">
+                  S(t,d) = Σ[r ∈ M(t)] w̃(r,t) × R(r,t,d)
+                </div>
+                <p className="mt-3 text-sm leading-6 text-[#475569]">For target date <strong>t</strong> and advance-purchase window <strong>d</strong>, the score combines every eligible route's matched fare movement using its normalized passenger weight. No fixed value is assumed before the first valid score is calculated.</p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {[
+                  { step: '01', title: 'DGCA route weight', formula: 'w(r) = Passengers(r) / Σ[k] Passengers(k)', note: 'Each route receives its share of total passenger traffic. Across the complete source basket, Σw(r) = 1 (100%).' },
+                  { step: '02', title: 'Cohort mean fare', formula: 'P(r,c,t,d) = (1 / n) × Σ[j=1..n] Fare(j)', note: 'A cohort c is the same route, airline and source. Only clean, non-null fare observations at the selected lead-time window are averaged.' },
+                  { step: '03', title: 'Matched route price relative', formula: 'R(r,t,d) = (1 / |C(r,t)|) × Σ[c] P(r,c,t,d) / P(r,c,0,d)', note: 'Only airline/source cohorts present in both the base date and target date are compared. This avoids changes caused merely by a different source mix.' },
+                  { step: '04', title: 'Matched-basket weight', formula: 'w̃(r,t) = w(r) / Σ[k ∈ M(t)] w(k)', note: 'If some routes lack a valid match, the available DGCA weights are renormalized over matched set M(t), so their normalized weights sum to 1.' },
+                  { step: '05', title: 'Route contribution and score', formula: 'Contribution(r,t) = w̃(r,t) × R(r,t,d); S(t,d) = Σ[r] Contribution(r,t)', note: 'A route contributes according to both its fare movement and its economic importance in passenger traffic. Summing all eligible contributions produces the period score.' },
+                  { step: '06', title: 'Change measures', formula: 'Change from first (%) = [(S(t) / S(first)) − 1] × 100', note: 'The first valid calculated score is the reference. Period-on-period change is [(S(t) / S(t−1)) − 1] × 100, so neither measure assumes that the starting value is 100.' },
+                ].map((item) => (
+                  <article key={item.step} className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
+                    <div className="flex items-center gap-2"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#1769AA] text-[10px] font-extrabold text-white">{item.step}</span><h3 className="font-heading text-sm font-bold text-[#172033]">{item.title}</h3></div>
+                    <div className="mt-3 overflow-x-auto rounded-xl bg-[#F1F5F9] px-3 py-2.5 whitespace-nowrap font-mono text-xs font-bold text-[#1769AA]">{item.formula}</div>
+                    <p className="mt-2 text-xs leading-5 text-[#64748B]">{item.note}</p>
+                  </article>
+                ))}
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div className="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+                  <div className="flex items-center gap-2 font-heading text-sm font-bold text-[#172033]"><ShieldCheck className="h-4 w-4 text-[#16A34A]" /> Inclusion rules</div>
+                  <ul className="mt-3 space-y-2 text-xs leading-5 text-[#64748B]">
+                    <li>• Uses the top 24 positively weighted city pairs.</li>
+                    <li>• Includes only records marked clean with a valid fare.</li>
+                    <li>• Holds the advance-purchase window constant; the default APIx series uses T+7.</li>
+                    <li>• Requires the same route, airline and source cohort in base and target periods.</li>
+                    <li>• Excludes unknown, unweighted and unmatched routes from that period's calculation.</li>
+                  </ul>
+                </div>
+                <div className="rounded-2xl border border-[#E2E8F0] bg-white p-5">
+                  <div className="flex items-center gap-2 font-heading text-sm font-bold text-[#172033]"><Database className="h-4 w-4 text-[#1769AA]" /> Coverage and interpretation</div>
+                  <div className="mt-3 rounded-xl bg-[#F8FAFC] px-3 py-2.5 font-mono text-xs font-bold text-[#1769AA]">Coverage (%) = 100 × Σ[r ∈ M(t)] w(r)</div>
+                  <p className="mt-2 text-xs leading-5 text-[#64748B]">Coverage reports the original passenger-weight share represented by matched routes before renormalization. A positive change means the weighted matched airfare basket increased relative to the selected reference period; a negative change means it decreased.</p>
+                  <p className="mt-2 text-xs leading-5 text-[#64748B]"><strong className="text-[#172033]">First reference period:</strong> the earliest persisted date with enough clean, matched observations for the selected lead-time window.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
 
       {/* Primary KPI Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -123,7 +185,7 @@ export const ApixPage: React.FC = () => {
               APIx Historical Index Trajectory
             </h3>
             <p className="text-xs text-[#64748B] mt-0.5">
-              Persisted daily index series; the earliest available observation is normalized to 100.
+              Persisted daily score series; percentage movement is measured from the first valid calculated observation.
             </p>
           </div>
 

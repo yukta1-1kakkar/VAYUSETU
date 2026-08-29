@@ -16,7 +16,8 @@ import { X, AlertTriangle, TrendingUp, CheckCircle, Clock, Plane, BarChart2, Shi
 export const RouteIntelligenceModal: React.FC<{
   routeId: string | null;
   onClose: () => void;
-}> = ({ routeId, onClose }) => {
+  dataViewLabel?: string;
+}> = ({ routeId, onClose, dataViewLabel }) => {
   if (!routeId) return null;
 
   const route = FLIGHT_ROUTES.find((r) => r.id === routeId) || FLIGHT_ROUTES[0];
@@ -46,7 +47,7 @@ export const RouteIntelligenceModal: React.FC<{
                 {route.originCity} ({route.origin}) → {route.destCity} ({route.destination})
               </h2>
               <div className="text-xs text-[#64748B] mt-1">
-                Distance: {route.distanceKm} km • Frequency: {route.weeklyFrequency} flights/week • Dominant: {route.dominantCarrier}
+                Distance: {route.distanceKm} km • Frequency: {route.weeklyFrequency} flights/week • {dataViewLabel ? `Data view: ${dataViewLabel}` : `Dominant: ${route.dominantCarrier}`}
               </div>
             </div>
 

@@ -14,14 +14,13 @@ interface NavigationItem {
 
 const NAVIGATION: NavigationItem[] = [
   { to: '/', label: 'Dashboard', permission: 'dashboard' },
-  { to: '/index', label: 'Airfare Index', permission: 'airfare-index' },
-  { to: '/reports', label: 'Reports', permission: 'reports' },
-  { to: '/downloads', label: 'Downloads', permission: 'downloads' },
-  { to: '/cpi', label: 'Price Trends', permission: 'price-trends' },
+  { to: '/index', label: 'APIx', permission: 'airfare-index' },
+  { to: '/cpi', label: 'CPI', permission: 'price-trends' },
   { to: '/routes', label: 'Route Comparison', permission: 'route-comparison' },
   { to: '/lead-time-elasticity', label: 'Lead-Time Elasticity', permission: 'lead-time-elasticity' },
   { to: '/user-management', label: 'User Management', permission: 'user-management' },
   { to: '/route-basket', label: 'Route Basket & Weights', permission: 'route-basket' },
+  { to: '/downloads', label: 'Downloads', permission: 'downloads' },
 ];
 
 function UserSummary() {
@@ -54,8 +53,18 @@ export function Navbar() {
   const navigate = useNavigate();
   const { user, logout, hasPermission } = useAuth();
   const allowedLinks = NAVIGATION.filter((item) => hasPermission(item.permission));
-  const primaryLinks = allowedLinks.slice(0, 4);
-  const overflowLinks = allowedLinks.slice(4);
+  const isRbiNavigation = user?.role === 'RBI';
+  const isNsoNavigation = user?.role === 'NSO';
+  const primaryLinks = isRbiNavigation
+    ? allowedLinks
+    : isNsoNavigation
+      ? allowedLinks
+    : allowedLinks.slice(0, 4).filter((link) => link.to !== '/lead-time-elasticity');
+  const overflowLinks = isRbiNavigation
+    ? []
+    : isNsoNavigation
+      ? []
+    : allowedLinks.filter((link, index) => index >= 4 || link.to === '/lead-time-elasticity');
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 15);

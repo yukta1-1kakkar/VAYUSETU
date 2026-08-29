@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactElement } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Braces, CalendarClock, Download, FileBarChart, Play, Settings } from 'lucide-react';
+import { Braces, CalendarClock, FileBarChart, Play, Settings } from 'lucide-react';
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { Navbar } from './components/common/Navbar';
 import { TelemetryTicker } from './components/common/TelemetryTicker';
@@ -13,6 +13,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ApixPage } from './pages/ApixPage';
 import { CpiPage } from './pages/CpiPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { DownloadsPage } from './pages/DownloadsPage';
 import { LeadTimePage } from './pages/LeadTimePage';
 import { Login } from './pages/Login';
 import { ModulePage } from './pages/ModulePage';
@@ -64,7 +65,7 @@ function PortalRoutes({ onReplayIntro }: { onReplayIntro: () => void }) {
         <Route path="dashboard" element={<Navigate to="/" replace />} />
         <Route path="index" element={modulePage('airfare-index', <ApixPage />)} />
         <Route path="reports" element={modulePage('reports', <ModulePage icon={FileBarChart} eyebrow="Official outputs" title="Reports" description="Prepare and review institutional airfare price index reports for policy stakeholders." />)} />
-        <Route path="downloads" element={modulePage('downloads', <ModulePage icon={Download} eyebrow="Data distribution" title="Download Datasets" description="Access approved APIx series, route observations and supporting metadata extracts." />)} />
+        <Route path="downloads" element={modulePage('downloads', <DownloadsPage />)} />
         <Route path="cpi" element={modulePage('price-trends', <CpiPage />)} />
         <Route path="price-trends" element={modulePage('price-trends', <Navigate to="/cpi" replace />)} />
         <Route path="routes" element={modulePage('route-comparison', <RoutesPage />)} />

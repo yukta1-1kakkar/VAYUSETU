@@ -1,11 +1,9 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import {
-  AlertTriangle,
   ArrowDownUp,
   BarChart3,
   CalendarDays,
   CheckCircle2,
-  Download,
   LockKeyhole,
   Map as MapIcon,
   Pencil,
@@ -14,7 +12,6 @@ import {
   Route as RouteIcon,
   Search,
   Trash2,
-  Weight,
   X,
 } from 'lucide-react';
 import {
@@ -59,17 +56,6 @@ function formatDate() {
   return new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date());
 }
 
-function createDownload(filename: string, content: string, mimeType: string) {
-  const url = URL.createObjectURL(new Blob([content], { type: mimeType }));
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
-}
-
 function StatusChip({ status }: { status: RouteBasketStatus }) {
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-extrabold ${status === 'Active' ? 'border-green-200 bg-green-50 text-[#15803D]' : 'border-slate-200 bg-slate-100 text-[#64748B]'}`}>
@@ -82,7 +68,14 @@ function StatusChip({ status }: { status: RouteBasketStatus }) {
 export function RouteBasketPage() {
   const { user } = useAuth();
   const canEdit = user?.role === 'MOSPI_ADMIN';
-  const basketAirports = Object.values(AIRPORTS);
+  const basketAirports = Object.values(AIRPORTS).filter((airport) =>
+    Number.isFinite(airport.lat)
+    && Number.isFinite(airport.lng)
+    && airport.lat >= 6
+    && airport.lat <= 38
+    && airport.lng >= 68
+    && airport.lng <= 98
+  );
   const [routes, setRoutes] = useState<RouteBasketItem[]>(() => ROUTE_WEIGHTS_DATA.map((route) => ({
     id: `basket-${route.routeId}`,
     route: route.routeId,
@@ -122,17 +115,15 @@ export function RouteBasketPage() {
 
   const sortedActiveRoutes = useMemo(() => [...activeRoutes].sort((a, b) => b.weight - a.weight), [activeRoutes]);
   const topTenRoutes = sortedActiveRoutes.slice(0, 10);
+  const topTenChartRoutes = topTenRoutes.map((route) => ({
+    ...route,
+    routeLabel: `${route.originCode}-${route.destinationCode}`,
+  }));
   const donutData = useMemo(() => {
-    const top = topTenRoutes.map((route) => ({ name: route.route, value: route.weight }));
+    const top = topTenRoutes.map((route) => ({ name: `${route.originCode}-${route.destinationCode}`, value: route.weight }));
     const others = Number(sortedActiveRoutes.slice(10).reduce((sum, route) => sum + route.weight, 0).toFixed(2));
     return others > 0 ? [...top, { name: 'Others', value: others }] : top;
   }, [sortedActiveRoutes, topTenRoutes]);
-
-  const weightState = Math.abs(totalWeight - 100) < EPSILON
-    ? { color: '#16A34A', bg: 'bg-green-50 border-green-200', text: 'text-[#15803D]', label: 'Validated' }
-    : totalWeight >= 95 && totalWeight < 100
-      ? { color: '#D97706', bg: 'bg-amber-50 border-amber-200', text: 'text-[#B45309]', label: 'Review required' }
-      : { color: '#DC2626', bg: 'bg-red-50 border-red-200', text: 'text-[#B91C1C]', label: 'Invalid total' };
 
   const openAdd = () => {
     setEditorError('');
@@ -204,20 +195,6 @@ export function RouteBasketPage() {
     setDeleteTarget(null);
   };
 
-  const exportJson = () => createDownload('vayusetu-route-basket.json', JSON.stringify(routes.map((route) => ({
-    route: route.route,
-    origin: route.originCity,
-    destination: route.destinationCity,
-    weight: route.weight,
-    status: route.status,
-  })), null, 2), 'application/json');
-  const exportCsv = () => {
-    const header = 'route,origin,destination,weight,status,last_updated';
-    const rows = routes.map((route) => [route.route, route.originCity, route.destinationCity, route.weight, route.status, route.lastUpdated]
-      .map((value) => `"${String(value).replaceAll('"', '""')}"`).join(','));
-    createDownload('vayusetu-route-basket.csv', [header, ...rows].join('\n'), 'text/csv;charset=utf-8');
-  };
-
   return (
     <div className="space-y-8 pb-16">
       <header className="flex flex-col justify-between gap-5 border-b border-[#E2E8F0] pb-5 lg:flex-row lg:items-end">
@@ -227,8 +204,6 @@ export function RouteBasketPage() {
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#64748B]">Manage the CPI airfare city-pair basket and passenger-volume weights consumed by the APIx computation pipeline.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button onClick={exportCsv} className="inline-flex items-center gap-2 rounded-xl border border-[#CBD5E1] bg-white px-4 py-2.5 text-xs font-bold text-[#334155] hover:border-[#1769AA] hover:text-[#1769AA]"><Download className="h-4 w-4" /> CSV</button>
-          <button onClick={exportJson} className="inline-flex items-center gap-2 rounded-xl border border-[#CBD5E1] bg-white px-4 py-2.5 text-xs font-bold text-[#334155] hover:border-[#1769AA] hover:text-[#1769AA]"><Download className="h-4 w-4" /> JSON</button>
           {canEdit ? (
             <button onClick={openAdd} className="inline-flex items-center gap-2 rounded-xl bg-[#1769AA] px-4 py-2.5 text-xs font-extrabold text-white shadow-lg shadow-blue-900/10 hover:bg-[#12558A]"><Plus className="h-4 w-4" /> Add Route</button>
           ) : (
@@ -237,11 +212,10 @@ export function RouteBasketPage() {
         </div>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {[
           { label: 'Total Routes', value: routes.length, detail: 'City-pair observations', icon: RouteIcon, tone: 'bg-blue-50 text-[#1769AA]' },
           { label: 'Active Routes', value: activeRoutes.length, detail: `${routes.length - activeRoutes.length} inactive`, icon: CheckCircle2, tone: 'bg-green-50 text-[#16A34A]' },
-          { label: 'Total Weight', value: `${totalWeight.toFixed(2)}%`, detail: weightState.label, icon: Weight, tone: `${weightState.bg} ${weightState.text}` },
           { label: 'Last Basket Updated', value: basketUpdated, detail: 'Frontend working basket', icon: CalendarDays, tone: 'bg-teal-50 text-[#0F8B8D]' },
         ].map((card) => (
           <div key={card.label} className="intel-card p-5">
@@ -251,15 +225,6 @@ export function RouteBasketPage() {
             <div className="mt-1 text-xs text-[#64748B]">{card.detail}</div>
           </div>
         ))}
-      </section>
-
-      <section className={`rounded-2xl border p-5 ${weightState.bg}`}>
-        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-          <div className={`flex items-center gap-2 text-sm font-extrabold ${weightState.text}`}><AlertTriangle className="h-4 w-4" /> Route basket weight validation</div>
-          <div className={`font-mono text-sm font-extrabold ${weightState.text}`}>{totalWeight.toFixed(2)} / 100.00%</div>
-        </div>
-        <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/80"><div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(totalWeight, 100)}%`, backgroundColor: weightState.color }} /></div>
-        {Math.abs(totalWeight - 100) >= EPSILON && <p className={`mt-3 text-xs font-semibold ${weightState.text}`}>Route basket weights must total exactly 100% for APIx computation.</p>}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
@@ -278,7 +243,7 @@ export function RouteBasketPage() {
           <div className="mb-5"><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1769AA]"><BarChart3 className="h-4 w-4" /> Weight ranking</div><h2 className="mt-1 font-heading text-xl font-extrabold text-[#172033]">Top Weighted Routes</h2><p className="mt-1 text-xs text-[#64748B]">The ten largest active contributions to the APIx route basket.</p></div>
           <div className="h-[380px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topTenRoutes} layout="vertical" margin={{ left: 6, right: 30 }}><CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" /><XAxis type="number" unit="%" tick={{ fontSize: 10, fill: '#64748B' }} /><YAxis type="category" dataKey="route" width={72} tick={{ fontSize: 10, fontWeight: 700, fill: '#334155' }} /><Tooltip formatter={(value) => [`${Number(value).toFixed(2)}%`, 'Weight']} cursor={{ fill: '#F1F5F9' }} /><Bar dataKey="weight" fill="#1769AA" radius={[0, 6, 6, 0]} barSize={18} /></BarChart>
+              <BarChart data={topTenChartRoutes} layout="vertical" margin={{ left: 6, right: 30 }}><CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" /><XAxis type="number" unit="%" tick={{ fontSize: 10, fill: '#64748B' }} /><YAxis type="category" dataKey="routeLabel" width={72} tick={{ fontSize: 10, fontWeight: 700, fill: '#334155' }} /><Tooltip formatter={(value) => [`${Number(value).toFixed(2)}%`, 'Weight']} cursor={{ fill: '#F1F5F9' }} /><Bar dataKey="weight" fill="#1769AA" radius={[0, 6, 6, 0]} barSize={18} /></BarChart>
             </ResponsiveContainer>
           </div>
         </div>

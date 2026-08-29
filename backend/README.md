@@ -246,3 +246,17 @@ The same report is exposed at `GET /api/backtest?advance_purchase=7`.
 This report explicitly labels synthetic observations. It is a prototype
 pipeline/index backtest, not a substitute for validation against an official
 route-fare benchmark.
+
+## Official MoSPI CPI comparison data
+
+Import the supplied MoSPI dashboard workbook into the shared PostgreSQL
+`cpi_reference` table:
+
+```powershell
+python -m app.services.cpi_import --file data/raw/mospi_cpi_dashboard_july_2026.xlsx
+```
+
+The dashboard compares monthly APIx with All-India General CPI (Combined),
+rebasing both series to 100 at their first overlapping month. This workbook
+does not contain the Transport & Communication sub-group, so that series is
+reported as unavailable rather than estimated.

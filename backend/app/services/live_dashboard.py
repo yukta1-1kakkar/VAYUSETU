@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.database.models import CPIReference, FareObservation, RouteWeight, ScrapeRun
 from app.services.index_engine import get_index_history
+from app.services.loader import normalize_cpi_month
 
 
 AIRPORT_REFERENCE = {
@@ -316,18 +317,53 @@ def build_live_dashboard(db: Session) -> dict:
         {"id": "kpai-anomalies", "title": "Active Anomalies", "value": len(anomalies), "trend": "20% baseline threshold", "trendType": "alert", "iconType": "alert", "subtitle": ", ".join(r["id"] for r in anomalies) or "None", "tooltip": "Routes whose latest mean differs from their earliest persisted mean by at least 20%."},
     ]
 
-    cpi_rows = {row.month: row for row in db.query(CPIReference).all()}
-    cpi_series = []
+    cpi_rows = {normalize_cpi_month(row.month): row for row in db.query(CPIReference).all()}
+    apix_monthly: dict[str, list[float]] = defaultdict(list)
     for point in index_timeline:
-        key = datetime.strptime(point["date"], "%d/%m/%y").strftime("%m/%y")
-        cpi = cpi_rows.get(key)
-        if cpi and cpi.transport_index is not None:
-            cpi_series.append({"month": key, "airfareIndex": point["indexValue"], "cpiGeneral": cpi.combined_index, "cpiTransport": cpi.transport_index, "divergence": _round(point["indexValue"] - cpi.combined_index)})
+        period = datetime.strptime(point["date"], "%d/%m/%y").strftime("%Y-%m")
+        apix_monthly[period].append(float(point["indexValue"]))
+    apix_monthly_mean = {period: mean(values) for period, values in apix_monthly.items()}
+    overlapping_periods = sorted(set(cpi_rows) & set(apix_monthly_mean))
+    comparison_base = overlapping_periods[0] if overlapping_periods else None
+    cpi_base = float(cpi_rows[comparison_base].combined_index) if comparison_base else None
+    apix_base = apix_monthly_mean.get(comparison_base) if comparison_base else None
+    transport_base = (
+        float(cpi_rows[comparison_base].transport_index)
+        if comparison_base and cpi_rows[comparison_base].transport_index is not None else None
+    )
+    cpi_series = []
+    for period in sorted(set(cpi_rows) | set(apix_monthly_mean)):
+        cpi = cpi_rows.get(period)
+        raw_apix = apix_monthly_mean.get(period)
+        raw_general = float(cpi.combined_index) if cpi else None
+        raw_transport = float(cpi.transport_index) if cpi and cpi.transport_index is not None else None
+        rebased_apix = raw_apix / apix_base * 100 if raw_apix is not None and apix_base else None
+        rebased_general = raw_general / cpi_base * 100 if raw_general is not None and cpi_base else None
+        rebased_transport = raw_transport / transport_base * 100 if raw_transport is not None and transport_base else None
+        cpi_series.append({
+            "month": datetime.strptime(period, "%Y-%m").strftime("%b %Y"),
+            "period": period,
+            "airfareIndex": _round(rebased_apix, 2) if rebased_apix is not None else None,
+            "airfareIndexRaw": _round(raw_apix, 2) if raw_apix is not None else None,
+            "cpiGeneral": _round(rebased_general, 2) if rebased_general is not None else None,
+            "cpiGeneralRaw": _round(raw_general, 2) if raw_general is not None else None,
+            "cpiTransport": _round(rebased_transport, 2) if rebased_transport is not None else None,
+            "cpiTransportRaw": _round(raw_transport, 2) if raw_transport is not None else None,
+            "divergence": _round(rebased_apix - rebased_general, 2)
+            if rebased_apix is not None and rebased_general is not None else None,
+        })
 
     return {
         "hasData": bool(observations), "generatedAt": datetime.now(timezone.utc).isoformat(),
         "kpaiMetrics": metrics, "routeWeights": route_weights, "airports": airport_rows,
         "flightRoutes": flight_routes, "indexTimeline": index_timeline, "cpiDataSeries": cpi_series,
+        "cpiComparisonMeta": {
+            "source": "MoSPI CPI Dashboard Data, updated July 2026 (12 August 2026 release)",
+            "officialSeries": "All-India General CPI (Combined)",
+            "comparisonBaseMonth": comparison_base,
+            "transportSeriesAvailable": any(row.transport_index is not None for row in cpi_rows.values()),
+            "note": "APIx and General CPI are independently rebased to 100 at the first overlapping month. General CPI is a macro benchmark, not an airfare validation target.",
+        },
         "sectorHeatmapData": sector_heatmap, "leadTimeByRoute": lead_time,
         "priceTrendSeries": [], "liveTelemetryFeed": telemetry, "dataQuality": quality, "dataSources": sources,
     }

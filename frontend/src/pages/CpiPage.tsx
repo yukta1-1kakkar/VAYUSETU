@@ -1,6 +1,6 @@
 import React from 'react';
 import { CpiComparisonChart } from '../components/charts/CpiComparisonChart';
-import { CPI_DATA_SERIES } from '../mock/airfareData';
+import { CPI_COMPARISON_META, CPI_DATA_SERIES } from '../mock/airfareData';
 import { BarChart3 } from 'lucide-react';
 
 export const CpiPage: React.FC = () => {
@@ -31,16 +31,16 @@ export const CpiPage: React.FC = () => {
         {/* Historical Divergence Table */}
         <div className="lg:col-span-7 intel-card p-6 sm:p-7 space-y-4">
           <h3 className="text-lg font-bold font-heading text-[#172033] pb-2 border-b border-[#E2E8F0]">
-            Quarterly Index Divergence Matrix
+            Monthly APIx–CPI Comparison Matrix
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-[#E2E8F0] text-[#64748B] font-semibold">
                   <th className="py-2.5">Period</th>
-                  <th className="py-2.5">APIx Airfare</th>
-                  <th className="py-2.5">CPI General</th>
-                  <th className="py-2.5">CPI Transport</th>
+                  <th className="py-2.5">APIx (Rebased)</th>
+                  <th className="py-2.5">CPI (Rebased)</th>
+                  <th className="py-2.5">Official CPI</th>
                   <th className="py-2.5">Spread (pts)</th>
                 </tr>
               </thead>
@@ -48,11 +48,11 @@ export const CpiPage: React.FC = () => {
                 {CPI_DATA_SERIES.map((row, idx) => (
                   <tr key={idx} className="hover:bg-[#F8FAFC]">
                     <td className="py-2.5 font-bold text-[#172033]">{row.month}</td>
-                    <td className="py-2.5 font-extrabold text-[#1769AA]">{row.airfareIndex}</td>
-                    <td className="py-2.5 font-semibold text-[#0F8B8D]">{row.cpiGeneral}</td>
-                    <td className="py-2.5 font-medium text-[#6366F1]">{row.cpiTransport}</td>
+                    <td className="py-2.5 font-extrabold text-[#1769AA]">{row.airfareIndex?.toFixed(2) ?? '—'}</td>
+                    <td className="py-2.5 font-semibold text-[#0F8B8D]">{row.cpiGeneral?.toFixed(2) ?? '—'}</td>
+                    <td className="py-2.5 font-medium text-[#6366F1]">{row.cpiGeneralRaw?.toFixed(2) ?? '—'}</td>
                     <td className="py-2.5 font-mono text-[#64748B] font-semibold">
-                      {(row.airfareIndex - row.cpiGeneral).toFixed(1)} pts
+                      {row.divergence === null ? '—' : `${row.divergence.toFixed(2)} pts`}
                     </td>
                   </tr>
                 ))}
@@ -85,7 +85,7 @@ export const CpiPage: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
               <div className="font-bold text-[#172033]">Official MoSPI Basket Reference</div>
               <p className="leading-relaxed">
-                Official CPI series used: All-India General Consumer Price Index (Base 2012=100) and Transport & Communication Sub-group.
+                Official series used: {CPI_COMPARISON_META.officialSeries}. APIx and CPI are rebased to the first overlapping month for a like-for-like trend comparison. The supplied workbook does not contain the Transport &amp; Communication sub-group.
               </p>
             </div>
           </div>

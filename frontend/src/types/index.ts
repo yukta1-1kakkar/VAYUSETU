@@ -58,10 +58,14 @@ export interface IndexPoint {
 
 export interface CPIDataPoint {
   month: string;
-  airfareIndex: number;
-  cpiGeneral: number;
-  cpiTransport: number;
-  divergence: number;
+  period: string;
+  airfareIndex: number | null;
+  airfareIndexRaw: number | null;
+  cpiGeneral: number | null;
+  cpiGeneralRaw: number | null;
+  cpiTransport: number | null;
+  cpiTransportRaw: number | null;
+  divergence: number | null;
 }
 
 export interface RouteWeight {

@@ -218,3 +218,18 @@ backtesting while retaining raw and rejected records for audit.
 The frontend reads `GET /api/dashboard/live` and refreshes every 60 seconds.
 For a deployed backend, set `VITE_API_URL` in `frontend/.env` to its `/api`
 URL before building the frontend. Airfare metrics never fall back to demo data.
+
+## Deployed frontend/backend integration
+
+- Frontend: `https://vayusetu-ten.vercel.app`
+- Backend: `https://vayusetu.onrender.com`
+- Production API base: `https://vayusetu.onrender.com/api`
+
+Vite reads the deployed API base from `frontend/.env.production`. Render must
+set `FRONTEND_ORIGINS=https://vayusetu-ten.vercel.app`; add any Vercel preview
+or custom domains to that comma-separated value explicitly. Render should start
+the API with `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+
+The repository-root `render.yaml` records this deployment contract. Existing
+manually configured Render services should use the same root directory, build
+command, start command and environment variables in their dashboard settings.

@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -26,7 +27,7 @@ app = FastAPI(
     and DGCA domestic city-pair passenger traffic weights.
     
     ### Key Modules:
-    - **Airfare Price Index**: Weighted Arithmetic Mean of domestic airfares ($\\sum w_r \\cdot \\bar{P}_r$).
+    - **Airfare Price Index**: DGCA-weighted matched price-relative index with base period 100.
     - **Routes & Weights**: Normalized DGCA city-pair traffic weights ($\\sum w_r = 1.0$).
     - **Data Ingestion**: High-throughput scraper ingestion API.
     - **Analytics**: 7-day price changes, rolling averages, and Z-score anomaly detection.
@@ -37,10 +38,21 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Enable CORS for cross-origin requests
+DEFAULT_FRONTEND_ORIGINS = (
+    "https://vayusetu-ten.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+)
+allowed_origins = [
+    origin.strip().rstrip("/")
+    for origin in os.getenv("FRONTEND_ORIGINS", ",".join(DEFAULT_FRONTEND_ORIGINS)).split(",")
+    if origin.strip()
+]
+
+# Permit only the deployed frontend and explicitly configured local/preview origins.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -83,4 +95,9 @@ def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run(
+        "app.main:app",
+        host=os.getenv("HOST", "0.0.0.0"),
+        port=int(os.getenv("PORT", "8000")),
+        reload=os.getenv("RELOAD", "false").lower() in {"1", "true", "yes"},
+    )

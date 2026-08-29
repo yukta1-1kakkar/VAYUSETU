@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { AlertTriangle, Database, LoaderCircle, RefreshCw } from 'lucide-react';
 import { applyLiveDashboard, type LiveDashboardPayload } from '../mock/airfareData';
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api').replace(/\/$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL || 'https://vayusetu.onrender.com/api').replace(/\/$/, '');
 
 export function LiveDataGate({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'empty' | 'error'>('loading');
-  const [message, setMessage] = useState('Connecting to the airfare database…');
+  const [message, setMessage] = useState('Connecting to the airfare database...');
   const [revision, setRevision] = useState(0);
 
   const refresh = useCallback(async (quiet = false) => {

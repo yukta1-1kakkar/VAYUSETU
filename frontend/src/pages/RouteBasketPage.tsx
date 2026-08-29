@@ -4,7 +4,6 @@ import {
   BarChart3,
   CalendarDays,
   CheckCircle2,
-  Download,
   LockKeyhole,
   Map as MapIcon,
   Pencil,
@@ -55,17 +54,6 @@ const EPSILON = 0.001;
 
 function formatDate() {
   return new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date());
-}
-
-function createDownload(filename: string, content: string, mimeType: string) {
-  const url = URL.createObjectURL(new Blob([content], { type: mimeType }));
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
 }
 
 function StatusChip({ status }: { status: RouteBasketStatus }) {
@@ -207,13 +195,6 @@ export function RouteBasketPage() {
     setDeleteTarget(null);
   };
 
-  const exportCsv = () => {
-    const header = 'route,origin,destination,weight,status,last_updated';
-    const rows = routes.map((route) => [route.route, route.originCity, route.destinationCity, route.weight, route.status, route.lastUpdated]
-      .map((value) => `"${String(value).replaceAll('"', '""')}"`).join(','));
-    createDownload('vayusetu-route-basket.csv', [header, ...rows].join('\n'), 'text/csv;charset=utf-8');
-  };
-
   return (
     <div className="space-y-8 pb-16">
       <header className="flex flex-col justify-between gap-5 border-b border-[#E2E8F0] pb-5 lg:flex-row lg:items-end">
@@ -223,7 +204,6 @@ export function RouteBasketPage() {
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#64748B]">Manage the CPI airfare city-pair basket and passenger-volume weights consumed by the APIx computation pipeline.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button onClick={exportCsv} className="inline-flex items-center gap-2 rounded-xl border border-[#CBD5E1] bg-white px-4 py-2.5 text-xs font-bold text-[#334155] hover:border-[#1769AA] hover:text-[#1769AA]"><Download className="h-4 w-4" /> CSV</button>
           {canEdit ? (
             <button onClick={openAdd} className="inline-flex items-center gap-2 rounded-xl bg-[#1769AA] px-4 py-2.5 text-xs font-extrabold text-white shadow-lg shadow-blue-900/10 hover:bg-[#12558A]"><Plus className="h-4 w-4" /> Add Route</button>
           ) : (

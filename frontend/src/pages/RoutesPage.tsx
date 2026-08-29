@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { FLIGHT_ROUTES, ROUTE_WEIGHTS_DATA } from '../mock/airfareData';
+import { DATA_SOURCES, FLIGHT_ROUTES, ROUTE_WEIGHTS_DATA } from '../mock/airfareData';
 import { formatINR, formatDelta } from '../utils/geo';
 import { RouteIntelligenceModal } from '../components/command-center/RouteIntelligenceModal';
 import {
@@ -43,6 +43,60 @@ const RouteAxisTick: React.FC<RouteAxisTickProps> = ({ x = 0, y = 0, payload }) 
   </text>
 );
 
+interface SourceCoverageItem {
+  name: string;
+  observations: number;
+  percentage: number;
+}
+
+const sourceKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+function calculateSourceCoverage(sourceNames: readonly string[]): SourceCoverageItem[] {
+  const observations = sourceNames.map((name) => {
+    const source = DATA_SOURCES.find((item) => sourceKey(item.name) === sourceKey(name));
+    return { name, observations: source?.recordsPerDay ?? 0 };
+  });
+  const total = observations.reduce((sum, item) => sum + item.observations, 0);
+
+  return observations.map((item) => ({
+    ...item,
+    percentage: total > 0 ? item.observations / total * 100 : 0,
+  }));
+}
+
+function CoverageBreakdown({ title, items }: { title: string; items: SourceCoverageItem[] }) {
+  const accent = '#1769AA';
+  const totalObservations = items.reduce((sum, item) => sum + item.observations, 0);
+
+  return (
+    <section className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4" aria-label={title}>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h3 className="text-xs font-extrabold text-[#172033]">{title}</h3>
+          <p className="mt-0.5 text-[10px] text-[#64748B]">Share of clean persisted fare observations in this source group.</p>
+        </div>
+        <span className="rounded-lg border border-[#E2E8F0] bg-white px-2.5 py-1 text-[10px] font-bold text-[#64748B]">
+          {totalObservations.toLocaleString('en-IN')} observations
+        </span>
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {items.map((item) => (
+          <div key={item.name} className="rounded-xl border border-[#E2E8F0] bg-white p-3">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="truncate text-[11px] font-bold text-[#334155]" title={item.name}>{item.name}</span>
+              <span className="font-mono text-sm font-extrabold" style={{ color: accent }}>{item.percentage.toFixed(1)}%</span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#E2E8F0]">
+              <div className="h-full rounded-full transition-all duration-300" style={{ width: `${item.percentage}%`, backgroundColor: accent }} />
+            </div>
+            <div className="mt-1.5 text-[9px] font-semibold text-[#94A3B8]">{item.observations.toLocaleString('en-IN')} records</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export const RoutesPage: React.FC = () => {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,6 +109,7 @@ export const RoutesPage: React.FC = () => {
   // Available airline filter options
   const airlines = ['ALL', 'Akasa Air', 'Air India Express', 'SpiceJet'];
   const otaSources = ['ALL', 'Yatra'];
+  const airlineCoverage = calculateSourceCoverage(airlines.filter((name) => name !== 'ALL'));
 
   const isCombinedView = airlineFilter === 'ALL' && otaFilter === 'ALL';
   const activeDataView = isCombinedView
@@ -210,6 +265,8 @@ export const RoutesPage: React.FC = () => {
           Showing <span className="font-bold text-[#172033]">{displayedRoutes.length}</span> of {filteredRoutes.length} routes
         </div>
       </div>
+
+      {airlineFilter === 'ALL' && <CoverageBreakdown title="Airline observation coverage" items={airlineCoverage} />}
 
       {/* ROUTE ANALYTICS GRAPH */}
       <section className="intel-card p-6 sm:p-8 space-y-6">

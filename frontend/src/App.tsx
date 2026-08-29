@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactElement } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Braces, CalendarClock, FileBarChart, Play, Settings } from 'lucide-react';
+import { Braces, FileBarChart, Play, Settings } from 'lucide-react';
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { Navbar } from './components/common/Navbar';
 import { TelemetryTicker } from './components/common/TelemetryTicker';
@@ -19,8 +19,10 @@ import { Login } from './pages/Login';
 import { ModulePage } from './pages/ModulePage';
 import { RouteBasketPage } from './pages/RouteBasketPage';
 import { RoutesPage } from './pages/RoutesPage';
+import { ScraperControlPage } from './pages/ScraperControlPage';
 import { Unauthorized } from './pages/Unauthorized';
 import { UserManagementPage } from './pages/UserManagementPage';
+import { UserGuidePage } from './pages/UserGuidePage';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -73,9 +75,11 @@ function PortalRoutes({ onReplayIntro }: { onReplayIntro: () => void }) {
         <Route path="lead-time-elasticity" element={modulePage('lead-time-elasticity', <LeadTimePage />)} />
         <Route path="api-explorer" element={modulePage('api-explorer', <ModulePage icon={Braces} eyebrow="Developer services" title="API Explorer" description="Inspect documented airfare index endpoints and prepare authorized data queries." />)} />
         <Route path="user-management" element={modulePage('user-management', <UserManagementPage />)} />
-        <Route path="scraping-scheduler" element={modulePage('scraping-scheduler', <ModulePage icon={CalendarClock} eyebrow="Data operations" title="Scraping Scheduler" description="Review collection windows and coordinate the airfare observation schedule." />)} />
+        <Route path="scraper-control" element={modulePage('scraping-scheduler', <ScraperControlPage />)} />
+        <Route path="scraping-scheduler" element={modulePage('scraping-scheduler', <Navigate to="/scraper-control" replace />)} />
         <Route path="route-basket" element={modulePage('route-basket', <RouteBasketPage />)} />
         <Route path="system-settings" element={modulePage('system-settings', <ModulePage icon={Settings} eyebrow="Platform administration" title="System Settings" description="Review platform-level configuration for the VAYUSETU analytical environment." />)} />
+        <Route path="user-guide" element={<UserGuidePage />} />
         <Route path="analytics" element={modulePage('price-trends', <Navigate to="/cpi" replace />)} />
         <Route path="data-quality" element={modulePage('airfare-index', <Navigate to="/index" replace />)} />
         <Route path="data-sources" element={modulePage('airfare-index', <Navigate to="/index" replace />)} />

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Info, Navigation, TrendingUp } from 'lucide-react';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { FLIGHT_ROUTES } from '../../mock/airfareData';
-import { formatDelta, formatINR } from '../../utils/geo';
+import { formatDelta, formatINR, formatMonthYearLabel } from '../../utils/geo';
 
 const COLORS = ['#DC2626', '#0F8B8D', '#D97706', '#8B5CF6'];
 
@@ -53,16 +53,16 @@ export const PriceTrendChart: React.FC = () => {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 15, left: -5, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-            <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} tickLine={false} />
+            <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={formatMonthYearLabel} tickLine={false} />
             <YAxis tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={(value) => `₹${(value / 1000).toFixed(1)}k`} tickLine={false} />
-            <Tooltip formatter={(value) => formatINR(Number(value))} />
+            <Tooltip formatter={(value) => formatINR(Number(value))} labelFormatter={(label) => formatMonthYearLabel(String(label))} />
             <Legend />
             {chartRoutes.map((route, index) => <Line key={route.id} type="monotone" dataKey={route.id} name={route.id} stroke={COLORS[index % COLORS.length]} strokeWidth={2.5} connectNulls dot={{ r: 3 }} />)}
             {selectedRouteId === 'ALL' && <Line type="monotone" dataKey="nationalMean" name="Displayed-route mean" stroke="#64748B" strokeDasharray="4 4" strokeWidth={2} dot={false} />}
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex items-center justify-between border-t border-[#F1F5F9] pt-2 text-xs text-[#64748B]"><span className="flex items-center gap-1.5"><Info className="h-3.5 w-3.5 text-[#1769AA]" /> No synthetic interpolation</span><span>Auto-refreshes every 60 seconds</span></div>
+      <div className="flex items-center justify-between border-t border-[#F1F5F9] pt-2 text-xs text-[#64748B]"><span className="flex items-center gap-1.5"><Info className="h-3.5 w-3.5 text-[#1769AA]" /> No synthetic interpolation</span><span>Auto-refreshes every 2 hours</span></div>
     </div>
   );
 };

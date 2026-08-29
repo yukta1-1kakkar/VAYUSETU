@@ -291,9 +291,15 @@ def build_live_dashboard(db: Session) -> dict:
     }
 
     source_counts = Counter(row.source for row in observations)
+    recent_runs = db.query(ScrapeRun).order_by(ScrapeRun.started_at.desc()).limit(100).all()
+    run_durations: dict[str, list[float]] = defaultdict(list)
+    for run in recent_runs:
+        if run.started_at and run.completed_at:
+            run_durations[run.source].append(max(0.0, (run.completed_at - run.started_at).total_seconds()))
     sources = [{
         "id": f"src-{name.lower().replace(' ', '-')}", "name": name, "type": "carrier" if name != "Yatra" else "ota",
-        "throughput": f"{count} persisted quotes", "status": "active", "latency": "Measured at collection",
+        "throughput": f"{count} persisted quotes", "status": "active",
+        "latency": f"{mean(run_durations[name]):.1f}s avg" if run_durations[name] else "Not recorded",
         "description": "Persisted scraper observations that passed ETL validation.", "recordsPerDay": count,
     } for name, count in source_counts.items()]
 

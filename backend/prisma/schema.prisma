@@ -79,6 +79,7 @@ model FareObservation {
   dataQualityScore    Float?      @map("data_quality_score")
   cleaningStatus      String      @default("clean") @map("cleaning_status") @db.VarChar(30)
   isOutlier           Boolean     @default(false) @map("is_outlier")
+  isSynthetic         Boolean     @default(false) @map("is_synthetic")
   rejectionReason     String?     @map("rejection_reason") @db.Text
   rawPayload          Json?       @map("raw_payload")
   createdAt           DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -99,6 +100,7 @@ model FareObservation {
   @@index([availabilityStatus])
   @@index([cleaningStatus])
   @@index([isOutlier])
+  @@index([isSynthetic])
   @@index([routeId, observationDate, advancePurchaseDays], map: "idx_route_obs_adv")
   @@index([routeId, airline, travelDate, observationDate, advancePurchaseDays], map: "idx_route_airline_dates")
   @@index([observationDate, advancePurchaseDays, cleaningStatus], map: "idx_clean_index_input")

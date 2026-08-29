@@ -96,6 +96,7 @@ class FareObservation(Base):
     data_quality_score = Column(Float, nullable=True)
     cleaning_status = Column(String(30), nullable=False, default="clean", index=True)
     is_outlier = Column(Boolean, nullable=False, default=False, index=True)
+    is_synthetic = Column(Boolean, nullable=False, default=False, index=True)
     rejection_reason = Column(Text, nullable=True)
     raw_payload = Column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)

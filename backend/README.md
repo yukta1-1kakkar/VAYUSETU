@@ -233,3 +233,16 @@ the API with `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
 The repository-root `render.yaml` records this deployment contract. Existing
 manually configured Render services should use the same root directory, build
 command, start command and environment variables in their dashboard settings.
+
+## APIx backtesting
+
+Run the internal 30-day stability and real-date holdout diagnostics:
+
+```powershell
+python -m app.services.backtesting --advance-purchase 7
+```
+
+The same report is exposed at `GET /api/backtest?advance_purchase=7`.
+This report explicitly labels synthetic observations. It is a prototype
+pipeline/index backtest, not a substitute for validation against an official
+route-fare benchmark.

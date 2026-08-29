@@ -11,6 +11,7 @@ from app.api.index import router as index_router
 from app.api.analytics import router as analytics_router
 from app.api.ingest import router as ingest_router
 from app.api.dashboard import router as dashboard_router
+from app.api.backtest import router as backtest_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -65,6 +66,7 @@ app.include_router(index_router)
 app.include_router(analytics_router)
 app.include_router(ingest_router)
 app.include_router(dashboard_router)
+app.include_router(backtest_router)
 
 # Also mount under /api prefix
 app.include_router(health_router, prefix="/api")
@@ -73,6 +75,7 @@ app.include_router(index_router, prefix="/api")
 app.include_router(analytics_router, prefix="/api")
 app.include_router(ingest_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
+app.include_router(backtest_router, prefix="/api")
 
 @app.get("/", tags=["Root"], summary="API Root Overview")
 def root():
@@ -90,6 +93,7 @@ def root():
             "ingest_fare": "/ingest/fare",
             "ingest_bulk": "/ingest/bulk",
             "compute_weights": "/ingest/compute-weights",
+            "backtest": "/backtest?advance_purchase=7",
         }
     }
 

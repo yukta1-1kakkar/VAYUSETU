@@ -68,3 +68,17 @@ export function formatDelta(val: number): string {
 export function formatCount(val: number): string {
   return new Intl.NumberFormat('en-IN').format(val);
 }
+
+/** Converts DD/MM/YY to 28 Aug'26 and monthly MM/YY values to Aug'26. */
+export function formatMonthYearLabel(value: string): string {
+  const parts = value.split('/');
+  if (parts.length !== 2 && parts.length !== 3) return value;
+
+  const month = Number(parts.length === 3 ? parts[1] : parts[0]);
+  const year = parts.length === 3 ? parts[2] : parts[1];
+  const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1];
+  if (!monthName || !year) return value;
+  return parts.length === 3
+    ? `${Number(parts[0])} ${monthName}'${year.slice(-2)}`
+    : `${monthName}'${year.slice(-2)}`;
+}

@@ -3,6 +3,7 @@ import { AlertTriangle, Database, LoaderCircle, RefreshCw } from 'lucide-react';
 import { applyLiveDashboard, type LiveDashboardPayload } from '../mock/airfareData';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'https://vayusetu.onrender.com/api').replace(/\/$/, '');
+const REFRESH_INTERVAL_MS = 2 * 60 * 60 * 1000;
 
 export function LiveDataGate({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'empty' | 'error'>('loading');
@@ -31,7 +32,7 @@ export function LiveDataGate({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void refresh();
-    const timer = window.setInterval(() => void refresh(true), 60_000);
+    const timer = window.setInterval(() => void refresh(true), REFRESH_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [refresh]);
 

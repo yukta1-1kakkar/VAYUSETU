@@ -10,6 +10,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { TrendingUp, Info } from 'lucide-react';
+import { formatMonthYearLabel } from '../../utils/geo';
 
 export const ApixOverviewChart: React.FC<{
   showFullDetails?: boolean;
@@ -94,6 +95,7 @@ export const ApixOverviewChart: React.FC<{
               dataKey="date"
               stroke="#94A3B8"
               tick={{ fontSize: 11, fill: '#64748B' }}
+              tickFormatter={formatMonthYearLabel}
               tickLine={false}
               axisLine={{ stroke: '#E2E8F0' }}
             />
@@ -111,7 +113,7 @@ export const ApixOverviewChart: React.FC<{
                   return (
                     <div className="bg-white p-3.5 rounded-xl border border-[#CBD5E1] shadow-lg text-xs space-y-1.5 min-w-[170px]">
                       <div className="font-semibold text-[#172033] border-b border-[#F1F5F9] pb-1">
-                        Period: {label}
+                        Period: {formatMonthYearLabel(String(label))}
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-[#64748B]">APIx Value:</span>

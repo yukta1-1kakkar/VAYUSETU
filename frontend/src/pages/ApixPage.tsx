@@ -10,7 +10,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { TrendingUp, Layers, Calendar, ArrowUpRight, CheckCircle2, Cpu, Compass, X, Calculator, Database, ShieldCheck } from 'lucide-react';
-import { formatINR, formatDelta } from '../utils/geo';
+import { formatINR, formatDelta, formatMonthYearLabel } from '../utils/geo';
 
 export const ApixPage: React.FC = () => {
   // Filters: 3M, 6M, 1Y, FY, ALL (default 3M)
@@ -216,7 +216,7 @@ export const ApixPage: React.FC = () => {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="date" stroke="#94A3B8" tick={{ fontSize: 11, fill: '#64748B' }} tickLine={false} />
+              <XAxis dataKey="date" stroke="#94A3B8" tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={formatMonthYearLabel} tickLine={false} />
               <YAxis domain={[95, 'auto']} stroke="#94A3B8" tick={{ fontSize: 11, fill: '#64748B' }} tickLine={false} />
               <Tooltip
                 content={({ active, payload, label }) => {
@@ -224,7 +224,7 @@ export const ApixPage: React.FC = () => {
                     const data = payload[0].payload;
                     return (
                       <div className="bg-white p-3.5 rounded-xl border border-[#CBD5E1] shadow-lg text-xs space-y-1.5 min-w-[180px]">
-                        <div className="font-bold text-[#172033] border-b border-[#F1F5F9] pb-1">{label}</div>
+                        <div className="font-bold text-[#172033] border-b border-[#F1F5F9] pb-1">{formatMonthYearLabel(String(label))}</div>
                         <div className="flex justify-between items-center text-[#1769AA]">
                           <span>APIx Index:</span>
                           <span className="font-bold text-sm">{data.indexValue}</span>

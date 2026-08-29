@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronDown, LogOut, Menu, ShieldCheck, X } from 'lucide-react';
+import { BookOpen, ChevronDown, LogOut, Menu, ShieldCheck, X } from 'lucide-react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import type { Permission } from '../../constants/auth';
 import { ROLE_LABELS } from '../../constants/auth';
@@ -18,6 +18,7 @@ const NAVIGATION: NavigationItem[] = [
   { to: '/cpi', label: 'CPI', permission: 'price-trends' },
   { to: '/routes', label: 'Route Comparison', permission: 'route-comparison' },
   { to: '/lead-time-elasticity', label: 'Lead-Time Elasticity', permission: 'lead-time-elasticity' },
+  { to: '/scraper-control', label: 'Scraper Control Panel', permission: 'scraping-scheduler' },
   { to: '/user-management', label: 'User Management', permission: 'user-management' },
   { to: '/route-basket', label: 'Route Basket & Weights', permission: 'route-basket' },
   { to: '/downloads', label: 'Downloads', permission: 'downloads' },
@@ -104,6 +105,9 @@ export function Navbar() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <NavLink to="/user-guide" className={({ isActive }) => `hidden items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition md:flex ${isActive ? 'border-[#1769AA] bg-[#1769AA] text-white' : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-blue-200 hover:bg-blue-50 hover:text-[#1769AA]'}`} aria-label="Open User Guide">
+            <BookOpen className="h-3.5 w-3.5" /> Help
+          </NavLink>
           <div className="relative hidden lg:block">
             <button onClick={() => setAccountOpen((open) => !open)} className="flex items-center gap-2 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] py-1.5 pl-1.5 pr-2 transition hover:border-[#CBD5E1] hover:bg-white" aria-label="Open user menu">
               <UserSummary /><ChevronDown className="h-3.5 w-3.5 text-[#94A3B8]" />
@@ -130,6 +134,7 @@ export function Navbar() {
             <div className="mb-3 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-3"><UserSummary /></div>
             <div className="grid gap-1 sm:grid-cols-2">
               {allowedLinks.map((link) => <NavLink key={link.to} to={link.to} end={link.to === '/'} className={navClass}>{link.label}</NavLink>)}
+              <NavLink to="/user-guide" className={navClass}><span className="inline-flex items-center gap-2"><BookOpen className="h-3.5 w-3.5" /> User Guide</span></NavLink>
             </div>
             <button onClick={handleLogout} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs font-bold text-[#DC2626]"><LogOut className="h-4 w-4" /> Logout</button>
           </div>

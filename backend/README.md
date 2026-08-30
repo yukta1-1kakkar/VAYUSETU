@@ -6,7 +6,7 @@
 
 ## ?? Overview
 
-The **VAYUSETU Backend** calculates high-frequency, real-time weighted airfare indices across Indian domestic aviation routes. By combining **DGCA (Directorate General of Civil Aviation)** city-pair passenger traffic shares as statistical weights with real-time scraped airfares, VAYUSETU computes a robust **Weighted Arithmetic Mean Airfare Index** to augment the transport basket of India's Consumer Price Index (CPI).
+The **VAYUSETU Backend** calculates high-frequency airfare indices across Indian domestic routes. By combining **DGCA (Directorate General of Civil Aviation)** city-pair passenger traffic with base-period airfares, VAYUSETU computes a fixed-base **Modified Laspeyres Airfare Price Index** to augment the transport basket of India's Consumer Price Index (CPI).
 
 ---
 
@@ -17,24 +17,31 @@ Passenger traffic weights are calculated by aggregating directional and bi-direc
 
 $$\\text{Weight}(r) = \\frac{\\text{Passengers}_r}{\\sum_{k \\in \\text{All Routes}} \\text{Passengers}_k}, \\quad \\sum_{r} \\text{Weight}(r) = 1.000000$$
 
-### 2. DGCA-Weighted Matched Price-Relative Index
+### 2. Base-Period Expenditure Weights
+For each route, DGCA passenger share acts as the base quantity and the base-period representative fare is its geometric cohort mean:
+
+$$p_{r,0}=\left(\prod_{c \in C_{r,0}}p_{r,c,0}\right)^{1/|C_{r,0}|},\qquad W_{r,0}=\frac{q_{r,0}p_{r,0}}{\sum_k q_{k,0}p_{k,0}}$$
+
+### 3. Fixed-Base Matched Price-Relative Index
 For target observation date $t$, base date $0$, and advance-purchase window $d$:
 
-$$\\text{APIx}_{t,d}=100\\sum_{r \\in M_t}\\tilde{w}_r\\left(\\frac{P_{r,t,d}}{P_{r,0,d}}\\right),\\qquad \\tilde{w}_r=\\frac{w_r}{\\sum_{k \\in M_t}w_k}$$
+$$R_{r,t,d}=\left(\prod_{c \in C_{r,0}\cap C_{r,t}}\frac{p_{r,c,t,d}}{p_{r,c,0,d}}\right)^{1/|C_{r,0}\cap C_{r,t}|}$$
+
+$$\text{APIx}_{t,d}=100\sum_{r \in M_t}\widetilde{W}_{r,0}R_{r,t,d},\qquad \widetilde{W}_{r,0}=\frac{q_{r,0}p_{r,0}}{\sum_{k \in M_t}q_{k,0}p_{k,0}}$$
 
 Where:
-- $w_r$ is the route's DGCA passenger-traffic weight.
+- $q_{r,0}$ is the route's DGCA passenger-traffic share and $p_{r,0}$ is its base fare level.
 - $M_t$ is the subset of the top-24 basket observed in both base and target periods.
-- $P$ uses identical `(route, airline, source)` cohorts in both periods, preventing source-mix bias.
-- Weights are renormalized only over matched routes. `coverage_weight` reports their original DGCA share.
+- The lower level uses the geometric mean of identical `(route, airline, source)` cohort relatives, reducing source-mix and extreme-relative bias.
+- The upper level uses arithmetic base-expenditure weights, as required by a modified Laspeyres structure. `coverage_weight` reports the original DGCA traffic share represented.
 - The base date therefore evaluates to 100. Unknown or unweighted routes do not enter APIx.
 
-### 3. Percentage Change From Base
+### 4. Percentage Change From Base
 Because the base is normalized to 100:
 
 $$\\Delta \\% = \\text{APIx}_t - 100$$
 
-### 4. Anomaly Detection (Statistical Z-Score)
+### 5. Anomaly Detection (Statistical Z-Score)
 Pricing anomalies and fare surges are flagged when:
 
 $$Z = \\frac{\\text{Fare} - \\mu}{\\sigma}, \\quad |Z| > 2.0$$

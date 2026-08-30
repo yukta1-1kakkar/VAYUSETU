@@ -29,13 +29,13 @@ class IndexComponentSchema(BaseModel):
     route_id: str
     origin: str
     destination: str
-    weight: float
-    avg_fare: float
+    weight: float = Field(..., description="Normalized base-period route expenditure weight")
+    avg_fare: float = Field(..., description="Geometric mean target fare for matched airline/source cohorts")
     weighted_fare: float = Field(..., description="Route contribution to APIx in index points")
     observation_count: int
 
 class IndexResponse(BaseModel):
-    index: float = Field(..., description="DGCA-weighted price-relative APIx (base period = 100)")
+    index: float = Field(..., description="Fixed-base expenditure-weighted APIx (base period = 100)")
     base_index: Optional[float] = Field(None, description="Base-period APIx, equal to 100 when a matched basket exists")
     pct_change: Optional[float] = Field(None, description="Percentage change from the base period, APIx - 100")
     target_date: date

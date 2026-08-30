@@ -69,7 +69,7 @@ export const ApixPage: React.FC = () => {
               <div>
                 <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1769AA]"><Calculator className="h-4 w-4" /> Statistical methodology</div>
                 <h2 id="apix-formulation-title" className="font-heading text-2xl font-extrabold text-[#172033]">How VAYUSETU calculates APIx</h2>
-                <p className="mt-1 text-xs leading-5 text-[#64748B]">DGCA passenger-weighted matched price relatives, with movement measured from the first valid computed period.</p>
+                <p className="mt-1 text-xs leading-5 text-[#64748B]">Fixed-base modified Laspeyres APIx with geometric matched-cohort relatives and base expenditure weights.</p>
               </div>
               <button type="button" onClick={() => setFormulationOpen(false)} aria-label="Close formulation information" className="rounded-xl border border-[#E2E8F0] bg-white p-2 text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#172033]"><X className="h-5 w-5" /></button>
             </header>
@@ -78,19 +78,19 @@ export const ApixPage: React.FC = () => {
               <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
                 <div className="text-xs font-bold uppercase tracking-wider text-[#1769AA]">Primary weighted score</div>
                 <div className="mt-3 overflow-x-auto whitespace-nowrap font-mono text-lg font-extrabold text-[#172033] sm:text-xl">
-                  S(t,d) = Σ[r ∈ M(t)] w̃(r,t) × R(r,t,d)
+                  APIx(t,d) = 100 × Σ[r ∈ M(t)] W̃(r,0) × R(r,t,d)
                 </div>
-                <p className="mt-3 text-sm leading-6 text-[#475569]">For target date <strong>t</strong> and advance-purchase window <strong>d</strong>, the score combines every eligible route's matched fare movement using its normalized passenger weight. No fixed value is assumed before the first valid score is calculated.</p>
+                <p className="mt-3 text-sm leading-6 text-[#475569]">For target date <strong>t</strong> and advance-purchase window <strong>d</strong>, APIx combines matched route movements using fixed-base expenditure weights. The base period equals 100.</p>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 {[
-                  { step: '01', title: 'DGCA route weight', formula: 'w(r) = Passengers(r) / Σ[k] Passengers(k)', note: 'Each route receives its share of total passenger traffic. Across the complete source basket, Σw(r) = 1 (100%).' },
-                  { step: '02', title: 'Cohort mean fare', formula: 'P(r,c,t,d) = (1 / n) × Σ[j=1..n] Fare(j)', note: 'A cohort c is the same route, airline and source. Only clean, non-null fare observations at the selected lead-time window are averaged.' },
-                  { step: '03', title: 'Matched route price relative', formula: 'R(r,t,d) = (1 / |C(r,t)|) × Σ[c] P(r,c,t,d) / P(r,c,0,d)', note: 'Only airline/source cohorts present in both the base date and target date are compared. This avoids changes caused merely by a different source mix.' },
-                  { step: '04', title: 'Matched-basket weight', formula: 'w̃(r,t) = w(r) / Σ[k ∈ M(t)] w(k)', note: 'If some routes lack a valid match, the available DGCA weights are renormalized over matched set M(t), so their normalized weights sum to 1.' },
-                  { step: '05', title: 'Route contribution and score', formula: 'Contribution(r,t) = w̃(r,t) × R(r,t,d); S(t,d) = Σ[r] Contribution(r,t)', note: 'A route contributes according to both its fare movement and its economic importance in passenger traffic. Summing all eligible contributions produces the period score.' },
-                  { step: '06', title: 'Change measures', formula: 'Change from first (%) = [(S(t) / S(first)) − 1] × 100', note: 'The first valid calculated score is the reference. Period-on-period change is [(S(t) / S(t−1)) − 1] × 100, so neither measure assumes that the starting value is 100.' },
+                  { step: '01', title: 'DGCA base quantity', formula: 'q(r,0) = Passengers(r) / Σ[k] Passengers(k)', note: 'DGCA passenger share supplies the route-level base quantity for the representative basket.' },
+                  { step: '02', title: 'Base expenditure weight', formula: 'W(r,0) = q(r,0) × p(r,0) / Σ[k] q(k,0) × p(k,0)', note: 'Multiplying passenger share by the base representative fare produces an expenditure share, as required for Laspeyres aggregation.' },
+                  { step: '03', title: 'Matched cohort relative', formula: 'R(r,t,d) = [Π[c] p(r,c,t,d) / p(r,c,0,d)] ^ (1 / |C(r,t)|)', note: 'The geometric mean combines only airline/source cohorts present in both periods and reduces distortion from extreme relatives.' },
+                  { step: '04', title: 'Available expenditure weight', formula: 'W̃(r,0) = q(r,0) × p(r,0) / Σ[k ∈ M(t)] q(k,0) × p(k,0)', note: 'Base expenditure weights are renormalized only when routes lack a valid matched price relative. Coverage remains visible.' },
+                  { step: '05', title: 'Modified Laspeyres APIx', formula: 'APIx(t,d) = 100 × Σ[r ∈ M(t)] W̃(r,0) × R(r,t,d)', note: 'The upper-level arithmetic aggregation measures the price change of the fixed-base expenditure basket.' },
+                  { step: '06', title: 'Change measures', formula: 'Change from base (%) = APIx(t,d) − 100', note: 'The base period is exactly 100. Period-on-period change is [(APIx(t) / APIx(t−1)) − 1] × 100.' },
                 ].map((item) => (
                   <article key={item.step} className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
                     <div className="flex items-center gap-2"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#1769AA] text-[10px] font-extrabold text-white">{item.step}</span><h3 className="font-heading text-sm font-bold text-[#172033]">{item.title}</h3></div>

@@ -47,6 +47,11 @@ def test_live_dashboard_uses_persisted_observations_only():
     }]
     assert payload["cpiComparisonMeta"]["transportSeriesAvailable"] is False
     assert payload["liveTelemetryFeed"][0]["observedFare"] == 7000
+    assert {
+        route_id
+        for sector in payload["sectorHeatmapData"]
+        for route_id in sector["keyRoutes"]
+    } == {route["id"] for route in payload["flightRoutes"]}
 
 
 def test_live_dashboard_endpoint_reuses_cached_snapshot(monkeypatch):

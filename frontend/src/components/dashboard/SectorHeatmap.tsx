@@ -17,8 +17,10 @@ export const SectorHeatmap: React.FC = () => {
     scrapedSources: string;
   } | null>(null);
 
-  // Highest-coverage airports in the live route basket (real IATA codes).
-  const hubs = Array.from(new Set(FLIGHT_ROUTES.flatMap((route) => [route.origin, route.destination]))).slice(0, 7);
+  // Use the complete directional basket. A shared seven-airport axis dropped
+  // every route touching airports outside that arbitrary subset.
+  const origins = Array.from(new Set(FLIGHT_ROUTES.map((route) => route.origin)));
+  const destinations = Array.from(new Set(FLIGHT_ROUTES.map((route) => route.destination)));
 
   // Matrix cell lookup helper
   const getMatrixCell = (origin: string, dest: string) => {
@@ -139,12 +141,12 @@ export const SectorHeatmap: React.FC = () => {
       {/* VIEW 1: INTERACTIVE HEATMAP MATRIX */}
       {viewMode === 'matrix' ? (
         <div className="overflow-x-auto pb-2">
-          <div className="min-w-[640px]">
+          <div style={{ minWidth: Math.max(640, 130 + destinations.length * 92) }}>
             <table className="w-full text-center border-collapse">
               <thead>
                 <tr>
                   <th className="p-2.5 text-xs font-bold text-[#64748B] text-left">Origin \ Dest</th>
-                  {hubs.map(h => (
+                  {destinations.map(h => (
                     <th key={h} className="p-2.5 text-xs font-black font-heading text-[#172033] tracking-wide">
                       {h}
                     </th>
@@ -152,12 +154,12 @@ export const SectorHeatmap: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {hubs.map((origin) => (
+                {origins.map((origin) => (
                   <tr key={origin} className="border-t border-[#E2E8F0]/80">
                     <td className="p-2.5 text-xs font-black font-heading text-[#172033] text-left bg-[#F8FAFC] rounded-l-xl">
                       {origin}
                     </td>
-                    {hubs.map((dest) => {
+                    {destinations.map((dest) => {
                       const cell = getMatrixCell(origin, dest);
                       if (origin === dest) {
                         return (

@@ -257,7 +257,7 @@ def build_live_dashboard(db: Session) -> dict:
             "baselineFare": round(baseline), "indexScore": _round(current / baseline * 100 if baseline else 0),
             "changePercent": _round(change), "volatility": round(mean(r["volatilityIndex"] for r in routes)),
             "status": "High Yield Stress" if change >= 15 else "Moderate Surge" if change >= 5 else "Discounted" if change < -5 else "Equilibrium",
-            "keyRoutes": [r["id"] for r in routes[:4]],
+            "keyRoutes": [r["id"] for r in routes],
         })
 
     airport_rows = {}
@@ -326,7 +326,7 @@ def build_live_dashboard(db: Session) -> dict:
     avg_fare = round(mean(float(row.fare) for row in observations)) if observations else 0
     anomalies = [r for r in flight_routes if r["isAnomaly"]]
     metrics = [
-        {"id": "kpai-index", "title": "National Airfare Index (APIx)", "value": latest_index, "trend": f"{_round(latest_index - previous_index):+}% latest", "trendType": "neutral", "iconType": "plane", "subtitle": "Earliest persisted day = 100", "tooltip": "DGCA traffic-weighted index from clean persisted quotes."},
+        {"id": "kpai-index", "title": "National Airfare Index (APIx)", "value": latest_index, "trend": f"{_round(latest_index - previous_index):+}% latest", "trendType": "neutral", "iconType": "plane", "subtitle": "Earliest persisted day = 100", "tooltip": "Fixed-base expenditure-weighted index using DGCA traffic and clean matched fare relatives."},
         {"id": "kpai-routes", "title": "Routes with Live Data", "value": len(by_route), "trend": f"{coverage}% basket coverage", "trendType": "positive", "iconType": "route", "subtitle": f"of {len(weights)} weighted city pairs", "tooltip": "Routes with at least one clean PostgreSQL observation."},
         {"id": "kpai-airlines", "title": "Airlines Monitored", "value": len(MONITORED_AIRLINES), "trend": f"{len(MONITORED_OTAS)} OTA monitored", "trendType": "neutral", "iconType": "airline", "subtitle": f"Airlines: {', '.join(MONITORED_AIRLINES)} • OTA: {', '.join(MONITORED_OTAS)}", "tooltip": "Configured direct airline and online travel aggregator sources. OTA-listed carrier names are not counted as separately monitored airline scrapers."},
         {"id": "kpai-records", "title": "Latest Daily Fare Records", "value": quality["totalDailyScrapes"], "trend": "Database count", "trendType": "positive", "iconType": "database", "subtitle": quality["lastSyncTimestamp"], "tooltip": "Clean quotes on the latest observation date."},

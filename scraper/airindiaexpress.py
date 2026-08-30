@@ -23,6 +23,7 @@ BASE_URL = "https://flights.airindiaexpress.com"
 ROBOTS_URL = f"{BASE_URL}/robots.txt"
 SITEMAP_URL = f"{BASE_URL}/sitemap_index.xml"
 OUTPUT_PATH = Path(__file__).with_name("airindiaexpress_top_24_routes.json")
+_ROBOTS_PARSER = None
 
 CITY_TO_IATA = {
     "DELHI": "DEL", "MUMBAI": "BOM", "BENGALURU": "BLR", "HYDERABAD": "HYD",
@@ -55,6 +56,9 @@ PRIORITY_ROUTES = [
 
 
 def robots_allowed(url):
+    global _ROBOTS_PARSER
+    if _ROBOTS_PARSER is not None:
+        return _ROBOTS_PARSER.can_fetch(USER_AGENT, url)
     parser = RobotFileParser()
     parser.set_url(ROBOTS_URL)
     try:
@@ -71,6 +75,7 @@ def robots_allowed(url):
     except Exception as exc:
         print(f"[!] Could not read {ROBOTS_URL}: {exc}")
         return False
+    _ROBOTS_PARSER = parser
     return parser.can_fetch(USER_AGENT, url)
 
 
@@ -156,16 +161,25 @@ async def collect_route(page, origin_city, destination_city, target_dates):
     schedules = parse_schedules(body, origin, destination)
 
     missing_months = sorted({
-        datetime.strptime(date, "%Y-%m-%d").strftime("%b %Y")
+        datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m")
         for date in target_dates if date not in fares
     })
-    for month_label in missing_months:
+    accept_cookies = page.get_by_role("button", name="Accept", exact=True)
+    if await accept_cookies.count():
+        try:
+            await accept_cookies.first.click(timeout=3_000)
+        except Exception:
+            pass
+    for month_key in missing_months:
+        month_label = datetime.strptime(month_key, "%Y-%m").strftime("%B %Y")
         try:
             carousel = page.locator("section[aria-label='Month selection carousel']")
-            month = carousel.get_by_text(month_label, exact=True)
+            month = carousel.locator(
+                f"button[data-att='monthly-fare-card'][aria-label*='{month_label}']"
+            )
             if await month.count() == 0:
                 continue
-            await month.first.click(timeout=3000)
+            await month.first.click(timeout=5_000, force=True)
             await page.wait_for_timeout(1000)
             body = await page.locator("body").inner_text()
             fares.update(parse_fares(body, origin, destination))
@@ -273,9 +287,14 @@ async def run_batch_scrape(headless=True):
         "advance_windows": ADVANCE_WINDOWS,
         "routes": records,
     }
+    priced_count = sum(record.get("total_fare") is not None for record in records)
+    if records and not priced_count and all(record.get("note") for record in records):
+        raise RuntimeError(
+            "Air India Express collection failed for every route; preserved the previous output and skipped ETL"
+        )
     with open(OUTPUT_PATH, "w", encoding="utf-8") as file:
         json.dump(output, file, indent=2, ensure_ascii=False)
-    print(f"Wrote {len(records)} records to {OUTPUT_PATH}")
+    print(f"Wrote {len(records)} records ({priced_count} priced) to {OUTPUT_PATH}")
     persist_scraper_output(OUTPUT_PATH)
     return records
 

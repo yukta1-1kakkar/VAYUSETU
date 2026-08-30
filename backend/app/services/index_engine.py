@@ -1,8 +1,9 @@
-"""DGCA-weighted airfare price-relative index calculations."""
+"""Fixed-base expenditure-weighted airfare price index calculations."""
 
 from __future__ import annotations
 
 from datetime import date
+from math import exp, log
 from typing import Optional
 
 from sqlalchemy import func
@@ -63,11 +64,18 @@ def _price_relative_index(
     advance_purchase_days: int,
 ) -> tuple[float, float, list[IndexComponentSchema]]:
     """
-    APIx_t = 100 * sum(normalized_DGCA_weight_i * P_it / P_i0).
+    APIx_t = 100 * sum(W_r0 * R_rt).
 
-    Only routes with positive official weights and clean prices in both periods
-    enter the matched basket. Their official weights are renormalized to one;
-    the pre-normalization sum is returned as coverage_weight.
+    This is a fixed-base modified Laspeyres design. DGCA passenger shares act
+    as base quantities and are converted to base-period expenditure weights:
+
+        W_r0 = (q_r0 * p_r0) / sum(q_k0 * p_k0)
+
+    Within a route, matched ``(airline, source)`` price relatives are combined
+    with a geometric mean. At the upper level, route relatives are combined
+    arithmetically using their base expenditure weights. If a route is missing
+    in either period, weights are renormalized only across matched routes and
+    ``coverage_weight`` reports the represented original DGCA traffic share.
     """
     basket = (
         db.query(RouteWeight)
@@ -79,37 +87,59 @@ def _price_relative_index(
     route_map = {row.route_id: row for row in basket}
     base_prices = _route_cohort_averages(db, base_date, advance_purchase_days)
     target_prices = _route_cohort_averages(db, target_date, advance_purchase_days)
-    matched_routes = sorted(
-        route_id for route_id in set(route_map) & set(base_prices) & set(target_prices)
-        if set(base_prices[route_id]) & set(target_prices[route_id])
-    )
+    base_route_prices: dict[str, float] = {}
+    for route_id in set(route_map) & set(base_prices):
+        valid_prices = [price for price, _ in base_prices[route_id].values() if price > 0]
+        if valid_prices:
+            base_route_prices[route_id] = exp(
+                sum(log(price) for price in valid_prices) / len(valid_prices)
+            )
+
+    route_relatives: dict[str, tuple[float, float, int]] = {}
+    for route_id in sorted(set(base_route_prices) & set(target_prices)):
+        matched_cohorts = set(base_prices[route_id]) & set(target_prices[route_id])
+        valid_cohorts = [
+            cohort for cohort in matched_cohorts
+            if base_prices[route_id][cohort][0] > 0 and target_prices[route_id][cohort][0] > 0
+        ]
+        if not valid_cohorts:
+            continue
+        relatives = [
+            target_prices[route_id][cohort][0] / base_prices[route_id][cohort][0]
+            for cohort in valid_cohorts
+        ]
+        price_relative = exp(sum(log(relative) for relative in relatives) / len(relatives))
+        target_fare = exp(
+            sum(log(target_prices[route_id][cohort][0]) for cohort in valid_cohorts)
+            / len(valid_cohorts)
+        )
+        observation_count = sum(target_prices[route_id][cohort][1] for cohort in valid_cohorts)
+        route_relatives[route_id] = (price_relative, target_fare, observation_count)
+
+    matched_routes = sorted(route_relatives)
     coverage_weight = sum(float(route_map[route_id].weight) for route_id in matched_routes)
-    if not matched_routes or coverage_weight <= 0:
+    expenditure_mass = sum(
+        float(route_map[route_id].weight) * base_route_prices[route_id]
+        for route_id in matched_routes
+    )
+    if not matched_routes or coverage_weight <= 0 or expenditure_mass <= 0:
         return 0.0, 0.0, []
 
     components = []
     apix = 0.0
     for route_id in matched_routes:
         route = route_map[route_id]
-        matched_cohorts = set(base_prices[route_id]) & set(target_prices[route_id])
-        relatives = [
-            target_prices[route_id][cohort][0] / base_prices[route_id][cohort][0]
-            for cohort in matched_cohorts
-            if base_prices[route_id][cohort][0] > 0
-        ]
-        if not relatives:
-            continue
-        price_relative = sum(relatives) / len(relatives)
-        target_fare = sum(target_prices[route_id][cohort][0] for cohort in matched_cohorts) / len(matched_cohorts)
-        observation_count = sum(target_prices[route_id][cohort][1] for cohort in matched_cohorts)
-        normalized_weight = float(route.weight) / coverage_weight
-        contribution = normalized_weight * price_relative * 100
+        price_relative, target_fare, observation_count = route_relatives[route_id]
+        expenditure_weight = (
+            float(route.weight) * base_route_prices[route_id] / expenditure_mass
+        )
+        contribution = expenditure_weight * price_relative * 100
         apix += contribution
         components.append(IndexComponentSchema(
             route_id=route_id,
             origin=route.origin,
             destination=route.destination,
-            weight=round(normalized_weight, 6),
+            weight=round(expenditure_weight, 6),
             avg_fare=round(target_fare, 2),
             weighted_fare=round(contribution, 4),
             observation_count=observation_count,

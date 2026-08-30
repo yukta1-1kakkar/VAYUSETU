@@ -35,15 +35,15 @@ export const MethodologyPage: React.FC = () => {
       step: '05',
       title: 'Route Weighting (DGCA Passenger Traffic)',
       icon: Layers,
-      desc: 'Weighting based on DGCA passenger-traffic distribution across the 24 monitored corridors.',
-      details: 'Available DGCA weights are renormalized across routes observed in both the base and target periods.'
+      desc: 'DGCA passenger traffic supplies the base quantity for each of the 24 monitored corridors.',
+      details: 'Base expenditure mass equals DGCA passenger share multiplied by the route geometric-mean base fare.'
     },
     {
       step: '06',
-      title: 'APIx Calculation (Matched Price Relatives)',
+      title: 'APIx Calculation (Modified Laspeyres)',
       icon: Calculator,
       desc: 'Combining matched route price relatives against the earliest persisted observation date, normalized to 100.',
-      details: 'Formula: APIx_t = 100 × Σ (normalized w_i × P_i,t / P_i,0). No unimplemented hedonic adjustment is claimed.'
+      details: 'Formula: APIx_t = 100 × Σ (base expenditure weight × geometric matched-cohort price relative).'
     },
     {
       step: '07',
@@ -72,7 +72,7 @@ export const MethodologyPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-xs font-bold text-[#1769AA]">
-          <span>DGCA-WEIGHTED MATCHED-BASKET PIPELINE</span>
+          <span>FIXED-BASE MODIFIED LASPEYRES PIPELINE</span>
         </div>
       </div>
 
@@ -124,12 +124,12 @@ export const MethodologyPage: React.FC = () => {
         </h3>
         <div className="p-4 rounded-xl bg-white border border-[#E2E8F0] font-mono text-xs text-[#172033] space-y-2 overflow-x-auto">
           <div className="text-[#1769AA] font-bold text-sm">
-            APIx_t = [ Σ_i ( W_i × ( P_i,t / P_i,0 ) ) ] × 100
+            APIx_t = 100 × Σ_i [ W_i,0 × GM_c( P_i,c,t / P_i,c,0 ) ]
           </div>
           <div className="text-[#64748B] text-[11px] pt-2 border-t border-[#F1F5F9] space-y-1">
-            <div>• <strong>W_i:</strong> DGCA passenger-traffic weight of route i, renormalized over matched routes.</div>
-            <div>• <strong>P_i,t:</strong> Mean valid fare for matched airline/source cohorts on route i in period t.</div>
-            <div>• <strong>P_i,0:</strong> Mean valid matched-cohort fare on the earliest persisted base date.</div>
+            <div>• <strong>W_i,0:</strong> Base expenditure share proportional to DGCA passengers × base representative fare.</div>
+            <div>• <strong>GM_c:</strong> Geometric mean over airline/source cohorts matched in base and target periods.</div>
+            <div>• <strong>P_i,c,t / P_i,c,0:</strong> Fixed-base price relative for the same route and cohort.</div>
           </div>
         </div>
       </div>

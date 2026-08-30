@@ -1,39 +1,119 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AlertTriangle, Database, LoaderCircle, RefreshCw } from 'lucide-react';
 import { applyLiveDashboard, type LiveDashboardPayload } from '../mock/airfareData';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'https://vayusetu.onrender.com/api').replace(/\/$/, '');
 const REFRESH_INTERVAL_MS = 2 * 60 * 60 * 1000;
+// Render cold starts and the first uncached aggregation can exceed 30 seconds.
+// Subsequent responses are served by the API's two-hour snapshot cache.
+const REQUEST_TIMEOUT_MS = 90_000;
+const DASHBOARD_CACHE_KEY = 'vayusetu-live-dashboard-cache';
+
+let activeDashboardRequest: Promise<LiveDashboardPayload> | null = null;
+
+function requestLiveDashboard(): Promise<LiveDashboardPayload> {
+  if (activeDashboardRequest) return activeDashboardRequest;
+
+  activeDashboardRequest = (async () => {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch(`${API_BASE}/dashboard/live`, {
+        headers: { Accept: 'application/json' },
+        // Honour the API's two-hour cache so page remounts and multiple tabs do
+        // not force the backend to rebuild the same dashboard payload.
+        cache: 'default',
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
+      return await response.json() as LiveDashboardPayload;
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  })().finally(() => { activeDashboardRequest = null; });
+
+  return activeDashboardRequest;
+}
+
+function readCachedDashboard(): LiveDashboardPayload | null {
+  try {
+    const cached = localStorage.getItem(DASHBOARD_CACHE_KEY);
+    return cached ? JSON.parse(cached) as LiveDashboardPayload : null;
+  } catch {
+    return null;
+  }
+}
+
+function cacheDashboard(payload: LiveDashboardPayload) {
+  try {
+    localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(payload));
+  } catch {
+    // A full or unavailable browser cache must never interrupt live rendering.
+  }
+}
 
 export function LiveDataGate({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'empty' | 'error'>('loading');
   const [message, setMessage] = useState('Connecting to the airfare database...');
   const [revision, setRevision] = useState(0);
+  const hasValidData = useRef(false);
 
   const refresh = useCallback(async (quiet = false) => {
     if (!quiet) setStatus('loading');
     try {
-      const response = await fetch(`${API_BASE}/dashboard/live`, { headers: { Accept: 'application/json' } });
-      if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
-      const payload = await response.json() as LiveDashboardPayload;
-      applyLiveDashboard(payload);
+      const payload = await requestLiveDashboard();
       if (!payload.hasData) {
+        if (hasValidData.current) return;
         setMessage('PostgreSQL is connected, but it has no clean airfare observations yet. Run an authorized scraper to populate it.');
         setStatus('empty');
         return;
       }
+      applyLiveDashboard(payload);
+      cacheDashboard(payload);
+      hasValidData.current = true;
       setRevision((value) => value + 1);
       setStatus('ready');
     } catch (error) {
+      if (hasValidData.current) return;
+
+      const cached = readCachedDashboard();
+      if (cached?.hasData) {
+        applyLiveDashboard(cached);
+        hasValidData.current = true;
+        setRevision((value) => value + 1);
+        setStatus('ready');
+        return;
+      }
       setMessage(error instanceof Error ? error.message : 'Unable to load live airfare data.');
       setStatus('error');
     }
   }, []);
 
   useEffect(() => {
-    void refresh();
-    const timer = window.setInterval(() => void refresh(true), REFRESH_INTERVAL_MS);
-    return () => window.clearInterval(timer);
+    let disposed = false;
+    let timer: number | undefined;
+
+    // Render a previously validated snapshot immediately while checking for a
+    // newer one in the background. This avoids replacing the whole dashboard
+    // with an error screen during a Render cold start.
+    const cached = readCachedDashboard();
+    if (cached?.hasData) {
+      applyLiveDashboard(cached);
+      hasValidData.current = true;
+      setRevision((value) => value + 1);
+      setStatus('ready');
+    }
+
+    const runRefreshCycle = async () => {
+      await refresh(hasValidData.current);
+      if (!disposed) timer = window.setTimeout(() => void runRefreshCycle(), REFRESH_INTERVAL_MS);
+    };
+
+    void runRefreshCycle();
+    return () => {
+      disposed = true;
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
   }, [refresh]);
 
   if (status === 'ready') return <div key={revision}>{children}</div>;

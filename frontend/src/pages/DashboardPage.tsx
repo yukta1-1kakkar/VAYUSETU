@@ -30,7 +30,7 @@ export const DashboardPage: React.FC = () => {
             National Aviation Fare Intelligence Console
           </h1>
           <p className="text-sm text-[#64748B] mt-1">
-            Live price telemetry, airfare index benchmarks, and route volatility calculated from persisted observations.
+            Airfare index benchmarks and route volatility calculated from persisted observations.
           </p>
         </div>
 

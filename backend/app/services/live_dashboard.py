@@ -45,12 +45,15 @@ def _city(code: str) -> str:
     return AIRPORT_REFERENCE.get(code, (code, "", 0.0, 0.0))[0]
 
 
-def _iata(rows: list[FareObservation], field: str, fallback: str) -> str:
-    for row in rows:
-        value = (row.raw_payload or {}).get(field)
-        if isinstance(value, str) and len(value.strip()) == 3:
-            return value.strip().upper()
-    return CITY_TO_IATA.get(fallback.upper(), fallback.upper())
+def _route_airports(route_id: str, fallback_origin: str, fallback_destination: str) -> tuple[str, str]:
+    """Resolve airport codes without loading each observation's raw JSON."""
+    route_parts = route_id.upper().replace("→", "-").split("-")
+    if len(route_parts) == 2 and all(len(part.strip()) == 3 for part in route_parts):
+        return route_parts[0].strip(), route_parts[1].strip()
+    return (
+        CITY_TO_IATA.get(fallback_origin.upper(), fallback_origin.upper()),
+        CITY_TO_IATA.get(fallback_destination.upper(), fallback_destination.upper()),
+    )
 
 
 def _distance(origin: str, destination: str) -> int:
@@ -77,8 +80,23 @@ def build_live_dashboard(db: Session) -> dict:
     weights = db.query(RouteWeight).order_by(RouteWeight.weight.desc()).limit(24).all()
     weight_by_route = {row.route_id: row for row in weights}
     route_ids = set(weight_by_route)
+    # Project only fields used below. Loading full ORM entities also loads the
+    # raw_payload JSON and keeps every entity in SQLAlchemy's identity map,
+    # which caused memory growth as the historical repository expanded.
     observations = (
-        db.query(FareObservation)
+        db.query(
+            FareObservation.id,
+            FareObservation.observation_id,
+            FareObservation.route_id,
+            FareObservation.airline,
+            FareObservation.flight_number,
+            FareObservation.observation_date,
+            FareObservation.advance_purchase_days,
+            FareObservation.fare,
+            FareObservation.source,
+            FareObservation.collected_at,
+            FareObservation.created_at,
+        )
         .filter(
             FareObservation.route_id.in_(route_ids),
             FareObservation.cleaning_status == "clean",
@@ -122,8 +140,7 @@ def build_live_dashboard(db: Session) -> dict:
         volatility = min(100, round((pstdev(all_fares) / mean(all_fares) * 100) if len(all_fares) > 1 and mean(all_fares) else 0))
         carriers = [name for name, _ in airlines.most_common(3)]
         sources = sorted({row.source for row in rows if row.source})
-        origin = _iata(rows, "origin", weight.origin)
-        destination = _iata(rows, "destination", weight.destination)
+        origin, destination = _route_airports(route_id, weight.origin, weight.destination)
         anomaly = abs(change) >= 20
         flight_routes.append({
             "id": route_id, "origin": origin, "destination": destination,

@@ -40,11 +40,11 @@ export const IndexConstructionPipeline: React.FC = () => {
     },
     {
       id: 'step-5',
-      title: 'AIRFARE INDEX (VNAI)',
+      title: 'AIRFARE INDEX (APIx)',
       icon: Cpu,
-      value: '113.6 Sovereign Index',
-      description: 'Laspeyres-chained formulation referenced against base 100 benchmark (Jan 2025).',
-      detail: 'Produces an objective, transparent, inflation-comparable indicator of aviation mobility cost.',
+      value: 'Fixed-base Modified Laspeyres',
+      description: 'Base expenditure-weighted formulation referenced to the earliest persisted observation date = 100.',
+      detail: 'Uses geometric matched airline/source relatives and publishes the represented route coverage.',
     },
   ];
 

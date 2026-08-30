@@ -17,10 +17,11 @@ def get_airfare_index(
     db: Session = Depends(get_db)
 ):
     """
-    Calculate APIx = 100 × Σ(normalized DGCA weight × route price relative).
-    Routes must have clean fares in both the base and target periods. Official
-    weights are renormalized over that matched basket, and coverage reports the
-    original DGCA weight represented before renormalization.
+    Calculate APIx = 100 × Σ(base expenditure weight × geometric route relative).
+    This endpoint uses a fixed-base modified Laspeyres formulation. Base route
+    expenditure weights are proportional to DGCA passenger share multiplied
+    by base-period fare. Matched airline/source relatives within a route use a
+    geometric mean, followed by arithmetic aggregation across routes.
     """
     return calculate_index(
         db=db,

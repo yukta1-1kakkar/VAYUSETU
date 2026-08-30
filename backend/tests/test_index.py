@@ -69,8 +69,9 @@ def test_index_calculation_methodology(db_session):
     f1 = FareObservation(route_id="DEL-BOM", airline="IndiGo", travel_date=base_d + timedelta(days=7), observation_date=base_d, advance_purchase_days=7, fare=5000.0, source="mock")
     f2 = FareObservation(route_id="BLR-DEL", airline="Air India", travel_date=base_d + timedelta(days=7), observation_date=base_d, advance_purchase_days=7, fare=4000.0, source="mock")
 
-    # Price relatives: DEL-BOM=1.10, BLR-DEL=1.125
-    # APIx = 100 * (0.6*1.10 + 0.4*1.125) = 111.0
+    # Price relatives: DEL-BOM=1.10, BLR-DEL=1.125. Base expenditure
+    # masses are 0.6*5000=3000 and 0.4*4000=1600.
+    # APIx = 100 * ((3000/4600)*1.10 + (1600/4600)*1.125) = 110.87
     f3 = FareObservation(route_id="DEL-BOM", airline="IndiGo", travel_date=target_d + timedelta(days=7), observation_date=target_d, advance_purchase_days=7, fare=5500.0, source="mock")
     f4 = FareObservation(route_id="BLR-DEL", airline="Air India", travel_date=target_d + timedelta(days=7), observation_date=target_d, advance_purchase_days=7, fare=4500.0, source="mock")
 
@@ -78,12 +79,32 @@ def test_index_calculation_methodology(db_session):
     db_session.commit()
 
     res = calculate_index(db_session, base_date=base_d, target_date=target_d, advance_purchase_days=7)
-    assert res.index == 111.0
+    assert res.index == 110.87
     assert res.base_index == 100.0
-    assert res.pct_change == 11.0
+    assert res.pct_change == 10.87
     assert res.coverage_weight == 1.0
     assert res.components_count == 2
-    assert round(sum(component.weighted_fare for component in res.components), 2) == 111.0
+    assert round(sum(component.weighted_fare for component in res.components), 2) == 110.87
+
+
+def test_index_uses_geometric_mean_for_matched_lower_level_relatives(db_session):
+    db_session.add(RouteWeight(
+        route_id="DEL-BOM", origin="DEL", destination="BOM",
+        total_passengers=100, weight=1.0,
+    ))
+    base_d, target_d = date(2026, 8, 1), date(2026, 8, 8)
+    db_session.add_all([
+        FareObservation(route_id="DEL-BOM", airline="A", source="airline", travel_date=base_d + timedelta(days=7), observation_date=base_d, advance_purchase_days=7, fare=100),
+        FareObservation(route_id="DEL-BOM", airline="B", source="ota", travel_date=base_d + timedelta(days=7), observation_date=base_d, advance_purchase_days=7, fare=400),
+        FareObservation(route_id="DEL-BOM", airline="A", source="airline", travel_date=target_d + timedelta(days=7), observation_date=target_d, advance_purchase_days=7, fare=200),
+        FareObservation(route_id="DEL-BOM", airline="B", source="ota", travel_date=target_d + timedelta(days=7), observation_date=target_d, advance_purchase_days=7, fare=400),
+    ])
+    db_session.commit()
+
+    result = calculate_index(db_session, base_date=base_d, target_date=target_d)
+
+    # Geometric mean of the cohort relatives 2.0 and 1.0 is sqrt(2).
+    assert result.index == 141.42
 
 
 def test_index_uses_same_route_basket_in_base_and_target(db_session):

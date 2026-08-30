@@ -43,10 +43,10 @@ const STAGES: Stage[] = [
   {
     id: 4,
     title: 'STAGE 04',
-    name: 'Fisher Ideal Index Synthesis',
-    description: 'Computing geometric mean of Laspeyres and Paasche aggregations to eliminate passenger load factor substitution bias.',
-    formula: 'I_F = \\sqrt{ \\frac{\\sum P_t Q_0}{\\sum P_0 Q_0} \\times \\frac{\\sum P_t Q_t}{\\sum P_0 Q_t} } \\times 100',
-    metrics: 'Base 100 (Jan 2025) | Monthly Chained',
+    name: 'Modified Laspeyres APIx',
+    description: 'Combining geometric matched-cohort price relatives with fixed-base route expenditure weights.',
+    formula: 'APIx_t = 100 \\times \\sum_r W_{r,0} \\times GM_c(P_{r,c,t}/P_{r,c,0})',
+    metrics: 'Earliest persisted base = 100 | Daily fixed-base series',
     icon: Calculator,
   },
   {
@@ -54,8 +54,8 @@ const STAGES: Stage[] = [
     title: 'STAGE 05',
     name: 'Sovereign Verification & Publication',
     description: 'Final publication of sovereign index quote with harmonic cross-validation scores and integration into DGCA / MoSPI macro models.',
-    formula: '\\text{Published Index} = 113.6 \\pm 2.0 \\text{ (95\\% CI)}',
-    metrics: '91% Total Confidence | Real-Time Sync',
+    formula: '\\text{Published Index}_t = APIx_t \\text{ with route coverage disclosed}',
+    metrics: 'Matched-basket coverage | Daily refresh',
     icon: FileCheck2,
   },
 ];

@@ -504,11 +504,22 @@ async def run_batch_scrape(headless: bool = True):
         "last_checked": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "routes": normalized_all,
     }
+    priced_count = sum(
+        isinstance(record.get("total_fare"), (int, float)) and record["total_fare"] > 0
+        for record in normalized_all
+    )
+    failed_outcomes = {"blocked_after_retries", "nav_error", "http_403", "robots_disallowed"}
+    if normalized_all and not priced_count and all(
+        record.get("scrape_outcome") in failed_outcomes for record in normalized_all
+    ):
+        raise RuntimeError(
+            "SpiceJet collection failed for every route; preserved the previous output and skipped ETL"
+        )
     with open(CONFIG_OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
 
     print(f"\nDone. Processed {total} route windows.")
-    print(f"Normalized records: {len(normalized_all)}")
+    print(f"Normalized records: {len(normalized_all)} ({priced_count} priced)")
     print(f"Updated: {CONFIG_OUTPUT_PATH}")
     persist_scraper_output(CONFIG_OUTPUT_PATH)
     return normalized_all

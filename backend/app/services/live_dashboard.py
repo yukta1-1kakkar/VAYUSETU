@@ -257,7 +257,7 @@ def build_live_dashboard(db: Session) -> dict:
             "baselineFare": round(baseline), "indexScore": _round(current / baseline * 100 if baseline else 0),
             "changePercent": _round(change), "volatility": round(mean(r["volatilityIndex"] for r in routes)),
             "status": "High Yield Stress" if change >= 15 else "Moderate Surge" if change >= 5 else "Discounted" if change < -5 else "Equilibrium",
-            "keyRoutes": [r["id"] for r in routes[:4]],
+            "keyRoutes": [r["id"] for r in routes],
         })
 
     airport_rows = {}

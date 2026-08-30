@@ -19,7 +19,7 @@ restored later only when the team has an approved API/feed or written access.
 ```powershell
 cd scraper
 python -m pip install -r requirements.txt
-playwright install chromium
+playwright install chromium firefox
 ```
 
 ## Cloud ETL

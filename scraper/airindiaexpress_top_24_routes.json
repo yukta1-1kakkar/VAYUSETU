@@ -10,7 +10,7 @@
   "sitemaps": [
     "https://flights.airindiaexpress.com/sitemap_index.xml"
   ],
-  "last_checked": "2026-08-30T05:16:48.820473Z",
+  "last_checked": "2026-08-30T11:05:15.609186Z",
   "advance_windows": [
     1,
     7,
@@ -20,8 +20,8 @@
   ],
   "routes": [
     {
-      "observation_id": "obs_03bc7eb8419d",
-      "collection_timestamp": "2026-08-30T10:40:36.993098+05:30",
+      "observation_id": "obs_e0d5701e4084",
+      "collection_timestamp": "2026-08-30T16:32:41.356639+05:30",
       "route_id": "DELHI-MUMBAI",
       "total_passengers": 4029444,
       "origin": "DEL",
@@ -42,7 +42,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 8396.0,
+      "total_fare": 7817.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -55,8 +55,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_a124521d45a8",
-      "collection_timestamp": "2026-08-30T10:40:36.993098+05:30",
+      "observation_id": "obs_2d5b352e6810",
+      "collection_timestamp": "2026-08-30T16:32:41.359643+05:30",
       "route_id": "DELHI-MUMBAI",
       "total_passengers": 4029444,
       "origin": "DEL",
@@ -77,7 +77,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 8396.0,
+      "total_fare": 7817.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -90,8 +90,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_93dfc92ec55d",
-      "collection_timestamp": "2026-08-30T10:40:36.993098+05:30",
+      "observation_id": "obs_a1ec7f99f763",
+      "collection_timestamp": "2026-08-30T16:32:41.359643+05:30",
       "route_id": "DELHI-MUMBAI",
       "total_passengers": 4029444,
       "origin": "DEL",
@@ -112,7 +112,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 6742.0,
+      "total_fare": 6361.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -125,8 +125,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_d3fc145044db",
-      "collection_timestamp": "2026-08-30T10:40:36.993098+05:30",
+      "observation_id": "obs_3023f8ffa740",
+      "collection_timestamp": "2026-08-30T16:32:41.359643+05:30",
       "route_id": "DELHI-MUMBAI",
       "total_passengers": 4029444,
       "origin": "DEL",
@@ -147,7 +147,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 6742.0,
+      "total_fare": 6361.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -160,8 +160,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_a82b7b649a9f",
-      "collection_timestamp": "2026-08-30T10:40:36.993098+05:30",
+      "observation_id": "obs_721e084d3f20",
+      "collection_timestamp": "2026-08-30T16:32:41.359643+05:30",
       "route_id": "DELHI-MUMBAI",
       "total_passengers": 4029444,
       "origin": "DEL",
@@ -195,8 +195,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_03b7ad5e9579",
-      "collection_timestamp": "2026-08-30T10:40:36.993098+05:30",
+      "observation_id": "obs_04ddf8a13383",
+      "collection_timestamp": "2026-08-30T16:32:41.359643+05:30",
       "route_id": "DELHI-MUMBAI",
       "total_passengers": 4029444,
       "origin": "DEL",
@@ -230,8 +230,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_76c3a5fcbb62",
-      "collection_timestamp": "2026-08-30T10:40:36.993098+05:30",
+      "observation_id": "obs_39bb9003c265",
+      "collection_timestamp": "2026-08-30T16:32:41.360637+05:30",
       "route_id": "DELHI-MUMBAI",
       "total_passengers": 4029444,
       "origin": "DEL",
@@ -265,8 +265,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_ccd648ac702c",
-      "collection_timestamp": "2026-08-30T10:40:36.993098+05:30",
+      "observation_id": "obs_c0980c630bd8",
+      "collection_timestamp": "2026-08-30T16:32:41.360637+05:30",
       "route_id": "DELHI-MUMBAI",
       "total_passengers": 4029444,
       "origin": "DEL",
@@ -300,8 +300,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_8cbd4405fffb",
-      "collection_timestamp": "2026-08-30T10:40:57.856194+05:30",
+      "observation_id": "obs_c0f571d6c29d",
+      "collection_timestamp": "2026-08-30T16:32:46.774642+05:30",
       "route_id": "BENGALURU-DELHI",
       "total_passengers": 2885936,
       "origin": "BLR",
@@ -335,8 +335,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_548741a218b2",
-      "collection_timestamp": "2026-08-30T10:40:57.856194+05:30",
+      "observation_id": "obs_fc0a0a461011",
+      "collection_timestamp": "2026-08-30T16:32:46.775648+05:30",
       "route_id": "BENGALURU-DELHI",
       "total_passengers": 2885936,
       "origin": "BLR",
@@ -370,8 +370,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_5465a40971ec",
-      "collection_timestamp": "2026-08-30T10:40:57.856194+05:30",
+      "observation_id": "obs_5e06253f8ae3",
+      "collection_timestamp": "2026-08-30T16:32:46.775648+05:30",
       "route_id": "BENGALURU-DELHI",
       "total_passengers": 2885936,
       "origin": "BLR",
@@ -405,8 +405,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_715586074a2d",
-      "collection_timestamp": "2026-08-30T10:40:57.856194+05:30",
+      "observation_id": "obs_496793502990",
+      "collection_timestamp": "2026-08-30T16:32:46.775648+05:30",
       "route_id": "BENGALURU-DELHI",
       "total_passengers": 2885936,
       "origin": "BLR",
@@ -440,8 +440,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_74f713be55ea",
-      "collection_timestamp": "2026-08-30T10:40:57.856194+05:30",
+      "observation_id": "obs_5d92bae95d30",
+      "collection_timestamp": "2026-08-30T16:32:46.775648+05:30",
       "route_id": "BENGALURU-DELHI",
       "total_passengers": 2885936,
       "origin": "BLR",
@@ -475,8 +475,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_c1e2425b641b",
-      "collection_timestamp": "2026-08-30T10:41:14.051723+05:30",
+      "observation_id": "obs_3be5c58d2d8d",
+      "collection_timestamp": "2026-08-30T16:32:53.209069+05:30",
       "route_id": "BENGALURU-MUMBAI",
       "total_passengers": 2476421,
       "origin": "BLR",
@@ -497,7 +497,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 9808.0,
+      "total_fare": 4641.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -510,8 +510,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_4eced3cae02b",
-      "collection_timestamp": "2026-08-30T10:41:14.051723+05:30",
+      "observation_id": "obs_c210b8a35e60",
+      "collection_timestamp": "2026-08-30T16:32:53.209069+05:30",
       "route_id": "BENGALURU-MUMBAI",
       "total_passengers": 2476421,
       "origin": "BLR",
@@ -545,8 +545,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_d37370add1e9",
-      "collection_timestamp": "2026-08-30T10:41:14.051723+05:30",
+      "observation_id": "obs_1c80657c8271",
+      "collection_timestamp": "2026-08-30T16:32:53.210070+05:30",
       "route_id": "BENGALURU-MUMBAI",
       "total_passengers": 2476421,
       "origin": "BLR",
@@ -580,8 +580,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_8a1a3f3a0cce",
-      "collection_timestamp": "2026-08-30T10:41:14.051723+05:30",
+      "observation_id": "obs_a5389ac80982",
+      "collection_timestamp": "2026-08-30T16:32:53.210070+05:30",
       "route_id": "BENGALURU-MUMBAI",
       "total_passengers": 2476421,
       "origin": "BLR",
@@ -615,8 +615,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_0c2cc9d1af2c",
-      "collection_timestamp": "2026-08-30T10:41:14.051723+05:30",
+      "observation_id": "obs_016c99ce82f9",
+      "collection_timestamp": "2026-08-30T16:32:53.210070+05:30",
       "route_id": "BENGALURU-MUMBAI",
       "total_passengers": 2476421,
       "origin": "BLR",
@@ -650,8 +650,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_dab4301fa1c8",
-      "collection_timestamp": "2026-08-30T10:41:30.172161+05:30",
+      "observation_id": "obs_cd98b6a64cc5",
+      "collection_timestamp": "2026-08-30T16:32:59.632568+05:30",
       "route_id": "DELHI-HYDERABAD",
       "total_passengers": 1862287,
       "origin": "DEL",
@@ -685,8 +685,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_0570c5363c47",
-      "collection_timestamp": "2026-08-30T10:41:30.172161+05:30",
+      "observation_id": "obs_80b4f6e440ca",
+      "collection_timestamp": "2026-08-30T16:32:59.632568+05:30",
       "route_id": "DELHI-HYDERABAD",
       "total_passengers": 1862287,
       "origin": "DEL",
@@ -720,8 +720,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_bf95b07321a5",
-      "collection_timestamp": "2026-08-30T10:41:30.172161+05:30",
+      "observation_id": "obs_62424455e5b3",
+      "collection_timestamp": "2026-08-30T16:32:59.632568+05:30",
       "route_id": "DELHI-HYDERABAD",
       "total_passengers": 1862287,
       "origin": "DEL",
@@ -738,25 +738,25 @@
       "departure_time": null,
       "arrival_time": null,
       "duration_minutes": null,
-      "fare_family": null,
+      "fare_family": "Economy",
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": null,
+      "total_fare": 7056.0,
       "currency": "INR",
-      "availability_status": "not_published",
+      "availability_status": "available",
       "seats_available": null,
       "source": "Air India Express",
       "source_type": "airline_published_fare_page",
-      "data_quality_score": 0,
-      "no_flights": null,
+      "data_quality_score": 60,
+      "no_flights": false,
       "sold_out": null,
       "source_url": "https://flights.airindiaexpress.com/en-in/delhi-to-hyderabad-flights",
       "note": null
     },
     {
-      "observation_id": "obs_c0de7e17f91d",
-      "collection_timestamp": "2026-08-30T10:41:30.172161+05:30",
+      "observation_id": "obs_250044919672",
+      "collection_timestamp": "2026-08-30T16:32:59.632568+05:30",
       "route_id": "DELHI-HYDERABAD",
       "total_passengers": 1862287,
       "origin": "DEL",
@@ -790,8 +790,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_bda6ddefca08",
-      "collection_timestamp": "2026-08-30T10:41:30.172161+05:30",
+      "observation_id": "obs_be7144285eaf",
+      "collection_timestamp": "2026-08-30T16:32:59.632568+05:30",
       "route_id": "DELHI-HYDERABAD",
       "total_passengers": 1862287,
       "origin": "DEL",
@@ -825,8 +825,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_dfedfd4a88ec",
-      "collection_timestamp": "2026-08-30T10:41:45.145468+05:30",
+      "observation_id": "obs_7839f401987d",
+      "collection_timestamp": "2026-08-30T16:33:05.947130+05:30",
       "route_id": "DELHI-KOLKATA",
       "total_passengers": 1778985,
       "origin": "DEL",
@@ -860,8 +860,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_756768aff6a4",
-      "collection_timestamp": "2026-08-30T10:41:45.145468+05:30",
+      "observation_id": "obs_a57df8b62a85",
+      "collection_timestamp": "2026-08-30T16:33:05.947130+05:30",
       "route_id": "DELHI-KOLKATA",
       "total_passengers": 1778985,
       "origin": "DEL",
@@ -895,8 +895,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_ab7a97760baa",
-      "collection_timestamp": "2026-08-30T10:41:45.145468+05:30",
+      "observation_id": "obs_5edbe7daf7b7",
+      "collection_timestamp": "2026-08-30T16:33:05.947130+05:30",
       "route_id": "DELHI-KOLKATA",
       "total_passengers": 1778985,
       "origin": "DEL",
@@ -930,8 +930,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_3261d3c5e227",
-      "collection_timestamp": "2026-08-30T10:41:45.145468+05:30",
+      "observation_id": "obs_57aacdf0bd3f",
+      "collection_timestamp": "2026-08-30T16:33:05.947130+05:30",
       "route_id": "DELHI-KOLKATA",
       "total_passengers": 1778985,
       "origin": "DEL",
@@ -948,25 +948,25 @@
       "departure_time": null,
       "arrival_time": null,
       "duration_minutes": null,
-      "fare_family": null,
+      "fare_family": "Economy",
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": null,
+      "total_fare": 7721.0,
       "currency": "INR",
-      "availability_status": "not_published",
+      "availability_status": "available",
       "seats_available": null,
       "source": "Air India Express",
       "source_type": "airline_published_fare_page",
-      "data_quality_score": 0,
-      "no_flights": null,
+      "data_quality_score": 60,
+      "no_flights": false,
       "sold_out": null,
       "source_url": "https://flights.airindiaexpress.com/en-in/delhi-to-kolkata-flights",
       "note": null
     },
     {
-      "observation_id": "obs_d8af59cf50c2",
-      "collection_timestamp": "2026-08-30T10:41:45.145468+05:30",
+      "observation_id": "obs_9021ecfb7745",
+      "collection_timestamp": "2026-08-30T16:33:05.947130+05:30",
       "route_id": "DELHI-KOLKATA",
       "total_passengers": 1778985,
       "origin": "DEL",
@@ -1000,8 +1000,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_42a1a89686f8",
-      "collection_timestamp": "2026-08-30T10:42:00.745726+05:30",
+      "observation_id": "obs_913a0de56598",
+      "collection_timestamp": "2026-08-30T16:33:11.808804+05:30",
       "route_id": "DELHI-PUNE",
       "total_passengers": 1704284,
       "origin": "DEL",
@@ -1035,8 +1035,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_07fe878ec1fc",
-      "collection_timestamp": "2026-08-30T10:42:00.745726+05:30",
+      "observation_id": "obs_d98af1d90e60",
+      "collection_timestamp": "2026-08-30T16:33:11.808804+05:30",
       "route_id": "DELHI-PUNE",
       "total_passengers": 1704284,
       "origin": "DEL",
@@ -1070,8 +1070,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_a6681dc001ef",
-      "collection_timestamp": "2026-08-30T10:42:00.745726+05:30",
+      "observation_id": "obs_92e8a9f524e3",
+      "collection_timestamp": "2026-08-30T16:33:11.808804+05:30",
       "route_id": "DELHI-PUNE",
       "total_passengers": 1704284,
       "origin": "DEL",
@@ -1105,8 +1105,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_ab91570f4577",
-      "collection_timestamp": "2026-08-30T10:42:00.745726+05:30",
+      "observation_id": "obs_33f4b9aaa85d",
+      "collection_timestamp": "2026-08-30T16:33:11.808804+05:30",
       "route_id": "DELHI-PUNE",
       "total_passengers": 1704284,
       "origin": "DEL",
@@ -1140,8 +1140,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_30981233d8e8",
-      "collection_timestamp": "2026-08-30T10:42:00.745726+05:30",
+      "observation_id": "obs_9728dcd40e64",
+      "collection_timestamp": "2026-08-30T16:33:11.809806+05:30",
       "route_id": "DELHI-PUNE",
       "total_passengers": 1704284,
       "origin": "DEL",
@@ -1175,8 +1175,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_b7c3b28994f0",
-      "collection_timestamp": "2026-08-30T10:42:18.081529+05:30",
+      "observation_id": "obs_934e1a458c2d",
+      "collection_timestamp": "2026-08-30T16:33:19.806060+05:30",
       "route_id": "GOA-MUMBAI",
       "total_passengers": 1495328,
       "origin": "GOX",
@@ -1210,8 +1210,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_59ef672d7dad",
-      "collection_timestamp": "2026-08-30T10:42:18.081529+05:30",
+      "observation_id": "obs_b58c58b34b15",
+      "collection_timestamp": "2026-08-30T16:33:19.806060+05:30",
       "route_id": "GOA-MUMBAI",
       "total_passengers": 1495328,
       "origin": "GOX",
@@ -1245,8 +1245,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_ff33ba2b72fa",
-      "collection_timestamp": "2026-08-30T10:42:18.081529+05:30",
+      "observation_id": "obs_3ce3714e1e61",
+      "collection_timestamp": "2026-08-30T16:33:19.806060+05:30",
       "route_id": "GOA-MUMBAI",
       "total_passengers": 1495328,
       "origin": "GOX",
@@ -1280,8 +1280,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_57ab39a6dd73",
-      "collection_timestamp": "2026-08-30T10:42:18.081529+05:30",
+      "observation_id": "obs_e57ef3135119",
+      "collection_timestamp": "2026-08-30T16:33:19.806060+05:30",
       "route_id": "GOA-MUMBAI",
       "total_passengers": 1495328,
       "origin": "GOX",
@@ -1315,8 +1315,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_b8576403b08f",
-      "collection_timestamp": "2026-08-30T10:42:18.081529+05:30",
+      "observation_id": "obs_20d4bdcfafe0",
+      "collection_timestamp": "2026-08-30T16:33:19.806060+05:30",
       "route_id": "GOA-MUMBAI",
       "total_passengers": 1495328,
       "origin": "GOX",
@@ -1350,8 +1350,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_25da4325d628",
-      "collection_timestamp": "2026-08-30T10:42:36.454058+05:30",
+      "observation_id": "obs_c56e4fd90994",
+      "collection_timestamp": "2026-08-30T16:33:27.666165+05:30",
       "route_id": "AHMEDABAD-DELHI",
       "total_passengers": 1402813,
       "origin": "AMD",
@@ -1385,8 +1385,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_a5eafc8899e6",
-      "collection_timestamp": "2026-08-30T10:42:36.454058+05:30",
+      "observation_id": "obs_2763470073c8",
+      "collection_timestamp": "2026-08-30T16:33:27.666165+05:30",
       "route_id": "AHMEDABAD-DELHI",
       "total_passengers": 1402813,
       "origin": "AMD",
@@ -1420,8 +1420,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_74607d7423fc",
-      "collection_timestamp": "2026-08-30T10:42:36.454058+05:30",
+      "observation_id": "obs_7251da3af43c",
+      "collection_timestamp": "2026-08-30T16:33:27.666165+05:30",
       "route_id": "AHMEDABAD-DELHI",
       "total_passengers": 1402813,
       "origin": "AMD",
@@ -1455,8 +1455,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_13697cfc8ac5",
-      "collection_timestamp": "2026-08-30T10:42:36.454058+05:30",
+      "observation_id": "obs_c50051d81622",
+      "collection_timestamp": "2026-08-30T16:33:27.666165+05:30",
       "route_id": "AHMEDABAD-DELHI",
       "total_passengers": 1402813,
       "origin": "AMD",
@@ -1490,8 +1490,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_eb3500d508db",
-      "collection_timestamp": "2026-08-30T10:42:36.454058+05:30",
+      "observation_id": "obs_10bf6d9bfb32",
+      "collection_timestamp": "2026-08-30T16:33:27.666165+05:30",
       "route_id": "AHMEDABAD-DELHI",
       "total_passengers": 1402813,
       "origin": "AMD",
@@ -1525,8 +1525,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_a7b80ef8bc26",
-      "collection_timestamp": "2026-08-30T10:42:50.897044+05:30",
+      "observation_id": "obs_10ddfba3aee9",
+      "collection_timestamp": "2026-08-30T16:33:35.495230+05:30",
       "route_id": "DELHI-GOA",
       "total_passengers": 1352032,
       "origin": "DEL",
@@ -1560,8 +1560,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_f4ce76178a88",
-      "collection_timestamp": "2026-08-30T10:42:50.897044+05:30",
+      "observation_id": "obs_38a865053a5a",
+      "collection_timestamp": "2026-08-30T16:33:35.495230+05:30",
       "route_id": "DELHI-GOA",
       "total_passengers": 1352032,
       "origin": "DEL",
@@ -1595,8 +1595,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_2fb2efb4eec4",
-      "collection_timestamp": "2026-08-30T10:42:50.897044+05:30",
+      "observation_id": "obs_ac2aa19e9ddf",
+      "collection_timestamp": "2026-08-30T16:33:35.495230+05:30",
       "route_id": "DELHI-GOA",
       "total_passengers": 1352032,
       "origin": "DEL",
@@ -1630,8 +1630,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_40f74340e0db",
-      "collection_timestamp": "2026-08-30T10:42:50.897044+05:30",
+      "observation_id": "obs_943209f56529",
+      "collection_timestamp": "2026-08-30T16:33:35.495230+05:30",
       "route_id": "DELHI-GOA",
       "total_passengers": 1352032,
       "origin": "DEL",
@@ -1665,8 +1665,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_e9618348c2ff",
-      "collection_timestamp": "2026-08-30T10:42:50.897044+05:30",
+      "observation_id": "obs_6b36b6f9af07",
+      "collection_timestamp": "2026-08-30T16:33:35.495230+05:30",
       "route_id": "DELHI-GOA",
       "total_passengers": 1352032,
       "origin": "DEL",
@@ -1700,8 +1700,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_cc2f8b65a50b",
-      "collection_timestamp": "2026-08-30T10:43:06.974657+05:30",
+      "observation_id": "obs_c6cc2553fc66",
+      "collection_timestamp": "2026-08-30T16:33:41.920513+05:30",
       "route_id": "CHENNAI-MUMBAI",
       "total_passengers": 1312448,
       "origin": "MAA",
@@ -1735,8 +1735,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_58e10337fa0f",
-      "collection_timestamp": "2026-08-30T10:43:06.974657+05:30",
+      "observation_id": "obs_522febaf8ada",
+      "collection_timestamp": "2026-08-30T16:33:41.920513+05:30",
       "route_id": "CHENNAI-MUMBAI",
       "total_passengers": 1312448,
       "origin": "MAA",
@@ -1770,8 +1770,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_42b9520a836f",
-      "collection_timestamp": "2026-08-30T10:43:06.974657+05:30",
+      "observation_id": "obs_a8aca8279d1f",
+      "collection_timestamp": "2026-08-30T16:33:41.920513+05:30",
       "route_id": "CHENNAI-MUMBAI",
       "total_passengers": 1312448,
       "origin": "MAA",
@@ -1805,8 +1805,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_be204ad50965",
-      "collection_timestamp": "2026-08-30T10:43:06.974657+05:30",
+      "observation_id": "obs_ddb9effe18e3",
+      "collection_timestamp": "2026-08-30T16:33:41.920513+05:30",
       "route_id": "CHENNAI-MUMBAI",
       "total_passengers": 1312448,
       "origin": "MAA",
@@ -1840,8 +1840,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_c8d70b8a059f",
-      "collection_timestamp": "2026-08-30T10:43:06.974657+05:30",
+      "observation_id": "obs_baa59c410327",
+      "collection_timestamp": "2026-08-30T16:33:41.920513+05:30",
       "route_id": "CHENNAI-MUMBAI",
       "total_passengers": 1312448,
       "origin": "MAA",
@@ -1875,8 +1875,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_7892da0a631f",
-      "collection_timestamp": "2026-08-30T10:43:18.536587+05:30",
+      "observation_id": "obs_115cf17c5505",
+      "collection_timestamp": "2026-08-30T16:33:49.704141+05:30",
       "route_id": "HYDERABAD-MUMBAI",
       "total_passengers": 1285881,
       "origin": "HYD",
@@ -1910,8 +1910,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_9b448b2d5c42",
-      "collection_timestamp": "2026-08-30T10:43:18.536587+05:30",
+      "observation_id": "obs_6d1af1fcfe5f",
+      "collection_timestamp": "2026-08-30T16:33:49.704141+05:30",
       "route_id": "HYDERABAD-MUMBAI",
       "total_passengers": 1285881,
       "origin": "HYD",
@@ -1945,8 +1945,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_b997cf356944",
-      "collection_timestamp": "2026-08-30T10:43:18.536587+05:30",
+      "observation_id": "obs_52032426c650",
+      "collection_timestamp": "2026-08-30T16:33:49.704141+05:30",
       "route_id": "HYDERABAD-MUMBAI",
       "total_passengers": 1285881,
       "origin": "HYD",
@@ -1980,8 +1980,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_fbdc5c0bcc4b",
-      "collection_timestamp": "2026-08-30T10:43:18.536587+05:30",
+      "observation_id": "obs_bcf3c45da355",
+      "collection_timestamp": "2026-08-30T16:33:49.704141+05:30",
       "route_id": "HYDERABAD-MUMBAI",
       "total_passengers": 1285881,
       "origin": "HYD",
@@ -2015,8 +2015,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_5cfa4d457c2f",
-      "collection_timestamp": "2026-08-30T10:43:18.536587+05:30",
+      "observation_id": "obs_c6258401d277",
+      "collection_timestamp": "2026-08-30T16:33:49.704141+05:30",
       "route_id": "HYDERABAD-MUMBAI",
       "total_passengers": 1285881,
       "origin": "HYD",
@@ -2050,8 +2050,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_033be869ebdb",
-      "collection_timestamp": "2026-08-30T10:43:46.330948+05:30",
+      "observation_id": "obs_5b3a7b807e10",
+      "collection_timestamp": "2026-08-30T16:33:56.047154+05:30",
       "route_id": "KOLKATA-MUMBAI",
       "total_passengers": 1281897,
       "origin": "CCU",
@@ -2085,8 +2085,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_ba8e85c9e529",
-      "collection_timestamp": "2026-08-30T10:43:46.330948+05:30",
+      "observation_id": "obs_a5288cf56255",
+      "collection_timestamp": "2026-08-30T16:33:56.047154+05:30",
       "route_id": "KOLKATA-MUMBAI",
       "total_passengers": 1281897,
       "origin": "CCU",
@@ -2120,8 +2120,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_45410142e7e9",
-      "collection_timestamp": "2026-08-30T10:43:46.330948+05:30",
+      "observation_id": "obs_794900b8796f",
+      "collection_timestamp": "2026-08-30T16:33:56.047154+05:30",
       "route_id": "KOLKATA-MUMBAI",
       "total_passengers": 1281897,
       "origin": "CCU",
@@ -2155,8 +2155,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_f75961061687",
-      "collection_timestamp": "2026-08-30T10:43:46.330948+05:30",
+      "observation_id": "obs_6325b7c221c4",
+      "collection_timestamp": "2026-08-30T16:33:56.047154+05:30",
       "route_id": "KOLKATA-MUMBAI",
       "total_passengers": 1281897,
       "origin": "CCU",
@@ -2190,8 +2190,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_890ca788a86f",
-      "collection_timestamp": "2026-08-30T10:43:46.330948+05:30",
+      "observation_id": "obs_c97761c27513",
+      "collection_timestamp": "2026-08-30T16:33:56.047154+05:30",
       "route_id": "KOLKATA-MUMBAI",
       "total_passengers": 1281897,
       "origin": "CCU",
@@ -2225,8 +2225,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_3396dde9ede5",
-      "collection_timestamp": "2026-08-30T10:44:06.254290+05:30",
+      "observation_id": "obs_8a7e7660ce8d",
+      "collection_timestamp": "2026-08-30T16:34:02.386730+05:30",
       "route_id": "CHENNAI-DELHI",
       "total_passengers": 1277274,
       "origin": "MAA",
@@ -2260,8 +2260,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_7fb250195df3",
-      "collection_timestamp": "2026-08-30T10:44:06.254290+05:30",
+      "observation_id": "obs_8e367101c01d",
+      "collection_timestamp": "2026-08-30T16:34:02.386730+05:30",
       "route_id": "CHENNAI-DELHI",
       "total_passengers": 1277274,
       "origin": "MAA",
@@ -2278,25 +2278,25 @@
       "departure_time": null,
       "arrival_time": null,
       "duration_minutes": null,
-      "fare_family": null,
+      "fare_family": "Economy",
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": null,
+      "total_fare": 11293.0,
       "currency": "INR",
-      "availability_status": "not_published",
+      "availability_status": "available",
       "seats_available": null,
       "source": "Air India Express",
       "source_type": "airline_published_fare_page",
-      "data_quality_score": 0,
-      "no_flights": null,
+      "data_quality_score": 60,
+      "no_flights": false,
       "sold_out": null,
       "source_url": "https://flights.airindiaexpress.com/en-in/chennai-to-delhi-flights",
       "note": null
     },
     {
-      "observation_id": "obs_923fb3218b41",
-      "collection_timestamp": "2026-08-30T10:44:06.254290+05:30",
+      "observation_id": "obs_a594f4aa905c",
+      "collection_timestamp": "2026-08-30T16:34:02.386730+05:30",
       "route_id": "CHENNAI-DELHI",
       "total_passengers": 1277274,
       "origin": "MAA",
@@ -2330,8 +2330,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_5fd1e5c064d5",
-      "collection_timestamp": "2026-08-30T10:44:06.254290+05:30",
+      "observation_id": "obs_9a9649966042",
+      "collection_timestamp": "2026-08-30T16:34:02.386730+05:30",
       "route_id": "CHENNAI-DELHI",
       "total_passengers": 1277274,
       "origin": "MAA",
@@ -2365,8 +2365,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_5a3c9434ccc7",
-      "collection_timestamp": "2026-08-30T10:44:06.254290+05:30",
+      "observation_id": "obs_894583f11f95",
+      "collection_timestamp": "2026-08-30T16:34:02.386730+05:30",
       "route_id": "CHENNAI-DELHI",
       "total_passengers": 1277274,
       "origin": "MAA",
@@ -2400,8 +2400,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_4dfd58edb459",
-      "collection_timestamp": "2026-08-30T10:44:18.082306+05:30",
+      "observation_id": "obs_ee6ac3edc23b",
+      "collection_timestamp": "2026-08-30T16:34:09.049974+05:30",
       "route_id": "BENGALURU-HYDERABAD",
       "total_passengers": 1217734,
       "origin": "BLR",
@@ -2435,8 +2435,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_79d381d8f8ba",
-      "collection_timestamp": "2026-08-30T10:44:18.082306+05:30",
+      "observation_id": "obs_5c0234a09794",
+      "collection_timestamp": "2026-08-30T16:34:09.049974+05:30",
       "route_id": "BENGALURU-HYDERABAD",
       "total_passengers": 1217734,
       "origin": "BLR",
@@ -2470,8 +2470,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_343626174706",
-      "collection_timestamp": "2026-08-30T10:44:18.082306+05:30",
+      "observation_id": "obs_0aefbb94f42d",
+      "collection_timestamp": "2026-08-30T16:34:09.049974+05:30",
       "route_id": "BENGALURU-HYDERABAD",
       "total_passengers": 1217734,
       "origin": "BLR",
@@ -2505,8 +2505,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_abd937ce4978",
-      "collection_timestamp": "2026-08-30T10:44:18.082306+05:30",
+      "observation_id": "obs_3cb6d53bca55",
+      "collection_timestamp": "2026-08-30T16:34:09.049974+05:30",
       "route_id": "BENGALURU-HYDERABAD",
       "total_passengers": 1217734,
       "origin": "BLR",
@@ -2523,25 +2523,25 @@
       "departure_time": null,
       "arrival_time": null,
       "duration_minutes": null,
-      "fare_family": null,
+      "fare_family": "Economy",
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": null,
+      "total_fare": 4523.0,
       "currency": "INR",
-      "availability_status": "not_published",
+      "availability_status": "available",
       "seats_available": null,
       "source": "Air India Express",
       "source_type": "airline_published_fare_page",
-      "data_quality_score": 0,
-      "no_flights": null,
+      "data_quality_score": 60,
+      "no_flights": false,
       "sold_out": null,
       "source_url": "https://flights.airindiaexpress.com/en-in/bengaluru-to-hyderabad-flights",
       "note": null
     },
     {
-      "observation_id": "obs_e9edc83e8892",
-      "collection_timestamp": "2026-08-30T10:44:18.082306+05:30",
+      "observation_id": "obs_aa9836ff3511",
+      "collection_timestamp": "2026-08-30T16:34:09.049974+05:30",
       "route_id": "BENGALURU-HYDERABAD",
       "total_passengers": 1217734,
       "origin": "BLR",
@@ -2575,8 +2575,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_7f2363f169a2",
-      "collection_timestamp": "2026-08-30T10:44:31.852809+05:30",
+      "observation_id": "obs_9b5002c84afc",
+      "collection_timestamp": "2026-08-30T16:34:15.354166+05:30",
       "route_id": "AHMEDABAD-MUMBAI",
       "total_passengers": 1215086,
       "origin": "AMD",
@@ -2610,8 +2610,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_402ba361e920",
-      "collection_timestamp": "2026-08-30T10:44:31.853705+05:30",
+      "observation_id": "obs_4b6674ff6eed",
+      "collection_timestamp": "2026-08-30T16:34:15.354166+05:30",
       "route_id": "AHMEDABAD-MUMBAI",
       "total_passengers": 1215086,
       "origin": "AMD",
@@ -2645,8 +2645,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_400ab9883242",
-      "collection_timestamp": "2026-08-30T10:44:31.853705+05:30",
+      "observation_id": "obs_abbdfe7ad701",
+      "collection_timestamp": "2026-08-30T16:34:15.354166+05:30",
       "route_id": "AHMEDABAD-MUMBAI",
       "total_passengers": 1215086,
       "origin": "AMD",
@@ -2680,8 +2680,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_c8a05d2ba1e5",
-      "collection_timestamp": "2026-08-30T10:44:31.853705+05:30",
+      "observation_id": "obs_a11398e113a7",
+      "collection_timestamp": "2026-08-30T16:34:15.354166+05:30",
       "route_id": "AHMEDABAD-MUMBAI",
       "total_passengers": 1215086,
       "origin": "AMD",
@@ -2715,8 +2715,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_09e58cf4f556",
-      "collection_timestamp": "2026-08-30T10:44:31.853705+05:30",
+      "observation_id": "obs_89f2254aa026",
+      "collection_timestamp": "2026-08-30T16:34:15.354166+05:30",
       "route_id": "AHMEDABAD-MUMBAI",
       "total_passengers": 1215086,
       "origin": "AMD",
@@ -2750,8 +2750,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_7de0cdb1eb9e",
-      "collection_timestamp": "2026-08-30T10:44:47.141113+05:30",
+      "observation_id": "obs_788b726be9f1",
+      "collection_timestamp": "2026-08-30T16:34:21.020920+05:30",
       "route_id": "BENGALURU-KOLKATA",
       "total_passengers": 1204113,
       "origin": "BLR",
@@ -2772,7 +2772,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 7343.0,
+      "total_fare": 7763.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -2785,8 +2785,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_c224e83d3a93",
-      "collection_timestamp": "2026-08-30T10:44:47.141113+05:30",
+      "observation_id": "obs_211bb9889b15",
+      "collection_timestamp": "2026-08-30T16:34:21.020920+05:30",
       "route_id": "BENGALURU-KOLKATA",
       "total_passengers": 1204113,
       "origin": "BLR",
@@ -2807,7 +2807,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 7343.0,
+      "total_fare": 7763.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -2820,8 +2820,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_79c32a5338d7",
-      "collection_timestamp": "2026-08-30T10:44:47.141113+05:30",
+      "observation_id": "obs_08fd6ba68bec",
+      "collection_timestamp": "2026-08-30T16:34:21.020920+05:30",
       "route_id": "BENGALURU-KOLKATA",
       "total_passengers": 1204113,
       "origin": "BLR",
@@ -2842,7 +2842,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 6177.0,
+      "total_fare": 6387.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -2855,8 +2855,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_b8d81ed3e0fd",
-      "collection_timestamp": "2026-08-30T10:44:47.141113+05:30",
+      "observation_id": "obs_f8ac10b0d3c0",
+      "collection_timestamp": "2026-08-30T16:34:21.020920+05:30",
       "route_id": "BENGALURU-KOLKATA",
       "total_passengers": 1204113,
       "origin": "BLR",
@@ -2877,7 +2877,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 6177.0,
+      "total_fare": 6387.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -2890,8 +2890,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_52ed0201743d",
-      "collection_timestamp": "2026-08-30T10:44:47.141113+05:30",
+      "observation_id": "obs_fed8bfcc61c6",
+      "collection_timestamp": "2026-08-30T16:34:21.020920+05:30",
       "route_id": "BENGALURU-KOLKATA",
       "total_passengers": 1204113,
       "origin": "BLR",
@@ -2925,8 +2925,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_4a9989bad1f1",
-      "collection_timestamp": "2026-08-30T10:44:47.141113+05:30",
+      "observation_id": "obs_67cb3d8960c6",
+      "collection_timestamp": "2026-08-30T16:34:21.020920+05:30",
       "route_id": "BENGALURU-KOLKATA",
       "total_passengers": 1204113,
       "origin": "BLR",
@@ -2960,8 +2960,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_4e466ac1fa67",
-      "collection_timestamp": "2026-08-30T10:44:47.141113+05:30",
+      "observation_id": "obs_8cb2e4e4b45a",
+      "collection_timestamp": "2026-08-30T16:34:21.020920+05:30",
       "route_id": "BENGALURU-KOLKATA",
       "total_passengers": 1204113,
       "origin": "BLR",
@@ -2995,8 +2995,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_58b686391133",
-      "collection_timestamp": "2026-08-30T10:44:47.141113+05:30",
+      "observation_id": "obs_cee837ec9daf",
+      "collection_timestamp": "2026-08-30T16:34:21.020920+05:30",
       "route_id": "BENGALURU-KOLKATA",
       "total_passengers": 1204113,
       "origin": "BLR",
@@ -3030,8 +3030,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_a63bdc88fcd9",
-      "collection_timestamp": "2026-08-30T10:44:47.141113+05:30",
+      "observation_id": "obs_209411d9bf2f",
+      "collection_timestamp": "2026-08-30T16:34:21.020920+05:30",
       "route_id": "BENGALURU-KOLKATA",
       "total_passengers": 1204113,
       "origin": "BLR",
@@ -3065,8 +3065,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_3d790d26dcc1",
-      "collection_timestamp": "2026-08-30T10:45:02.648580+05:30",
+      "observation_id": "obs_0fc26dae3a62",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3100,8 +3100,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_6ef4d7d9446d",
-      "collection_timestamp": "2026-08-30T10:45:02.648580+05:30",
+      "observation_id": "obs_558fb69efff6",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3135,8 +3135,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_581d1d307e5a",
-      "collection_timestamp": "2026-08-30T10:45:02.648580+05:30",
+      "observation_id": "obs_34b0628c2bfc",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3170,8 +3170,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_c679ac2dee2c",
-      "collection_timestamp": "2026-08-30T10:45:02.648580+05:30",
+      "observation_id": "obs_d79483b1584b",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3205,8 +3205,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_d70d44e87979",
-      "collection_timestamp": "2026-08-30T10:45:02.648580+05:30",
+      "observation_id": "obs_e8bfc5154039",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3240,8 +3240,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_e3aea040844c",
-      "collection_timestamp": "2026-08-30T10:45:02.648580+05:30",
+      "observation_id": "obs_a340bb322971",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3275,8 +3275,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_c3b64742f8eb",
-      "collection_timestamp": "2026-08-30T10:45:02.648580+05:30",
+      "observation_id": "obs_e55388a598aa",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3310,8 +3310,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_1758a5a559d2",
-      "collection_timestamp": "2026-08-30T10:45:02.650599+05:30",
+      "observation_id": "obs_bff187605b24",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3345,8 +3345,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_e5b35e6fe09c",
-      "collection_timestamp": "2026-08-30T10:45:02.650599+05:30",
+      "observation_id": "obs_05e3a58264df",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3380,8 +3380,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_701262b5ef40",
-      "collection_timestamp": "2026-08-30T10:45:02.650599+05:30",
+      "observation_id": "obs_2aba896e840c",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3415,8 +3415,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_b47b737b33d9",
-      "collection_timestamp": "2026-08-30T10:45:02.650599+05:30",
+      "observation_id": "obs_11b07484542f",
+      "collection_timestamp": "2026-08-30T16:34:27.915232+05:30",
       "route_id": "DELHI-SRINAGAR",
       "total_passengers": 1141145,
       "origin": "DEL",
@@ -3450,8 +3450,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_33a3217134c2",
-      "collection_timestamp": "2026-08-30T10:45:16.218812+05:30",
+      "observation_id": "obs_7d8e0860b5dc",
+      "collection_timestamp": "2026-08-30T16:34:33.108295+05:30",
       "route_id": "BENGALURU-PUNE",
       "total_passengers": 1079353,
       "origin": "BLR",
@@ -3485,8 +3485,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_0a4410a0e49f",
-      "collection_timestamp": "2026-08-30T10:45:16.218812+05:30",
+      "observation_id": "obs_fab4bb87961d",
+      "collection_timestamp": "2026-08-30T16:34:33.109281+05:30",
       "route_id": "BENGALURU-PUNE",
       "total_passengers": 1079353,
       "origin": "BLR",
@@ -3520,8 +3520,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_acd14073caea",
-      "collection_timestamp": "2026-08-30T10:45:16.218812+05:30",
+      "observation_id": "obs_9189c0ff384c",
+      "collection_timestamp": "2026-08-30T16:34:33.109281+05:30",
       "route_id": "BENGALURU-PUNE",
       "total_passengers": 1079353,
       "origin": "BLR",
@@ -3555,8 +3555,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_bc7abfe8932f",
-      "collection_timestamp": "2026-08-30T10:45:16.218812+05:30",
+      "observation_id": "obs_87c7c8277aaf",
+      "collection_timestamp": "2026-08-30T16:34:33.109281+05:30",
       "route_id": "BENGALURU-PUNE",
       "total_passengers": 1079353,
       "origin": "BLR",
@@ -3590,8 +3590,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_70529b285d27",
-      "collection_timestamp": "2026-08-30T10:45:16.218812+05:30",
+      "observation_id": "obs_d90a8daf4b7a",
+      "collection_timestamp": "2026-08-30T16:34:33.109281+05:30",
       "route_id": "BENGALURU-PUNE",
       "total_passengers": 1079353,
       "origin": "BLR",
@@ -3625,8 +3625,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_aa1c26586087",
-      "collection_timestamp": "2026-08-30T10:45:27.400595+05:30",
+      "observation_id": "obs_c8d37e5023a4",
+      "collection_timestamp": "2026-08-30T16:34:39.968263+05:30",
       "route_id": "DELHI-GUWAHATI",
       "total_passengers": 938099,
       "origin": "DEL",
@@ -3647,7 +3647,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 7570.0,
+      "total_fare": 7820.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -3660,8 +3660,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_5482bbd73a36",
-      "collection_timestamp": "2026-08-30T10:45:27.400595+05:30",
+      "observation_id": "obs_fe2c90ffff70",
+      "collection_timestamp": "2026-08-30T16:34:39.968263+05:30",
       "route_id": "DELHI-GUWAHATI",
       "total_passengers": 938099,
       "origin": "DEL",
@@ -3695,8 +3695,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_0213a5007397",
-      "collection_timestamp": "2026-08-30T10:45:27.400595+05:30",
+      "observation_id": "obs_f1728ce2b48d",
+      "collection_timestamp": "2026-08-30T16:34:39.968263+05:30",
       "route_id": "DELHI-GUWAHATI",
       "total_passengers": 938099,
       "origin": "DEL",
@@ -3713,25 +3713,25 @@
       "departure_time": null,
       "arrival_time": null,
       "duration_minutes": null,
-      "fare_family": null,
+      "fare_family": "Economy",
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": null,
+      "total_fare": 7570.0,
       "currency": "INR",
-      "availability_status": "not_published",
+      "availability_status": "available",
       "seats_available": null,
       "source": "Air India Express",
       "source_type": "airline_published_fare_page",
-      "data_quality_score": 0,
-      "no_flights": null,
+      "data_quality_score": 60,
+      "no_flights": false,
       "sold_out": null,
       "source_url": "https://flights.airindiaexpress.com/en-in/delhi-to-guwahati-flights",
       "note": null
     },
     {
-      "observation_id": "obs_c756b1c3774f",
-      "collection_timestamp": "2026-08-30T10:45:27.400595+05:30",
+      "observation_id": "obs_28762859f4ee",
+      "collection_timestamp": "2026-08-30T16:34:39.968263+05:30",
       "route_id": "DELHI-GUWAHATI",
       "total_passengers": 938099,
       "origin": "DEL",
@@ -3765,8 +3765,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_f8688f8a832d",
-      "collection_timestamp": "2026-08-30T10:45:27.400595+05:30",
+      "observation_id": "obs_a257aa90e042",
+      "collection_timestamp": "2026-08-30T16:34:39.968263+05:30",
       "route_id": "DELHI-GUWAHATI",
       "total_passengers": 938099,
       "origin": "DEL",
@@ -3783,25 +3783,25 @@
       "departure_time": null,
       "arrival_time": null,
       "duration_minutes": null,
-      "fare_family": null,
+      "fare_family": "Economy",
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": null,
+      "total_fare": 9451.0,
       "currency": "INR",
-      "availability_status": "not_published",
+      "availability_status": "available",
       "seats_available": null,
       "source": "Air India Express",
       "source_type": "airline_published_fare_page",
-      "data_quality_score": 0,
-      "no_flights": null,
+      "data_quality_score": 60,
+      "no_flights": false,
       "sold_out": null,
       "source_url": "https://flights.airindiaexpress.com/en-in/delhi-to-guwahati-flights",
       "note": null
     },
     {
-      "observation_id": "obs_cf7a12510d29",
-      "collection_timestamp": "2026-08-30T10:45:37.273047+05:30",
+      "observation_id": "obs_e3fac6051e8e",
+      "collection_timestamp": "2026-08-30T16:34:46.952001+05:30",
       "route_id": "DELHI-PATNA",
       "total_passengers": 908354,
       "origin": "DEL",
@@ -3835,8 +3835,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_dc9c0d9f07e3",
-      "collection_timestamp": "2026-08-30T10:45:37.273047+05:30",
+      "observation_id": "obs_026a7e0ac971",
+      "collection_timestamp": "2026-08-30T16:34:46.952001+05:30",
       "route_id": "DELHI-PATNA",
       "total_passengers": 908354,
       "origin": "DEL",
@@ -3870,8 +3870,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_059c19a4d5f3",
-      "collection_timestamp": "2026-08-30T10:45:37.273047+05:30",
+      "observation_id": "obs_fe0032f183fe",
+      "collection_timestamp": "2026-08-30T16:34:46.952001+05:30",
       "route_id": "DELHI-PATNA",
       "total_passengers": 908354,
       "origin": "DEL",
@@ -3905,8 +3905,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_08b48945b7d7",
-      "collection_timestamp": "2026-08-30T10:45:37.273047+05:30",
+      "observation_id": "obs_a21731b16213",
+      "collection_timestamp": "2026-08-30T16:34:46.952001+05:30",
       "route_id": "DELHI-PATNA",
       "total_passengers": 908354,
       "origin": "DEL",
@@ -3927,7 +3927,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 6294.0,
+      "total_fare": 6818.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -3940,8 +3940,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_cad7c2a1967b",
-      "collection_timestamp": "2026-08-30T10:45:37.273047+05:30",
+      "observation_id": "obs_a6850f1615c2",
+      "collection_timestamp": "2026-08-30T16:34:46.952001+05:30",
       "route_id": "DELHI-PATNA",
       "total_passengers": 908354,
       "origin": "DEL",
@@ -3962,7 +3962,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 6294.0,
+      "total_fare": 6818.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -3975,8 +3975,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_e8d237c286e4",
-      "collection_timestamp": "2026-08-30T10:45:37.273047+05:30",
+      "observation_id": "obs_4f8e55c45d13",
+      "collection_timestamp": "2026-08-30T16:34:46.952001+05:30",
       "route_id": "DELHI-PATNA",
       "total_passengers": 908354,
       "origin": "DEL",
@@ -3997,7 +3997,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 6294.0,
+      "total_fare": 6818.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -4010,8 +4010,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_d77c021e658d",
-      "collection_timestamp": "2026-08-30T10:45:37.273047+05:30",
+      "observation_id": "obs_0eda6bfb06a4",
+      "collection_timestamp": "2026-08-30T16:34:46.952001+05:30",
       "route_id": "DELHI-PATNA",
       "total_passengers": 908354,
       "origin": "DEL",
@@ -4045,8 +4045,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_222ff1e77640",
-      "collection_timestamp": "2026-08-30T10:45:37.273047+05:30",
+      "observation_id": "obs_bff6511ea79c",
+      "collection_timestamp": "2026-08-30T16:34:46.952001+05:30",
       "route_id": "DELHI-PATNA",
       "total_passengers": 908354,
       "origin": "DEL",
@@ -4080,8 +4080,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_9831918295ab",
-      "collection_timestamp": "2026-08-30T10:45:37.273047+05:30",
+      "observation_id": "obs_0a4b4c8e776f",
+      "collection_timestamp": "2026-08-30T16:34:46.952001+05:30",
       "route_id": "DELHI-PATNA",
       "total_passengers": 908354,
       "origin": "DEL",
@@ -4115,8 +4115,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_2a8436838a91",
-      "collection_timestamp": "2026-08-30T10:45:50.110568+05:30",
+      "observation_id": "obs_d7f0d1277306",
+      "collection_timestamp": "2026-08-30T16:34:54.464548+05:30",
       "route_id": "BENGALURU-GOA",
       "total_passengers": 875214,
       "origin": "BLR",
@@ -4150,8 +4150,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_68db0e9de4d0",
-      "collection_timestamp": "2026-08-30T10:45:50.110568+05:30",
+      "observation_id": "obs_3447b72df3a2",
+      "collection_timestamp": "2026-08-30T16:34:54.464548+05:30",
       "route_id": "BENGALURU-GOA",
       "total_passengers": 875214,
       "origin": "BLR",
@@ -4185,8 +4185,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_187d31b09532",
-      "collection_timestamp": "2026-08-30T10:45:50.110568+05:30",
+      "observation_id": "obs_3b30ee159e7a",
+      "collection_timestamp": "2026-08-30T16:34:54.464548+05:30",
       "route_id": "BENGALURU-GOA",
       "total_passengers": 875214,
       "origin": "BLR",
@@ -4220,8 +4220,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_18932c6bac60",
-      "collection_timestamp": "2026-08-30T10:45:50.110568+05:30",
+      "observation_id": "obs_78919788d197",
+      "collection_timestamp": "2026-08-30T16:34:54.464548+05:30",
       "route_id": "BENGALURU-GOA",
       "total_passengers": 875214,
       "origin": "BLR",
@@ -4255,8 +4255,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_5bf21565a730",
-      "collection_timestamp": "2026-08-30T10:45:50.110568+05:30",
+      "observation_id": "obs_ecb881a213de",
+      "collection_timestamp": "2026-08-30T16:34:54.464548+05:30",
       "route_id": "BENGALURU-GOA",
       "total_passengers": 875214,
       "origin": "BLR",
@@ -4290,14 +4290,49 @@
       "note": null
     },
     {
-      "observation_id": "obs_3587248132de",
-      "collection_timestamp": "2026-08-30T10:46:11.054474+05:30",
+      "observation_id": "obs_f5d737a5cbe4",
+      "collection_timestamp": "2026-08-30T16:35:00.858940+05:30",
       "route_id": "BENGALURU-CHENNAI",
       "total_passengers": 872523,
       "origin": "BLR",
       "destination": "MAA",
       "travel_date": "2026-08-31",
       "advance_purchase_days": 1,
+      "trip_type": "one_way",
+      "passenger_count": 1,
+      "cabin": "economy",
+      "stops": null,
+      "airline_code": "IX",
+      "airline_name": "Air India Express",
+      "flight_number": null,
+      "departure_time": null,
+      "arrival_time": null,
+      "duration_minutes": null,
+      "fare_family": "Economy",
+      "base_fare": null,
+      "taxes": null,
+      "mandatory_fees": null,
+      "total_fare": 3770.0,
+      "currency": "INR",
+      "availability_status": "available",
+      "seats_available": null,
+      "source": "Air India Express",
+      "source_type": "airline_published_fare_page",
+      "data_quality_score": 60,
+      "no_flights": false,
+      "sold_out": null,
+      "source_url": "https://flights.airindiaexpress.com/en-in/bengaluru-to-chennai-flights",
+      "note": null
+    },
+    {
+      "observation_id": "obs_894bdada9cb1",
+      "collection_timestamp": "2026-08-30T16:35:00.858940+05:30",
+      "route_id": "BENGALURU-CHENNAI",
+      "total_passengers": 872523,
+      "origin": "BLR",
+      "destination": "MAA",
+      "travel_date": "2026-09-06",
+      "advance_purchase_days": 7,
       "trip_type": "one_way",
       "passenger_count": 1,
       "cabin": "economy",
@@ -4325,14 +4360,14 @@
       "note": null
     },
     {
-      "observation_id": "obs_be1474f67480",
-      "collection_timestamp": "2026-08-30T10:46:11.054474+05:30",
+      "observation_id": "obs_c5a875df2d03",
+      "collection_timestamp": "2026-08-30T16:35:00.858940+05:30",
       "route_id": "BENGALURU-CHENNAI",
       "total_passengers": 872523,
       "origin": "BLR",
       "destination": "MAA",
-      "travel_date": "2026-09-06",
-      "advance_purchase_days": 7,
+      "travel_date": "2026-09-14",
+      "advance_purchase_days": 15,
       "trip_type": "one_way",
       "passenger_count": 1,
       "cabin": "economy",
@@ -4360,43 +4395,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_4e0eb309aaa8",
-      "collection_timestamp": "2026-08-30T10:46:11.054474+05:30",
-      "route_id": "BENGALURU-CHENNAI",
-      "total_passengers": 872523,
-      "origin": "BLR",
-      "destination": "MAA",
-      "travel_date": "2026-09-14",
-      "advance_purchase_days": 15,
-      "trip_type": "one_way",
-      "passenger_count": 1,
-      "cabin": "economy",
-      "stops": null,
-      "airline_code": "IX",
-      "airline_name": "Air India Express",
-      "flight_number": null,
-      "departure_time": null,
-      "arrival_time": null,
-      "duration_minutes": null,
-      "fare_family": null,
-      "base_fare": null,
-      "taxes": null,
-      "mandatory_fees": null,
-      "total_fare": null,
-      "currency": "INR",
-      "availability_status": "not_published",
-      "seats_available": null,
-      "source": "Air India Express",
-      "source_type": "airline_published_fare_page",
-      "data_quality_score": 0,
-      "no_flights": null,
-      "sold_out": null,
-      "source_url": "https://flights.airindiaexpress.com/en-in/bengaluru-to-chennai-flights",
-      "note": null
-    },
-    {
-      "observation_id": "obs_eb3b7de67212",
-      "collection_timestamp": "2026-08-30T10:46:11.054474+05:30",
+      "observation_id": "obs_d34f2ad704dc",
+      "collection_timestamp": "2026-08-30T16:35:00.858940+05:30",
       "route_id": "BENGALURU-CHENNAI",
       "total_passengers": 872523,
       "origin": "BLR",
@@ -4430,8 +4430,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_e06a4eb9453b",
-      "collection_timestamp": "2026-08-30T10:46:11.054474+05:30",
+      "observation_id": "obs_41b5fb2c651b",
+      "collection_timestamp": "2026-08-30T16:35:00.858940+05:30",
       "route_id": "BENGALURU-CHENNAI",
       "total_passengers": 872523,
       "origin": "BLR",
@@ -4465,8 +4465,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_59faf1d03cd8",
-      "collection_timestamp": "2026-08-30T10:46:26.521518+05:30",
+      "observation_id": "obs_0f83241b04fc",
+      "collection_timestamp": "2026-08-30T16:35:07.183981+05:30",
       "route_id": "DELHI-LUCKNOW",
       "total_passengers": 854555,
       "origin": "DEL",
@@ -4500,8 +4500,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_5a19c5c3c541",
-      "collection_timestamp": "2026-08-30T10:46:26.521518+05:30",
+      "observation_id": "obs_1481df3dab66",
+      "collection_timestamp": "2026-08-30T16:35:07.183981+05:30",
       "route_id": "DELHI-LUCKNOW",
       "total_passengers": 854555,
       "origin": "DEL",
@@ -4535,8 +4535,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_12f9fe52018a",
-      "collection_timestamp": "2026-08-30T10:46:26.521518+05:30",
+      "observation_id": "obs_f2c852becf1b",
+      "collection_timestamp": "2026-08-30T16:35:07.183981+05:30",
       "route_id": "DELHI-LUCKNOW",
       "total_passengers": 854555,
       "origin": "DEL",
@@ -4570,8 +4570,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_6b4fa1973e81",
-      "collection_timestamp": "2026-08-30T10:46:26.521518+05:30",
+      "observation_id": "obs_49dc15bb1db6",
+      "collection_timestamp": "2026-08-30T16:35:07.183981+05:30",
       "route_id": "DELHI-LUCKNOW",
       "total_passengers": 854555,
       "origin": "DEL",
@@ -4605,8 +4605,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_e9061335f713",
-      "collection_timestamp": "2026-08-30T10:46:26.521518+05:30",
+      "observation_id": "obs_1416c5f66968",
+      "collection_timestamp": "2026-08-30T16:35:07.183981+05:30",
       "route_id": "DELHI-LUCKNOW",
       "total_passengers": 854555,
       "origin": "DEL",
@@ -4640,8 +4640,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_a80889d022f0",
-      "collection_timestamp": "2026-08-30T10:46:38.454840+05:30",
+      "observation_id": "obs_0d8bd6d6574f",
+      "collection_timestamp": "2026-08-30T16:35:12.340269+05:30",
       "route_id": "KOCHI-MUMBAI",
       "total_passengers": 805813,
       "origin": "COK",
@@ -4662,7 +4662,7 @@
       "base_fare": null,
       "taxes": null,
       "mandatory_fees": null,
-      "total_fare": 9490.0,
+      "total_fare": 9882.0,
       "currency": "INR",
       "availability_status": "available",
       "seats_available": null,
@@ -4675,8 +4675,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_92ef92056e50",
-      "collection_timestamp": "2026-08-30T10:46:38.454840+05:30",
+      "observation_id": "obs_3c84e4531a1b",
+      "collection_timestamp": "2026-08-30T16:35:12.340269+05:30",
       "route_id": "KOCHI-MUMBAI",
       "total_passengers": 805813,
       "origin": "COK",
@@ -4710,8 +4710,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_4e73a9e4f706",
-      "collection_timestamp": "2026-08-30T10:46:38.454840+05:30",
+      "observation_id": "obs_3bd8c359cd48",
+      "collection_timestamp": "2026-08-30T16:35:12.340269+05:30",
       "route_id": "KOCHI-MUMBAI",
       "total_passengers": 805813,
       "origin": "COK",
@@ -4745,8 +4745,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_33fd77a160b2",
-      "collection_timestamp": "2026-08-30T10:46:38.454840+05:30",
+      "observation_id": "obs_4b8b0fb67584",
+      "collection_timestamp": "2026-08-30T16:35:12.340269+05:30",
       "route_id": "KOCHI-MUMBAI",
       "total_passengers": 805813,
       "origin": "COK",
@@ -4780,8 +4780,8 @@
       "note": null
     },
     {
-      "observation_id": "obs_7512b0469e12",
-      "collection_timestamp": "2026-08-30T10:46:38.454840+05:30",
+      "observation_id": "obs_fb114d24c8f4",
+      "collection_timestamp": "2026-08-30T16:35:12.340269+05:30",
       "route_id": "KOCHI-MUMBAI",
       "total_passengers": 805813,
       "origin": "COK",

@@ -65,6 +65,7 @@ AIRLINE_CODES = {
     "IX": "Air India Express",
     "QP": "Akasa Air",
     "SG": "SpiceJet",
+    "S5": "Star Air",
 }
 
 _ROBOTS_LINES: list[str] | None = None
@@ -606,10 +607,11 @@ async def run_batch_scrape(headless: bool = True, test_only: bool = False) -> li
     routes = PRIORITY_ROUTES[:1] if test_only else PRIORITY_ROUTES
     records: list[dict] = []
     async with async_playwright() as playwright:
-        browser: Browser = await playwright.chromium.launch(
-            headless=headless,
-            args=["--disable-http2"],
-        )
+        # Yatra's public route pages currently fail in Chromium with
+        # net::ERR_HTTP2_PROTOCOL_ERROR (and hang when HTTP/2 is disabled).
+        # Firefox loads the same allowed public surface normally, so keep this
+        # collector isolated on Firefox while the other collectors use Chromium.
+        browser: Browser = await playwright.firefox.launch(headless=headless)
         contact = os.getenv("VAYUSETU_CONTACT_EMAIL", "").strip()
         page = await browser.new_page(
             viewport={"width": 1366, "height": 768},
@@ -634,9 +636,17 @@ async def run_batch_scrape(headless: bool = True, test_only: bool = False) -> li
         "routes": records,
     }
     if not test_only:
+        priced_count = sum(record.get("total_fare") is not None for record in records)
+        failure_outcomes = {"connection_blocked", "robots_disallowed"}
+        if records and not priced_count and all(
+            record.get("scrape_outcome") in failure_outcomes for record in records
+        ):
+            raise RuntimeError(
+                "Yatra collection failed for every route; preserved the previous output and skipped ETL"
+            )
         with open(OUTPUT_PATH, "w", encoding="utf-8") as file:
             json.dump(output, file, indent=2, ensure_ascii=False)
-        print(f"Wrote {len(records)} records to {OUTPUT_PATH}")
+        print(f"Wrote {len(records)} records ({priced_count} priced) to {OUTPUT_PATH}")
         persist_scraper_output(OUTPUT_PATH)
     else:
         outcomes: dict[str, int] = {}

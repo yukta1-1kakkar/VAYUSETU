@@ -26,6 +26,9 @@ elif DATABASE_URL.startswith("postgresql://"):
 engine_options = {"echo": False, "pool_pre_ping": True}
 if DATABASE_URL.startswith("sqlite"):
     engine_options["connect_args"] = {"check_same_thread": False}
+else:
+    # Keep the API's connection footprint bounded on small deployment instances.
+    engine_options.update({"pool_size": 2, "max_overflow": 1, "pool_recycle": 1800})
 
 engine = create_engine(DATABASE_URL, **engine_options)
 

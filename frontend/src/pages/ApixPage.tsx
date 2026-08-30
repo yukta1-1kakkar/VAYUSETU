@@ -10,28 +10,13 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { TrendingUp, Layers, Calendar, ArrowUpRight, CheckCircle2, Cpu, Compass, X, Calculator, Database, ShieldCheck } from 'lucide-react';
-import { formatINR, formatDelta, formatMonthYearLabel } from '../utils/geo';
+import { filterByChartRange, formatINR, formatDelta, formatMonthYearLabel, type ChartTimeRange } from '../utils/geo';
 
 export const ApixPage: React.FC = () => {
-  // Filters: 3M, 6M, 1Y, FY, ALL (default 3M)
-  const [filter, setFilter] = useState<'3M' | '6M' | '1Y' | 'FY' | 'ALL'>('3M');
+  const [filter, setFilter] = useState<ChartTimeRange>('1M');
   const [formulationOpen, setFormulationOpen] = useState(false);
 
-  const filteredData = React.useMemo(() => {
-    switch (filter) {
-      case '3M':
-        return INDEX_TIMELINE.slice(-3);
-      case '6M':
-        return INDEX_TIMELINE.slice(-6);
-      case 'FY':
-        return INDEX_TIMELINE.filter(pt => pt.date.includes('/26'));
-      case '1Y':
-        return INDEX_TIMELINE.slice(-13);
-      case 'ALL':
-      default:
-        return INDEX_TIMELINE;
-    }
-  }, [filter]);
+  const filteredData = React.useMemo(() => filterByChartRange(INDEX_TIMELINE, filter), [filter]);
 
   const currentPoint = INDEX_TIMELINE[INDEX_TIMELINE.length - 1];
   const previousPoint = INDEX_TIMELINE[INDEX_TIMELINE.length - 2] ?? currentPoint;
@@ -190,7 +175,7 @@ export const ApixPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1 p-1 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-medium">
-            {(['3M', '6M', '1Y', 'FY', 'ALL'] as const).map((t) => (
+            {(['1W', '1M', '3M', '1Y', 'ALL'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setFilter(t)}
@@ -200,7 +185,7 @@ export const ApixPage: React.FC = () => {
                     : 'text-[#64748B] hover:text-[#172033]'
                 }`}
               >
-                {t}
+                {t === 'ALL' ? 'All' : t}
               </button>
             ))}
           </div>

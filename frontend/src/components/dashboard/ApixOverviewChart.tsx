@@ -9,34 +9,14 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
-import { TrendingUp, Info } from 'lucide-react';
-import { formatMonthYearLabel } from '../../utils/geo';
+import { TrendingUp } from 'lucide-react';
+import { filterByChartRange, formatMonthYearLabel, type ChartTimeRange } from '../../utils/geo';
 
 export const ApixOverviewChart: React.FC<{
   showFullDetails?: boolean;
 }> = ({ showFullDetails = false }) => {
-  // Filters: 3M, 6M, 1Y, FY, ALL (default 3M)
-  const [filter, setFilter] = useState<'3M' | '6M' | '1Y' | 'FY' | 'ALL'>('3M');
-
-  const filteredData = React.useMemo(() => {
-    switch (filter) {
-      case '3M':
-        // Last 3 months (06/26, 07/26, 08/26)
-        return INDEX_TIMELINE.slice(-3);
-      case '6M':
-        // Last 6 months (03/26 to 08/26)
-        return INDEX_TIMELINE.slice(-6);
-      case 'FY':
-        // Financial Year (From 01/26 to 08/26)
-        return INDEX_TIMELINE.filter(pt => pt.date.includes('/26'));
-      case '1Y':
-        // 1 Year View (12 months from 08/25 to 08/26)
-        return INDEX_TIMELINE.slice(-13);
-      case 'ALL':
-      default:
-        return INDEX_TIMELINE;
-    }
-  }, [filter]);
+  const [filter, setFilter] = useState<ChartTimeRange>('1M');
+  const filteredData = React.useMemo(() => filterByChartRange(INDEX_TIMELINE, filter), [filter]);
 
   const currentVal = INDEX_TIMELINE[INDEX_TIMELINE.length - 1].indexValue;
   const prevVal = INDEX_TIMELINE[INDEX_TIMELINE.length - 2]?.indexValue ?? currentVal;
@@ -62,9 +42,9 @@ export const ApixOverviewChart: React.FC<{
           </div>
         </div>
 
-        {/* Timeframe Filters: 3M, 6M, 1Y, FY, ALL */}
+        {/* Calendar-based timeframe filters */}
         <div className="flex items-center gap-1 p-1 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-medium">
-          {(['3M', '6M', '1Y', 'FY', 'ALL'] as const).map((t) => (
+          {(['1W', '1M', '3M', '1Y', 'ALL'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setFilter(t)}
@@ -74,7 +54,7 @@ export const ApixOverviewChart: React.FC<{
                   : 'text-[#64748B] hover:text-[#172033] hover:bg-[#EDF2F7]'
               }`}
             >
-              {t}
+              {t === 'ALL' ? 'All' : t}
             </button>
           ))}
         </div>
@@ -149,20 +129,6 @@ export const ApixOverviewChart: React.FC<{
           </span>
         </div>
 
-        {/* Hoverable Methodology Tooltip */}
-        <div className="relative group/tip cursor-pointer">
-          <div className="flex items-center gap-1 text-[#64748B] hover:text-[#1769AA] text-xs font-semibold transition-colors">
-            <Info className="w-3.5 h-3.5 text-[#1769AA]" />
-            <span>Index Methodology</span>
-          </div>
-
-          <div className="absolute bottom-6 right-0 z-50 w-64 p-3 rounded-xl bg-white border border-[#CBD5E1] shadow-xl text-[11px] text-[#172033] leading-relaxed opacity-0 pointer-events-none group-hover/tip:opacity-100 group-hover/tip:pointer-events-auto transition-opacity duration-150">
-            <div className="font-bold text-[#1769AA] border-b border-[#F1F5F9] pb-1 mb-1">
-              Methodology & Basket
-            </div>
-            Matched-route price relatives weighted by normalized DGCA passenger traffic across the 24-route basket.
-          </div>
-        </div>
       </div>
     </div>
   );

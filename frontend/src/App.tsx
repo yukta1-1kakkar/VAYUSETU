@@ -3,7 +3,6 @@ import { AnimatePresence } from 'framer-motion';
 import { Braces, FileBarChart, Play, Settings } from 'lucide-react';
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { Navbar } from './components/common/Navbar';
-import { TelemetryTicker } from './components/common/TelemetryTicker';
 import { VayuSetuLogo } from './components/common/VayuSetuLogo';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LiveDataGate } from './components/LiveDataGate';
@@ -40,7 +39,7 @@ function PortalLayout({ onReplayIntro }: { onReplayIntro: () => void }) {
   return (
     <div className="flex min-h-screen flex-col bg-[#F6F8FB] font-sans text-[#172033] antialiased selection:bg-[#1769AA]/15 selection:text-[#1769AA]">
         <Navbar key={pathname} />
-        <div className="pt-[65px]"><TelemetryTicker /></div>
+        <div className="pt-[65px]" />
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 pt-8 sm:px-6 lg:px-8"><Outlet /></main>
         <footer className="mt-16 w-full border-t border-[#E2E8F0] bg-white py-8 text-xs text-[#64748B]">
           <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">

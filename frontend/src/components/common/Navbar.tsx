@@ -18,6 +18,7 @@ const NAVIGATION: NavigationItem[] = [
   { to: '/cpi', label: 'CPI', permission: 'price-trends' },
   { to: '/routes', label: 'Route Comparison', permission: 'route-comparison' },
   { to: '/lead-time-elasticity', label: 'Lead-Time Elasticity', permission: 'lead-time-elasticity' },
+  { to: '/api-explorer', label: 'API Access', permission: 'api-explorer' },
   { to: '/scraper-control', label: 'Scraper Control Panel', permission: 'scraping-scheduler' },
   { to: '/user-management', label: 'User Management', permission: 'user-management' },
   { to: '/route-basket', label: 'Route Basket & Weights', permission: 'route-basket' },

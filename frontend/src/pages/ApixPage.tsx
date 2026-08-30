@@ -10,34 +10,24 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { TrendingUp, Layers, Calendar, ArrowUpRight, CheckCircle2, Cpu, Compass, X, Calculator, Database, ShieldCheck } from 'lucide-react';
-import { formatINR, formatDelta, formatMonthYearLabel } from '../utils/geo';
+import { filterByChartRange, formatINR, formatDelta, formatMonthYearLabel, type ChartTimeRange } from '../utils/geo';
 
 export const ApixPage: React.FC = () => {
-  // Filters: 3M, 6M, 1Y, FY, ALL (default 3M)
-  const [filter, setFilter] = useState<'3M' | '6M' | '1Y' | 'FY' | 'ALL'>('3M');
+  const [filter, setFilter] = useState<ChartTimeRange>('1M');
   const [formulationOpen, setFormulationOpen] = useState(false);
+  const [showAllLedgerPeriods, setShowAllLedgerPeriods] = useState(false);
 
-  const filteredData = React.useMemo(() => {
-    switch (filter) {
-      case '3M':
-        return INDEX_TIMELINE.slice(-3);
-      case '6M':
-        return INDEX_TIMELINE.slice(-6);
-      case 'FY':
-        return INDEX_TIMELINE.filter(pt => pt.date.includes('/26'));
-      case '1Y':
-        return INDEX_TIMELINE.slice(-13);
-      case 'ALL':
-      default:
-        return INDEX_TIMELINE;
-    }
-  }, [filter]);
+  const filteredData = React.useMemo(() => filterByChartRange(INDEX_TIMELINE, filter), [filter]);
 
   const currentPoint = INDEX_TIMELINE[INDEX_TIMELINE.length - 1];
   const previousPoint = INDEX_TIMELINE[INDEX_TIMELINE.length - 2] ?? currentPoint;
   const momGrowth = ((currentPoint.indexValue - previousPoint.indexValue) / previousPoint.indexValue * 100).toFixed(2);
   const observedMeanFare = Math.round(FLIGHT_ROUTES.reduce((sum, route) => sum + route.currentFare, 0) / FLIGHT_ROUTES.length);
   const monitoredAirlines = new Set(FLIGHT_ROUTES.map((route) => route.primaryAirline)).size;
+  const ledgerPeriodCount = Math.min(24, INDEX_TIMELINE.length);
+  const ledgerRows = INDEX_TIMELINE
+    .slice(-(showAllLedgerPeriods ? ledgerPeriodCount : 8))
+    .reverse();
 
   return (
     <div className="space-y-8 pb-16">
@@ -49,7 +39,7 @@ export const ApixPage: React.FC = () => {
             <span>SOVEREIGN BENCHMARK SERIES</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-[#172033] tracking-tight">
-            APIx — Airfare Price Index ({currentPoint.date})
+            APIx - Airfare Price Index ({currentPoint.date})
           </h1>
           <p className="text-sm text-[#64748B] mt-1">
             A high-frequency aviation price index weighted by DGCA passenger traffic across 24 representative domestic corridors.
@@ -190,7 +180,7 @@ export const ApixPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1 p-1 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-medium">
-            {(['3M', '6M', '1Y', 'FY', 'ALL'] as const).map((t) => (
+            {(['1W', '1M', '3M', '1Y', 'ALL'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setFilter(t)}
@@ -200,7 +190,7 @@ export const ApixPage: React.FC = () => {
                     : 'text-[#64748B] hover:text-[#172033]'
                 }`}
               >
-                {t}
+                {t === 'ALL' ? 'All' : t}
               </button>
             ))}
           </div>
@@ -269,7 +259,7 @@ export const ApixPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F1F5F9]">
-                {INDEX_TIMELINE.slice(-8).reverse().map((pt, idx) => (
+                {ledgerRows.map((pt, idx) => (
                   <tr key={idx} className="hover:bg-[#F8FAFC]">
                     <td className="py-2.5 font-bold text-[#172033]">{pt.date}</td>
                     <td className="py-2.5 font-extrabold text-[#1769AA]">{pt.indexValue}</td>
@@ -286,6 +276,17 @@ export const ApixPage: React.FC = () => {
               </tbody>
             </table>
           </div>
+          {ledgerPeriodCount > 8 && (
+            <div className="flex justify-center border-t border-[#E2E8F0] pt-4">
+              <button
+                type="button"
+                onClick={() => setShowAllLedgerPeriods((current) => !current)}
+                className="rounded-xl border border-[#BFD4E8] bg-white px-4 py-2 text-xs font-extrabold text-[#1769AA] transition-colors hover:bg-blue-50"
+              >
+                {showAllLedgerPeriods ? 'Show recent 8' : `View all ${ledgerPeriodCount}`}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Route Contribution Breakdown */}

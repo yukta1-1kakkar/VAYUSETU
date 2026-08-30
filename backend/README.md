@@ -215,7 +215,10 @@ direct URL as `DIRECT_URL`. Never commit either credential. The ETL stores one
 deduplicated snapshot per offer and observation date, enabling daily 30-day
 backtesting while retaining raw and rejected records for audit.
 
-The frontend reads `GET /api/dashboard/live` and refreshes every 60 seconds.
+The frontend reads `GET /api/dashboard/live` immediately on page load and then
+refreshes every two hours. The API caches the generated dashboard snapshot for
+the same two-hour window, coalesces simultaneous cache misses, and returns
+browser cache headers so remounts and additional tabs do not repeat the work.
 For a deployed backend, set `VITE_API_URL` in `frontend/.env` to its `/api`
 URL before building the frontend. Airfare metrics never fall back to demo data.
 

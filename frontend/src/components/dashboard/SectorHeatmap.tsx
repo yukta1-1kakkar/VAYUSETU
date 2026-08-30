@@ -3,6 +3,8 @@ import { SECTOR_HEATMAP_DATA, FLIGHT_ROUTES } from '../../mock/airfareData';
 import { formatINR, formatDelta } from '../../utils/geo';
 import { Grid, TrendingUp, AlertTriangle, CheckCircle2, ShieldAlert, Sparkles, Filter, Layers, ArrowUpRight } from 'lucide-react';
 
+const CONFIGURED_SCRAPE_SOURCES = new Set(['Akasa Air', 'Air India Express', 'SpiceJet', 'Yatra']);
+
 export const SectorHeatmap: React.FC = () => {
   const [viewMode, setViewMode] = useState<'matrix' | 'cards'>('matrix');
   const [hoveredCell, setHoveredCell] = useState<{
@@ -12,7 +14,7 @@ export const SectorHeatmap: React.FC = () => {
     change: number;
     index: number;
     status: 'green' | 'yellow' | 'red';
-    airline: string;
+    scrapedSources: string;
   } | null>(null);
 
   // Highest-coverage airports in the live route basket (real IATA codes).
@@ -32,6 +34,11 @@ export const SectorHeatmap: React.FC = () => {
     
     // Status color tiers
     const status: 'green' | 'yellow' | 'red' = change >= 15 ? 'red' : change >= 5 ? 'yellow' : 'green';
+    const scrapedSources = (directRoute.sources ?? [])
+      .filter((source) => CONFIGURED_SCRAPE_SOURCES.has(source));
+    if (!scrapedSources.length && CONFIGURED_SCRAPE_SOURCES.has(directRoute.primaryAirline)) {
+      scrapedSources.push(directRoute.primaryAirline);
+    }
 
     return {
       routeId: directRoute.id,
@@ -41,7 +48,7 @@ export const SectorHeatmap: React.FC = () => {
       change,
       indexScore,
       status,
-      dominantCarrier: directRoute.dominantCarrier,
+      scrapedSources: scrapedSources.join(' / ') || 'No configured source',
       isAnomaly: directRoute.isAnomaly
     };
   };
@@ -156,7 +163,7 @@ export const SectorHeatmap: React.FC = () => {
                         return (
                           <td key={dest} className="p-1.5">
                             <div className="w-full h-12 rounded-xl bg-[#F1F5F9] border border-dashed border-[#CBD5E1] flex items-center justify-center text-[10px] text-[#94A3B8] font-mono">
-                              —
+                              -
                             </div>
                           </td>
                         );
@@ -181,7 +188,7 @@ export const SectorHeatmap: React.FC = () => {
                               change: cell.change,
                               index: cell.indexScore,
                               status: cell.status,
-                              airline: cell.dominantCarrier
+                              scrapedSources: cell.scrapedSources
                             })}
                             onMouseLeave={() => setHoveredCell(null)}
                             className={`w-full h-12 rounded-xl border p-1.5 flex flex-col justify-center items-center cursor-pointer transition-all duration-150 shadow-xs ${getHeatBg(cell.status)}`}
@@ -223,7 +230,7 @@ export const SectorHeatmap: React.FC = () => {
                 <span>Current Fare: <strong className="text-[#172033]">{formatINR(hoveredCell.fare)}</strong></span>
                 <span>Shift: <strong className={hoveredCell.change >= 10 ? 'text-[#DC2626]' : 'text-[#16A34A]'}>{formatDelta(hoveredCell.change)}</strong></span>
                 <span>Index Score: <strong className="text-[#1769AA]">{hoveredCell.index}</strong></span>
-                <span className="text-[#64748B]">Carrier: {hoveredCell.airline}</span>
+                <span className="text-[#64748B]">Scraped Sources: {hoveredCell.scrapedSources}</span>
               </div>
             </div>
           )}

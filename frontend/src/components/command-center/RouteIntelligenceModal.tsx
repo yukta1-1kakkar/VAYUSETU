@@ -47,7 +47,7 @@ export const RouteIntelligenceModal: React.FC<{
                 {route.originCity} ({route.origin}) → {route.destCity} ({route.destination})
               </h2>
               <div className="text-xs text-[#64748B] mt-1">
-                Distance: {route.distanceKm} km • Frequency: {route.weeklyFrequency} flights/week • {dataViewLabel ? `Data view: ${dataViewLabel}` : `Dominant: ${route.dominantCarrier}`}
+                Distance: {route.distanceKm} km • {dataViewLabel ? `Data view: ${dataViewLabel}` : `Dominant: ${route.dominantCarrier}`}
               </div>
             </div>
 
@@ -58,7 +58,7 @@ export const RouteIntelligenceModal: React.FC<{
                   route.changePercent >= 15 ? 'text-[#DC2626]' : 'text-[#1769AA]'
                 }`}
               >
-                {formatDelta(route.changePercent)} vs 30-day baseline
+                {formatDelta(route.changePercent)} vs reference baseline
               </div>
             </div>
           </div>
@@ -69,15 +69,15 @@ export const RouteIntelligenceModal: React.FC<{
           <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
             <span className="text-[11px] text-[#64748B] uppercase font-medium block">HISTORICAL AVG</span>
             <span className="text-lg font-extrabold text-[#172033] mt-0.5 block">{formatINR(route.historicalAvg)}</span>
-            <span className="text-[10px] text-[#94A3B8]">60-day median</span>
+            <span className="text-[10px] text-[#94A3B8]">Across five booking windows</span>
           </div>
           <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-            <span className="text-[11px] text-[#64748B] uppercase font-medium block">MIN FARE (30D)</span>
+            <span className="text-[11px] text-[#64748B] uppercase font-medium block">MIN FARE</span>
             <span className="text-lg font-extrabold text-[#16A34A] mt-0.5 block">{formatINR(route.minFare)}</span>
             <span className="text-[10px] text-[#94A3B8]">Adv. booking bucket</span>
           </div>
           <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-            <span className="text-[11px] text-[#64748B] uppercase font-medium block">MAX FARE (30D)</span>
+            <span className="text-[11px] text-[#64748B] uppercase font-medium block">MAX FARE</span>
             <span className="text-lg font-extrabold text-[#DC2626] mt-0.5 block">{formatINR(route.maxFare)}</span>
             <span className="text-[10px] text-[#94A3B8]">Peak churn yield</span>
           </div>

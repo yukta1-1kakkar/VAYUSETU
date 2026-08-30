@@ -29,7 +29,7 @@ export const CpiComparisonChart: React.FC = () => {
   }, [timeframe]);
 
   if (!CPI_DATA_SERIES.length) {
-    return <div className="intel-card p-8 text-center"><BarChart3 className="mx-auto h-10 w-10 text-[#0F8B8D]" /><h3 className="mt-3 text-xl font-bold text-[#172033]">Official CPI reference series not loaded</h3><p className="mt-2 text-sm text-[#64748B]">Load real MoSPI headline and Transport &amp; Communication index values into PostgreSQL to enable this comparison. No substitute values are displayed.</p></div>;
+    return <div className="intel-card p-8 text-center"><BarChart3 className="mx-auto h-10 w-10 text-[#0F8B8D]" /><h3 className="mt-3 text-xl font-bold text-[#172033]">APIx comparison awaiting an overlapping month</h3><p className="mt-2 text-sm text-[#64748B]">The official MoSPI CPI graphs and all 19 workbook observations are displayed above. This comparison will activate when monthly APIx and CPI observations overlap.</p></div>;
   }
 
   const latestAPIx = [...CPI_DATA_SERIES].reverse().find((point) => point.airfareIndex !== null);

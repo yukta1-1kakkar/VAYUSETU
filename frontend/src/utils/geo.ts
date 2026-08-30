@@ -82,3 +82,23 @@ export function formatMonthYearLabel(value: string): string {
     ? `${Number(parts[0])} ${monthName}'${year.slice(-2)}`
     : `${monthName}'${year.slice(-2)}`;
 }
+
+export type ChartTimeRange = '1W' | '1M' | '3M' | '1Y' | 'ALL';
+
+/** Filters DD/MM/YY observations using the latest available point as the range end. */
+export function filterByChartRange<T extends { date: string }>(data: T[], range: ChartTimeRange): T[] {
+  if (range === 'ALL' || data.length === 0) return data;
+
+  const toTimestamp = (value: string) => {
+    const [day, month, year] = value.split('/').map(Number);
+    if (!day || !month || !year) return Number.NaN;
+    return Date.UTC(year < 100 ? 2000 + year : year, month - 1, day);
+  };
+  const dated = data.map((point) => ({ point, timestamp: toTimestamp(point.date) })).filter((item) => Number.isFinite(item.timestamp));
+  if (!dated.length) return data;
+
+  const latest = Math.max(...dated.map((item) => item.timestamp));
+  const rangeDays: Record<Exclude<ChartTimeRange, 'ALL'>, number> = { '1W': 7, '1M': 31, '3M': 93, '1Y': 366 };
+  const threshold = latest - rangeDays[range] * 24 * 60 * 60 * 1000;
+  return dated.filter((item) => item.timestamp >= threshold).map((item) => item.point);
+}

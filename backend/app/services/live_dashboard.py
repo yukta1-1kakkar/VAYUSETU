@@ -3,10 +3,6 @@
 from __future__ import annotations
 
 import math
-import os
-import threading
-import time
-from heapq import nlargest
 from collections import Counter, defaultdict
 from datetime import date, datetime, timezone
 from statistics import mean, pstdev
@@ -43,7 +39,6 @@ CITY_TO_IATA = {
     "DELHI": "DEL", "NEW DELHI": "DEL", "MUMBAI": "BOM", "BENGALURU": "BLR", "BANGALORE": "BLR",
     "HYDERABAD": "HYD", "KOLKATA": "CCU", "CHENNAI": "MAA", "AHMEDABAD": "AMD", "KOCHI": "COK",
     "COCHIN": "COK", "GUWAHATI": "GAU", "PUNE": "PNQ", "GOA": "GOI", "LUCKNOW": "LKO",
-    "SRINAGAR": "SXR", "PATNA": "PAT",
 }
 
 
@@ -51,9 +46,15 @@ def _city(code: str) -> str:
     return AIRPORT_REFERENCE.get(code, (code, "", 0.0, 0.0))[0]
 
 
-def _iata(fallback: str) -> str:
-    """Resolve a route-weight city/code without loading observation raw JSON."""
-    return CITY_TO_IATA.get(fallback.upper(), fallback.upper())
+def _route_airports(route_id: str, fallback_origin: str, fallback_destination: str) -> tuple[str, str]:
+    """Resolve airport codes without loading each observation's raw JSON."""
+    route_parts = route_id.upper().replace("→", "-").split("-")
+    if len(route_parts) == 2 and all(len(part.strip()) == 3 for part in route_parts):
+        return route_parts[0].strip(), route_parts[1].strip()
+    return (
+        CITY_TO_IATA.get(fallback_origin.upper(), fallback_origin.upper()),
+        CITY_TO_IATA.get(fallback_destination.upper(), fallback_destination.upper()),
+    )
 
 
 def _distance(origin: str, destination: str) -> int:
@@ -80,9 +81,9 @@ def build_live_dashboard(db: Session) -> dict:
     weights = db.query(RouteWeight).order_by(RouteWeight.weight.desc()).limit(24).all()
     weight_by_route = {row.route_id: row for row in weights}
     route_ids = set(weight_by_route)
-    # Do not hydrate full FareObservation ORM entities here. In particular,
-    # raw_payload/source_url can be large and are not used by the dashboard.
-    # A projected result keeps peak memory bounded as the 30-day history grows.
+    # Project only fields used below. Loading full ORM entities also loads the
+    # raw_payload JSON and keeps every entity in SQLAlchemy's identity map,
+    # which caused memory growth as the historical repository expanded.
     observations = (
         db.query(
             FareObservation.id,
@@ -90,10 +91,10 @@ def build_live_dashboard(db: Session) -> dict:
             FareObservation.route_id,
             FareObservation.airline,
             FareObservation.flight_number,
-            FareObservation.fare,
-            FareObservation.source,
             FareObservation.observation_date,
             FareObservation.advance_purchase_days,
+            FareObservation.fare,
+            FareObservation.source,
             FareObservation.collected_at,
             FareObservation.created_at,
         )
@@ -106,11 +107,11 @@ def build_live_dashboard(db: Session) -> dict:
         .all()
     ) if route_ids else []
 
-    by_route: dict[str, list] = defaultdict(list)
-    daily_counts: Counter[date] = Counter()
+    by_route: dict[str, list[FareObservation]] = defaultdict(list)
+    by_date: dict[date, list[FareObservation]] = defaultdict(list)
     for row in observations:
         by_route[row.route_id].append(row)
-        daily_counts[row.observation_date] += 1
+        by_date[row.observation_date].append(row)
 
     flight_routes = []
     route_weights = []
@@ -140,8 +141,7 @@ def build_live_dashboard(db: Session) -> dict:
         volatility = min(100, round((pstdev(all_fares) / mean(all_fares) * 100) if len(all_fares) > 1 and mean(all_fares) else 0))
         carriers = [name for name, _ in airlines.most_common(3)]
         sources = sorted({row.source for row in rows if row.source})
-        origin = _iata(weight.origin)
-        destination = _iata(weight.destination)
+        origin, destination = _route_airports(route_id, weight.origin, weight.destination)
         anomaly = abs(change) >= 20
         flight_routes.append({
             "id": route_id, "origin": origin, "destination": destination,
@@ -271,7 +271,7 @@ def build_live_dashboard(db: Session) -> dict:
             "tier": 1 if code in METROS else 2, "dailyFlights": sum(r["observationsCount"] for r in related),
         }
 
-    latest_rows = nlargest(10, observations, key=lambda row: row.collected_at or row.created_at)
+    latest_rows = sorted(observations, key=lambda row: row.collected_at or row.created_at, reverse=True)[:10]
     route_lookup = {r["id"]: r for r in flight_routes}
     telemetry = []
     for row in latest_rows:
@@ -303,7 +303,7 @@ def build_live_dashboard(db: Session) -> dict:
     quality = {
         "overallConfidence": round(mean([coverage, completeness, freshness, consistency])), "coverage": coverage,
         "completeness": completeness, "freshness": freshness, "consistency": consistency,
-        "totalDailyScrapes": daily_counts[max(daily_counts)] if daily_counts else 0,
+        "totalDailyScrapes": len(by_date[max(by_date)]) if by_date else 0,
         "verifiedCarriers": len(MONITORED_AIRLINES), "activeMonitoringNodes": len(by_route),
         "lastSyncTimestamp": latest_at.isoformat() if latest_at else "No observations",
     }
@@ -384,26 +384,3 @@ def build_live_dashboard(db: Session) -> dict:
         "sectorHeatmapData": sector_heatmap, "leadTimeByRoute": lead_time,
         "priceTrendSeries": [], "liveTelemetryFeed": telemetry, "dataQuality": quality, "dataSources": sources,
     }
-
-
-_CACHE_LOCK = threading.Lock()
-_CACHE_PAYLOAD: dict | None = None
-_CACHE_EXPIRES_AT = 0.0
-
-
-def get_cached_live_dashboard(db: Session) -> dict:
-    """Coalesce concurrent dashboard builds and briefly reuse their result."""
-    global _CACHE_PAYLOAD, _CACHE_EXPIRES_AT
-    now = time.monotonic()
-    if _CACHE_PAYLOAD is not None and now < _CACHE_EXPIRES_AT:
-        return _CACHE_PAYLOAD
-
-    with _CACHE_LOCK:
-        now = time.monotonic()
-        if _CACHE_PAYLOAD is not None and now < _CACHE_EXPIRES_AT:
-            return _CACHE_PAYLOAD
-        payload = build_live_dashboard(db)
-        ttl_seconds = max(0, int(os.getenv("DASHBOARD_CACHE_TTL_SECONDS", "7200")))
-        _CACHE_PAYLOAD = payload
-        _CACHE_EXPIRES_AT = time.monotonic() + ttl_seconds
-        return payload

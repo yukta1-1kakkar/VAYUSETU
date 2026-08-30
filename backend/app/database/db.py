@@ -27,10 +27,8 @@ engine_options = {"echo": False, "pool_pre_ping": True}
 if DATABASE_URL.startswith("sqlite"):
     engine_options["connect_args"] = {"check_same_thread": False}
 else:
-    # Recycle serverless PostgreSQL connections before an upstream idle
-    # database/restart can leave an unusable socket in the pool. Keep the pool
-    # deliberately small for Render's memory-constrained service instances.
-    engine_options.update({"pool_recycle": 300, "pool_size": 3, "max_overflow": 2})
+    # Keep the API's connection footprint bounded on small deployment instances.
+    engine_options.update({"pool_size": 2, "max_overflow": 1, "pool_recycle": 300})
 
 engine = create_engine(DATABASE_URL, **engine_options)
 

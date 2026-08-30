@@ -8,7 +8,6 @@ import {
   Map as MapIcon,
   Pencil,
   PieChart as PieChartIcon,
-  Plus,
   Route as RouteIcon,
   Search,
   Trash2,
@@ -125,11 +124,6 @@ export function RouteBasketPage() {
     return others > 0 ? [...top, { name: 'Others', value: others }] : top;
   }, [sortedActiveRoutes, topTenRoutes]);
 
-  const openAdd = () => {
-    setEditorError('');
-    setEditor({ mode: 'add', originCode: 'DEL', destinationCode: 'BOM', weight: '', status: 'Inactive' });
-  };
-
   const openEdit = (route: RouteBasketItem) => {
     setEditorError('');
     setEditor({ mode: 'edit', id: route.id, originCode: route.originCode, destinationCode: route.destinationCode, weight: String(route.weight), status: route.status });
@@ -203,13 +197,11 @@ export function RouteBasketPage() {
           <h1 className="font-heading text-3xl font-extrabold tracking-tight text-[#172033] sm:text-4xl">Route Basket & Weights</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#64748B]">Manage the CPI airfare city-pair basket and passenger-volume weights consumed by the APIx computation pipeline.</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {canEdit ? (
-            <button onClick={openAdd} className="inline-flex items-center gap-2 rounded-xl bg-[#1769AA] px-4 py-2.5 text-xs font-extrabold text-white shadow-lg shadow-blue-900/10 hover:bg-[#12558A]"><Plus className="h-4 w-4" /> Add Route</button>
-          ) : (
+        {!canEdit && (
+          <div className="flex flex-wrap gap-2">
             <span className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-4 py-2.5 text-xs font-bold text-[#64748B]"><LockKeyhole className="h-4 w-4" /> NSO read-only</span>
-          )}
-        </div>
+          </div>
+        )}
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

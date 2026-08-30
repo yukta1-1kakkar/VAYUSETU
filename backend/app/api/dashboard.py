@@ -1,26 +1,71 @@
-from fastapi import APIRouter, Depends
+import os
+from threading import Lock
+from time import monotonic
+
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from app.database.db import SessionLocal, engine, get_db
-from app.services.live_dashboard import get_cached_live_dashboard
+from app.services.live_dashboard import build_live_dashboard
 
 
 router = APIRouter(prefix="/dashboard", tags=["Live Dashboard"])
 
 
-@router.get("/live", summary="Get all live frontend data from persisted fare observations")
-def live_dashboard(db: Session = Depends(get_db)):
+def _cache_ttl_seconds() -> int:
     try:
-        return get_cached_live_dashboard(db)
+        configured = int(os.getenv("DASHBOARD_CACHE_TTL_SECONDS", "7200"))
+    except ValueError:
+        configured = 7200
+    return max(300, configured)
+
+
+CACHE_TTL_SECONDS = _cache_ttl_seconds()
+_cache_lock = Lock()
+_cached_payload: dict | None = None
+_cached_at = 0.0
+
+
+def _build_with_reconnect(db: Session) -> dict:
+    """Retry once when serverless PostgreSQL removes a pooled database connection."""
+    try:
+        return build_live_dashboard(db)
     except OperationalError as exc:
-        # Serverless PostgreSQL may invalidate an already-pooled connection
-        # during a database restart/replacement. Psycopg reports this specific
-        # case as `ProtocolViolation: database removed`, which SQLAlchemy does
-        # not always classify as a disconnect for pool_pre_ping.
         if "database removed" not in str(exc).lower():
             raise
-        db.rollback()
+        try:
+            db.rollback()
+        except OperationalError:
+            pass
         engine.dispose()
         with SessionLocal() as retry_db:
-            return get_cached_live_dashboard(retry_db)
+            return build_live_dashboard(retry_db)
+
+
+@router.get("/live", summary="Get all live frontend data from persisted fare observations")
+def live_dashboard(response: Response, db: Session = Depends(get_db)):
+    """Return one shared dashboard snapshot for the configured refresh window.
+
+    The lock coalesces simultaneous cache misses, preventing several browser
+    sessions from running the memory-intensive dashboard aggregation at once.
+    """
+    global _cached_at, _cached_payload
+
+    response.headers["Cache-Control"] = f"public, max-age={CACHE_TTL_SECONDS}, stale-while-revalidate=300"
+    now = monotonic()
+    if _cached_payload is not None and now - _cached_at < CACHE_TTL_SECONDS:
+        response.headers["X-VAYUSETU-Cache"] = "HIT"
+        return _cached_payload
+
+    with _cache_lock:
+        now = monotonic()
+        if _cached_payload is not None and now - _cached_at < CACHE_TTL_SECONDS:
+            response.headers["X-VAYUSETU-Cache"] = "HIT"
+            return _cached_payload
+
+        payload = _build_with_reconnect(db)
+        _cached_payload = payload
+        _cached_at = monotonic()
+        response.headers["X-VAYUSETU-Cache"] = "MISS"
+        return payload

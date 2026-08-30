@@ -166,16 +166,15 @@ def get_index_history(
     dates = [day for day in all_dates if (start_date is None or day >= start_date) and (end_date is None or day <= end_date)]
     history = []
     for day in dates:
-        response = calculate_index(
-            db, base_date=base_date, target_date=day,
-            advance_purchase_days=advance_purchase_days,
+        index_value, coverage_weight, components = _price_relative_index(
+            db, base_date, day, advance_purchase_days,
         )
-        if response.components_count:
-            observation_count = sum(component.observation_count for component in response.components or [])
+        if components:
+            observation_count = sum(component.observation_count for component in components)
             history.append(IndexHistoryPoint(
                 observation_date=day,
-                index=response.index,
-                coverage_weight=response.coverage_weight,
+                index=index_value,
+                coverage_weight=coverage_weight,
                 observation_count=observation_count,
             ))
     return IndexHistoryResponse(

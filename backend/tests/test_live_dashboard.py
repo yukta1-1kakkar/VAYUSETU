@@ -3,7 +3,9 @@ from datetime import date, datetime, timezone
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+from fastapi import Response
 
+from app.api import dashboard as dashboard_api
 from app.database.db import Base
 from app.database.models import CPIReference, FareObservation, RouteWeight
 from app.services.live_dashboard import build_live_dashboard
@@ -45,3 +47,29 @@ def test_live_dashboard_uses_persisted_observations_only():
     }]
     assert payload["cpiComparisonMeta"]["transportSeriesAvailable"] is False
     assert payload["liveTelemetryFeed"][0]["observedFare"] == 7000
+
+
+def test_live_dashboard_endpoint_reuses_cached_snapshot(monkeypatch):
+    calls = 0
+    expected = {"hasData": True, "generatedAt": "cached"}
+
+    def fake_builder(_db):
+        nonlocal calls
+        calls += 1
+        return expected
+
+    monkeypatch.setattr(dashboard_api, "build_live_dashboard", fake_builder)
+    monkeypatch.setattr(dashboard_api, "_cached_payload", None)
+    monkeypatch.setattr(dashboard_api, "_cached_at", 0.0)
+
+    first_response = Response()
+    second_response = Response()
+    first = dashboard_api.live_dashboard(response=first_response, db=object())
+    second = dashboard_api.live_dashboard(response=second_response, db=object())
+
+    assert first is expected
+    assert second is expected
+    assert calls == 1
+    assert first_response.headers["X-VAYUSETU-Cache"] == "MISS"
+    assert second_response.headers["X-VAYUSETU-Cache"] == "HIT"
+    assert "max-age=7200" in second_response.headers["Cache-Control"]

@@ -210,9 +210,8 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                   {formatDelta(hoveredRoute.fareChange)}
                 </span>
               </div>
-              <div className="flex justify-between items-center text-[10px] text-[#94A3B8]">
-                <span>Distance: {hoveredRoute.distanceKm} km</span>
-                <span>{hoveredRoute.weeklyFlights} flts/wk</span>
+              <div className="text-[10px] text-[#94A3B8]">
+                Distance: {hoveredRoute.distanceKm} km
               </div>
             </div>
           )}
@@ -515,7 +514,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                   <span>{selectedDirection.destCity}</span>
                 </h4>
                 <div className="text-xs text-[#64748B] mt-0.5">
-                  {selectedDirection.originCode}-{selectedDirection.destCode} • {selectedRoute.distanceKm} km • {selectedRoute.weeklyFlights} flights/week
+                  {selectedDirection.originCode}-{selectedDirection.destCode} • {selectedRoute.distanceKm} km
                 </div>
               </div>
             </div>
@@ -537,7 +536,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                 <div className="text-xl font-extrabold text-[#64748B] mt-0.5">
                   {formatINR(selectedRoute.historicalAvg)}
                 </div>
-                <div className="text-[10px] text-[#94A3B8] mt-0.5">60-day median tariff</div>
+                <div className="text-[10px] text-[#94A3B8] mt-0.5">Across five booking windows</div>
               </div>
 
               <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">

@@ -56,7 +56,7 @@ export const AnomalySection: React.FC<{ onSelectRoute: (id: string) => void }> =
           <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 font-mono">
             <div className="text-slate-400 text-xs mb-1 uppercase">REFERENCE EXPECTATION</div>
             <div className="text-3xl font-black text-slate-200">₹6,450</div>
-            <div className="text-[11px] text-slate-400 mt-1">Based on 60-day corridor norm</div>
+            <div className="text-[11px] text-slate-400 mt-1">Based on the five booking-window corridor norm</div>
           </div>
 
           <div className="p-4 rounded-xl bg-slate-950/80 border border-rose-900/50 font-mono">

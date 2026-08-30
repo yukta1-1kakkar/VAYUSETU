@@ -46,7 +46,7 @@ function PortalLayout({ onReplayIntro }: { onReplayIntro: () => void }) {
             <div className="flex items-center gap-3"><VayuSetuLogo variant="horizontal" size="sm" showTagline={false} /><span className="text-[#CBD5E1]">|</span><span>Sovereign Airfare Intelligence & Price Indexing</span></div>
             <div className="flex items-center gap-4 text-[11px] text-[#94A3B8]">
               <button onClick={onReplayIntro} className="flex cursor-pointer items-center gap-1 transition-colors hover:text-[#1769AA]" title="Replay cinematic intro animation"><Play className="h-3 w-3" /> Replay Intro</button>
-              <span>•</span><span>VAYUSETU APIx Research Prototype • 08/2026</span>
+              <span>•</span><span>VAYUSETU APIx Research Prototype</span>
             </div>
           </div>
         </footer>

@@ -195,7 +195,7 @@ export const DashboardPage: React.FC = () => {
 
           <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#64748B] leading-relaxed">
             <span className="font-bold text-[#172033]">Algorithmic Scrubbing: </span>
-            Anomalies are detected by real-time z-score estimation against 60-day historical time-series distributions.
+            Anomalies compare the latest mean fare with the persisted reference baseline across the five booking windows: T+1, T+7, T+15, T+30 and T+45.
           </div>
         </div>
       </div>

@@ -208,30 +208,30 @@ export const LeadTimeElasticityChart: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
           <div className="flex items-center gap-1.5 font-bold text-[#16A34A]">
             <span className="w-2 h-2 rounded-full bg-[#16A34A]" />
-            <span>45 → 14 Days (Green • Early-Bird Advantage)</span>
+            <span>Green = Lower Fare Pressure</span>
           </div>
           <span className="text-[#64748B] text-[11px] mt-1 block">
-            Matched route/carrier observations collected in the longer advance-purchase windows.
+            Yield multiplier below 1.15×; commonly seen in the T+45 and T+30 early-booking windows.
           </span>
         </div>
 
         <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
           <div className="flex items-center gap-1.5 font-bold text-[#D97706]">
             <span className="w-2 h-2 rounded-full bg-[#D97706]" />
-            <span>13 → 4 Days (Yellow • Equilibrium & Moderate Yield)</span>
+            <span>Yellow = Moderate Fare Pressure</span>
           </div>
           <span className="text-[#64748B] text-[11px] mt-1 block">
-            Observed intermediate booking windows; no synthetic price curve is applied.
+            Yield multiplier from 1.15× to below 1.60×; often associated with the T+15 window.
           </span>
         </div>
 
         <div className="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200">
           <div className="flex items-center gap-1.5 font-bold text-[#DC2626]">
             <span className="w-2 h-2 rounded-full bg-[#DC2626]" />
-            <span>T+7 → T+1 (Observed short-lead windows)</span>
+            <span>Red = High Fare Pressure</span>
           </div>
           <span className="text-[#64748B] text-[11px] mt-1 block">
-            {risesTowardDeparture ? 'The matched-cohort data currently rises toward departure.' : 'The current matched-cohort data is inverted; date-specific demand or incomplete comparable inventory can cause this.'}
+            Yield multiplier of 1.60× or more; commonly seen in the T+7 and T+1 short-lead windows. {risesTowardDeparture ? 'Current matched-cohort fares rise toward departure.' : 'Current data is inverted and may reflect date-specific demand or incomplete comparable inventory.'}
           </span>
         </div>
       </div>

@@ -163,7 +163,7 @@ export const SectorHeatmap: React.FC = () => {
                         return (
                           <td key={dest} className="p-1.5">
                             <div className="w-full h-12 rounded-xl bg-[#F1F5F9] border border-dashed border-[#CBD5E1] flex items-center justify-center text-[10px] text-[#94A3B8] font-mono">
-                              —
+                              -
                             </div>
                           </td>
                         );

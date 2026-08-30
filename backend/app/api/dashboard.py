@@ -15,10 +15,10 @@ router = APIRouter(prefix="/dashboard", tags=["Live Dashboard"])
 
 def _cache_ttl_seconds() -> int:
     try:
-        configured = int(os.getenv("DASHBOARD_CACHE_TTL_SECONDS", "7200"))
+        configured = int(os.getenv("DASHBOARD_CACHE_TTL_SECONDS", "60"))
     except ValueError:
-        configured = 7200
-    return max(300, configured)
+        configured = 60
+    return max(60, configured)
 
 
 CACHE_TTL_SECONDS = _cache_ttl_seconds()
@@ -52,7 +52,7 @@ def live_dashboard(response: Response, db: Session = Depends(get_db)):
     """
     global _cached_at, _cached_payload
 
-    response.headers["Cache-Control"] = f"public, max-age={CACHE_TTL_SECONDS}, stale-while-revalidate=300"
+    response.headers["Cache-Control"] = f"public, max-age={CACHE_TTL_SECONDS}, stale-while-revalidate=60"
     now = monotonic()
     if _cached_payload is not None and now - _cached_at < CACHE_TTL_SECONDS:
         response.headers["X-VAYUSETU-Cache"] = "HIT"

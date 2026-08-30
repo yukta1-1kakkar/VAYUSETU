@@ -77,4 +77,4 @@ def test_live_dashboard_endpoint_reuses_cached_snapshot(monkeypatch):
     assert calls == 1
     assert first_response.headers["X-VAYUSETU-Cache"] == "MISS"
     assert second_response.headers["X-VAYUSETU-Cache"] == "HIT"
-    assert "max-age=7200" in second_response.headers["Cache-Control"]
+    assert "max-age=60" in second_response.headers["Cache-Control"]

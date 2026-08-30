@@ -13,7 +13,7 @@ services:
       - key: FRONTEND_ORIGINS
         value: https://vayusetu-ten.vercel.app
       - key: DASHBOARD_CACHE_TTL_SECONDS
-        value: 7200
+        value: 60
       - key: WEB_CONCURRENCY
         value: 1
       - key: DATABASE_URL

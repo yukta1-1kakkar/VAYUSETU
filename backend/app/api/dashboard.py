@@ -3,9 +3,10 @@ from threading import Lock
 from time import monotonic
 
 from fastapi import APIRouter, Depends, Response
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
-from app.database.db import get_db
+from app.database.db import SessionLocal, engine, get_db
 from app.services.live_dashboard import build_live_dashboard
 
 
@@ -24,6 +25,22 @@ CACHE_TTL_SECONDS = _cache_ttl_seconds()
 _cache_lock = Lock()
 _cached_payload: dict | None = None
 _cached_at = 0.0
+
+
+def _build_with_reconnect(db: Session) -> dict:
+    """Retry once when serverless PostgreSQL removes a pooled database connection."""
+    try:
+        return build_live_dashboard(db)
+    except OperationalError as exc:
+        if "database removed" not in str(exc).lower():
+            raise
+        try:
+            db.rollback()
+        except OperationalError:
+            pass
+        engine.dispose()
+        with SessionLocal() as retry_db:
+            return build_live_dashboard(retry_db)
 
 
 @router.get("/live", summary="Get all live frontend data from persisted fare observations")
@@ -47,7 +64,7 @@ def live_dashboard(response: Response, db: Session = Depends(get_db)):
             response.headers["X-VAYUSETU-Cache"] = "HIT"
             return _cached_payload
 
-        payload = build_live_dashboard(db)
+        payload = _build_with_reconnect(db)
         _cached_payload = payload
         _cached_at = monotonic()
         response.headers["X-VAYUSETU-Cache"] = "MISS"

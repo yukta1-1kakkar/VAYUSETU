@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Info, Navigation, TrendingUp } from 'lucide-react';
+import { Navigation, TrendingUp } from 'lucide-react';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { FLIGHT_ROUTES } from '../../mock/airfareData';
 import { formatDelta, formatINR, formatMonthYearLabel } from '../../utils/geo';
@@ -36,7 +36,7 @@ export const PriceTrendChart: React.FC = () => {
         <div>
           <div className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#1769AA]"><TrendingUp className="h-3.5 w-3.5" /> Corridor tariff evolution</div>
           <h3 className="font-heading text-xl font-extrabold text-[#172033] sm:text-2xl">Persisted Price Trends</h3>
-          <p className="mt-0.5 text-xs text-[#64748B]">Daily route means calculated only from clean PostgreSQL observations.</p>
+          <p className="mt-0.5 text-xs text-[#64748B]">Daily route fare means across monitored corridors.</p>
         </div>
         <select value={selectedRouteId} onChange={(event) => setSelectedRouteId(event.target.value)} className="rounded-xl border border-[#CBD5E1] bg-white px-3 py-2 text-xs font-bold text-[#172033]">
           <option value="ALL">Top corridors</option>
@@ -62,7 +62,7 @@ export const PriceTrendChart: React.FC = () => {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex items-center justify-between border-t border-[#F1F5F9] pt-2 text-xs text-[#64748B]"><span className="flex items-center gap-1.5"><Info className="h-3.5 w-3.5 text-[#1769AA]" /> No synthetic interpolation</span><span>Auto-refreshes every 2 hours</span></div>
+      <div className="flex justify-end border-t border-[#F1F5F9] pt-2 text-xs text-[#64748B]"><span>Auto-refreshes every 2 hours</span></div>
     </div>
   );
 };

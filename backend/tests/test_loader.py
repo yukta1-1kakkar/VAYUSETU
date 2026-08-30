@@ -8,8 +8,32 @@ from app.services.loader import (
     load_airline_excel,
     scan_raw_directory,
     load_raw_data,
-    DGCA_AIRLINE_COLUMNS
+    DGCA_AIRLINE_COLUMNS,
+    load_cpi_excel,
 )
+
+
+def test_load_mospi_cpi_dashboard_workbook(tmp_path):
+    test_file = tmp_path / "CPI Dashboard Data.xlsx"
+    with pd.ExcelWriter(test_file) as writer:
+        for label, values in {
+            "Rural": [104.59, 108.34],
+            "Urban": [104.28, 107.45],
+            "Combined": [104.45, 107.94],
+        }.items():
+            pd.DataFrame({
+                "Year": [2026, 2026], "Month": ["January", "July"],
+                "State": ["ALL India", "ALL India"],
+                "Description": ["General Index (All Groups)"] * 2,
+                label: values,
+            }).to_excel(writer, sheet_name=f"CPI- {label}" if label != "Combined" else "CPI Combined", index=False)
+
+    result = load_cpi_excel(test_file)
+
+    assert result["month"].tolist() == ["2026-01", "2026-07"]
+    assert result["combined_index"].tolist() == [104.45, 107.94]
+    assert result["rural_index"].tolist() == [104.59, 108.34]
+    assert result["urban_index"].tolist() == [104.28, 107.45]
 
 def test_load_citypair_excel(tmp_path):
     # Construct mock City-Pair Excel file matching DGCA structure

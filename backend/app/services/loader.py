@@ -122,11 +122,61 @@ def load_airline_excel(file_path: Path) -> pd.DataFrame:
     df_clean["SOURCE_FILE"] = file_path.name
     return df_clean
 
+def normalize_cpi_month(value: Any, year: Any = None) -> str:
+    """Return a stable YYYY-MM key for CPI joins and database storage."""
+    raw = f"{year} {value}" if year is not None else str(value)
+    parsed = pd.to_datetime(raw.replace("*", "").strip(), errors="coerce")
+    if pd.isna(parsed):
+        return str(value).replace("*", "").strip()
+    return parsed.strftime("%Y-%m")
+
+
+def _load_cpi_dashboard_excel(file_path: Path, sheet_names: list[str]) -> pd.DataFrame:
+    """Load MoSPI dashboard sheets containing Rural, Urban and Combined CPI."""
+    series = {}
+    for label in ("Rural", "Urban", "Combined"):
+        sheet_name = next((
+            name for name in sheet_names
+            if " ".join(name.replace("-", " ").lower().split()) == f"cpi {label.lower()}"
+        ), None)
+        if not sheet_name:
+            continue
+        frame = pd.read_excel(file_path, sheet_name=sheet_name)
+        frame.columns = [str(column).strip() for column in frame.columns]
+        if "Year" not in frame.columns:
+            frame = pd.read_excel(file_path, sheet_name=sheet_name, header=1)
+            frame.columns = [str(column).strip() for column in frame.columns]
+        value_column = next((column for column in frame.columns if column.lower() == label.lower()), None)
+        if not value_column or not {"Year", "Month"}.issubset(frame.columns):
+            continue
+        if "Description" in frame.columns:
+            frame = frame[frame["Description"].astype(str).str.contains("General Index", case=False, na=False)]
+        rows = {}
+        for _, row in frame.iterrows():
+            value = pd.to_numeric(row.get(value_column), errors="coerce")
+            if pd.notna(value):
+                rows[normalize_cpi_month(row.get("Month"), row.get("Year"))] = float(value)
+        series[label.lower()] = rows
+
+    combined = series.get("combined", {})
+    return pd.DataFrame([{
+        "month": month,
+        "combined_index": combined_index,
+        "inflation_pct": None,
+        "rural_index": series.get("rural", {}).get(month),
+        "urban_index": series.get("urban", {}).get(month),
+    } for month, combined_index in sorted(combined.items())])
+
+
 def load_cpi_excel(file_path: Path) -> pd.DataFrame:
     """
     Load CPI Reference Annexure Excel file.
     Extracts Monthly Combined Index and Inflation (%).
     """
+    sheet_names = pd.ExcelFile(file_path).sheet_names
+    if any(" ".join(name.replace("-", " ").lower().split()) == "cpi combined" for name in sheet_names):
+        return _load_cpi_dashboard_excel(file_path, sheet_names)
+
     df = pd.read_excel(file_path, header=None)
     
     # Rows 4 to 22 contains monthly CPI data
@@ -140,9 +190,7 @@ def load_cpi_excel(file_path: Path) -> pd.DataFrame:
             continue
             
         # Clean month format (e.g. 'Jan-25', 'Jul-26*')
-        clean_month = month_raw.replace("*", "").strip()
-        if clean_month.startswith("2026-03"):
-            clean_month = "Mar-26"
+        clean_month = normalize_cpi_month(month_raw)
             
         combined_idx = pd.to_numeric(row[3], errors="coerce")
         combined_inf = pd.to_numeric(row[6], errors="coerce") if len(row) > 6 else None

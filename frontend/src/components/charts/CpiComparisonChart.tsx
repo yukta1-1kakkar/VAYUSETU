@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CPI_DATA_SERIES } from '../../mock/airfareData';
+import { CPI_COMPARISON_META, CPI_DATA_SERIES } from '../../mock/airfareData';
 import {
   ResponsiveContainer,
   LineChart,
@@ -10,7 +10,7 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts';
-import { BarChart3, TrendingUp, HelpCircle, ArrowRightLeft } from 'lucide-react';
+import { BarChart3, HelpCircle } from 'lucide-react';
 
 export const CpiComparisonChart: React.FC = () => {
   const [timeframe, setTimeframe] = useState<'1Y' | '3Y' | '5Y' | 'ALL'>('1Y');
@@ -18,9 +18,9 @@ export const CpiComparisonChart: React.FC = () => {
   const filteredData = React.useMemo(() => {
     switch (timeframe) {
       case '1Y':
-        return CPI_DATA_SERIES.slice(-6);
+        return CPI_DATA_SERIES.slice(-12);
       case '3Y':
-        return CPI_DATA_SERIES.slice(-10);
+        return CPI_DATA_SERIES.slice(-36);
       case '5Y':
       case 'ALL':
       default:
@@ -32,11 +32,16 @@ export const CpiComparisonChart: React.FC = () => {
     return <div className="intel-card p-8 text-center"><BarChart3 className="mx-auto h-10 w-10 text-[#0F8B8D]" /><h3 className="mt-3 text-xl font-bold text-[#172033]">Official CPI reference series not loaded</h3><p className="mt-2 text-sm text-[#64748B]">Load real MoSPI headline and Transport &amp; Communication index values into PostgreSQL to enable this comparison. No substitute values are displayed.</p></div>;
   }
 
-  const latest = CPI_DATA_SERIES[CPI_DATA_SERIES.length - 1];
+  const latestAPIx = [...CPI_DATA_SERIES].reverse().find((point) => point.airfareIndex !== null);
+  const latestCPI = [...CPI_DATA_SERIES].reverse().find((point) => point.cpiGeneralRaw !== null);
+  const matchedData = CPI_DATA_SERIES.filter(
+    (point): point is typeof point & { airfareIndex: number; cpiGeneral: number } =>
+      point.airfareIndex !== null && point.cpiGeneral !== null,
+  );
   const correlation = (() => {
-    if (CPI_DATA_SERIES.length < 2) return null;
-    const xs = CPI_DATA_SERIES.map((point) => point.airfareIndex);
-    const ys = CPI_DATA_SERIES.map((point) => point.cpiGeneral);
+    if (matchedData.length < 2) return null;
+    const xs = matchedData.map((point) => point.airfareIndex);
+    const ys = matchedData.map((point) => point.cpiGeneral);
     const xMean = xs.reduce((sum, value) => sum + value, 0) / xs.length;
     const yMean = ys.reduce((sum, value) => sum + value, 0) / ys.length;
     const numerator = xs.reduce((sum, value, index) => sum + (value - xMean) * (ys[index] - yMean), 0);
@@ -54,10 +59,10 @@ export const CpiComparisonChart: React.FC = () => {
             <span>MACROECONOMIC TRANSMISSION LAB</span>
           </div>
           <h3 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#172033]">
-            APIx Airfare Index vs Official CPI Inflation
+            APIx Airfare Index vs Official Consumer Price Index
           </h3>
           <p className="text-xs text-[#64748B] mt-0.5">
-            Empirical comparison of high-velocity aviation prices against the official MoSPI Consumer Price Index.
+            Monthly APIx and MoSPI All-India General CPI, independently rebased to a common 100-point comparison base.
           </p>
         </div>
 
@@ -83,20 +88,22 @@ export const CpiComparisonChart: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
           <div className="text-xs text-[#64748B] font-medium uppercase">APIx Index Value</div>
-          <div className="text-2xl font-extrabold text-[#1769AA] mt-1">{latest.airfareIndex}</div>
-          <div className="text-[11px] text-[#16A34A] font-semibold mt-0.5">Latest persisted index</div>
+          <div className="text-2xl font-extrabold text-[#1769AA] mt-1">{latestAPIx?.airfareIndex?.toFixed(2) ?? 'N/A'}</div>
+          <div className="text-[11px] text-[#16A34A] font-semibold mt-0.5">Rebased monthly APIx · {latestAPIx?.month ?? 'No overlap'}</div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
           <div className="text-xs text-[#64748B] font-medium uppercase">CPI General (MoSPI)</div>
-          <div className="text-2xl font-extrabold text-[#0F8B8D] mt-1">{latest.cpiGeneral}</div>
-          <div className="text-[11px] text-[#64748B] mt-0.5">Base 100 benchmark (2012)</div>
+          <div className="text-2xl font-extrabold text-[#0F8B8D] mt-1">{latestCPI?.cpiGeneralRaw?.toFixed(2) ?? 'N/A'}</div>
+          <div className="text-[11px] text-[#64748B] mt-0.5">Official published value · {latestCPI?.month ?? 'Not loaded'}</div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
           <div className="text-xs text-[#64748B] font-medium uppercase">CPI Transport Component</div>
-          <div className="text-2xl font-extrabold text-[#6366F1] mt-1">{latest.cpiTransport}</div>
-          <div className="text-[11px] text-[#64748B] mt-0.5">Direct mobility basket</div>
+          <div className="text-2xl font-extrabold text-[#6366F1] mt-1">
+            {CPI_COMPARISON_META.transportSeriesAvailable ? 'Available' : 'N/A'}
+          </div>
+          <div className="text-[11px] text-[#64748B] mt-0.5">Not included in the supplied MoSPI workbook</div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
@@ -119,7 +126,7 @@ export const CpiComparisonChart: React.FC = () => {
               axisLine={{ stroke: '#E2E8F0' }}
             />
             <YAxis
-              domain={[95, 135]}
+              domain={['dataMin - 2', 'dataMax + 2']}
               stroke="#94A3B8"
               tick={{ fontSize: 11, fill: '#64748B' }}
               tickLine={false}
@@ -133,17 +140,17 @@ export const CpiComparisonChart: React.FC = () => {
                       <div className="font-semibold text-[#172033] border-b border-[#F1F5F9] pb-1">
                         Month: {label}
                       </div>
-                      <div className="flex justify-between items-center text-[#1769AA]">
+                      <div className="flex justify-between gap-4 items-center text-[#1769AA]">
                         <span>APIx Airfare Index:</span>
-                        <span className="font-bold">{payload[0]?.value}</span>
+                        <span className="font-bold">{payload.find((entry) => entry.dataKey === 'airfareIndex')?.value ?? 'N/A'}</span>
                       </div>
-                      <div className="flex justify-between items-center text-[#0F8B8D]">
-                        <span>CPI General (Headline):</span>
-                        <span className="font-bold">{payload[1]?.value}</span>
+                      <div className="flex justify-between gap-4 items-center text-[#0F8B8D]">
+                        <span>CPI General (rebased):</span>
+                        <span className="font-bold">{payload.find((entry) => entry.dataKey === 'cpiGeneral')?.value ?? 'N/A'}</span>
                       </div>
-                      <div className="flex justify-between items-center text-[#6366F1]">
-                        <span>CPI Transport:</span>
-                        <span className="font-bold">{payload[2]?.value}</span>
+                      <div className="flex justify-between gap-4 items-center text-[#64748B]">
+                        <span>Official CPI raw:</span>
+                        <span className="font-bold">{payload[0]?.payload?.cpiGeneralRaw ?? 'N/A'}</span>
                       </div>
                     </div>
                   );
@@ -160,7 +167,7 @@ export const CpiComparisonChart: React.FC = () => {
             <Line
               type="monotone"
               dataKey="airfareIndex"
-              name="APIx Airfare Index"
+              name="APIx (rebased monthly mean)"
               stroke="#1769AA"
               strokeWidth={3}
               dot={{ r: 4, fill: '#1769AA', strokeWidth: 2, stroke: '#FFFFFF' }}
@@ -169,20 +176,16 @@ export const CpiComparisonChart: React.FC = () => {
             <Line
               type="monotone"
               dataKey="cpiGeneral"
-              name="CPI General (Official Basket)"
+              name="MoSPI General CPI (rebased)"
               stroke="#0F8B8D"
               strokeWidth={2.5}
               strokeDasharray="4 4"
               dot={{ r: 3.5, fill: '#0F8B8D' }}
             />
-            <Line
-              type="monotone"
-              dataKey="cpiTransport"
-              name="CPI Transport & Comm."
-              stroke="#6366F1"
-              strokeWidth={2}
-              dot={{ r: 3, fill: '#6366F1' }}
-            />
+            {CPI_COMPARISON_META.transportSeriesAvailable && (
+              <Line type="monotone" dataKey="cpiTransport" name="CPI Transport & Comm. (rebased)"
+                stroke="#6366F1" strokeWidth={2} dot={{ r: 3, fill: '#6366F1' }} />
+            )}
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -191,9 +194,8 @@ export const CpiComparisonChart: React.FC = () => {
       <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-100 flex items-start gap-3 text-xs text-[#172033]">
         <HelpCircle className="w-4 h-4 text-[#1769AA] shrink-0 mt-0.5" />
         <div className="leading-relaxed">
-          <span className="font-semibold text-[#1769AA]">Analytical Correlation Note: </span>
-          The calculated correlation coefficient is provided for macroeconomic trend benchmarking only.
-          Airfare movements reflect immediate supply-demand shifts and dynamic revenue algorithms, whereas official CPI tracks a broader fixed consumer expenditure basket. Correlation is measured for analytical comparison and does not imply direct causation.
+          <span className="font-semibold text-[#1769AA]">Source and comparison note: </span>
+          {CPI_COMPARISON_META.source}. {CPI_COMPARISON_META.note} Correlation is shown only when at least two matched monthly observations exist and does not imply causation.
         </div>
       </div>
     </div>

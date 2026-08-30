@@ -215,7 +215,10 @@ direct URL as `DIRECT_URL`. Never commit either credential. The ETL stores one
 deduplicated snapshot per offer and observation date, enabling daily 30-day
 backtesting while retaining raw and rejected records for audit.
 
-The frontend reads `GET /api/dashboard/live` and refreshes every 60 seconds.
+The frontend reads `GET /api/dashboard/live` immediately on page load and then
+refreshes every two hours. The API caches the generated dashboard snapshot for
+the same two-hour window, coalesces simultaneous cache misses, and returns
+browser cache headers so remounts and additional tabs do not repeat the work.
 For a deployed backend, set `VITE_API_URL` in `frontend/.env` to its `/api`
 URL before building the frontend. Airfare metrics never fall back to demo data.
 
@@ -233,3 +236,30 @@ the API with `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
 The repository-root `render.yaml` records this deployment contract. Existing
 manually configured Render services should use the same root directory, build
 command, start command and environment variables in their dashboard settings.
+
+## APIx backtesting
+
+Run the internal 30-day stability and real-date holdout diagnostics:
+
+```powershell
+python -m app.services.backtesting --advance-purchase 7
+```
+
+The same report is exposed at `GET /api/backtest?advance_purchase=7`.
+This report explicitly labels synthetic observations. It is a prototype
+pipeline/index backtest, not a substitute for validation against an official
+route-fare benchmark.
+
+## Official MoSPI CPI comparison data
+
+Import the supplied MoSPI dashboard workbook into the shared PostgreSQL
+`cpi_reference` table:
+
+```powershell
+python -m app.services.cpi_import --file data/raw/mospi_cpi_dashboard_july_2026.xlsx
+```
+
+The dashboard compares monthly APIx with All-India General CPI (Combined),
+rebasing both series to 100 at their first overlapping month. This workbook
+does not contain the Transport & Communication sub-group, so that series is
+reported as unavailable rather than estimated.

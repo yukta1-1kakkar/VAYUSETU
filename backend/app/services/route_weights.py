@@ -5,7 +5,7 @@ import pandas as pd
 from sqlalchemy.orm import Session
 
 from app.database.models import RouteWeight, CPIReference
-from app.services.loader import load_raw_data, get_default_raw_dir
+from app.services.loader import load_raw_data, get_default_raw_dir, normalize_cpi_month
 from app.services.cleaner import clean_citypair_data, clean_airline_data
 
 def get_default_processed_dir() -> Path:
@@ -86,13 +86,14 @@ def sync_cpi_data(cpi_df: pd.DataFrame, db: Optional[Session] = None) -> None:
     
     if db is not None:
         for _, row in cpi_df.iterrows():
-            existing = db.query(CPIReference).filter(CPIReference.month == str(row["month"])).first()
+            month_key = normalize_cpi_month(row["month"])
+            existing = db.query(CPIReference).filter(CPIReference.month == month_key).first()
             if existing:
                 existing.combined_index = float(row["combined_index"])
                 existing.inflation_pct = float(row["inflation_pct"]) if pd.notna(row.get("inflation_pct")) else None
             else:
                 db.add(CPIReference(
-                    month=str(row["month"]),
+                    month=month_key,
                     combined_index=float(row["combined_index"]),
                     inflation_pct=float(row["inflation_pct"]) if pd.notna(row.get("inflation_pct")) else None
                 ))

@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.database.models import CPIReference, FareObservation, RouteWeight, ScrapeRun
 from app.services.index_engine import get_index_history
+from app.services.loader import normalize_cpi_month
 
 
 AIRPORT_REFERENCE = {
@@ -45,12 +46,15 @@ def _city(code: str) -> str:
     return AIRPORT_REFERENCE.get(code, (code, "", 0.0, 0.0))[0]
 
 
-def _iata(rows: list[FareObservation], field: str, fallback: str) -> str:
-    for row in rows:
-        value = (row.raw_payload or {}).get(field)
-        if isinstance(value, str) and len(value.strip()) == 3:
-            return value.strip().upper()
-    return CITY_TO_IATA.get(fallback.upper(), fallback.upper())
+def _route_airports(route_id: str, fallback_origin: str, fallback_destination: str) -> tuple[str, str]:
+    """Resolve airport codes without loading each observation's raw JSON."""
+    route_parts = route_id.upper().replace("→", "-").split("-")
+    if len(route_parts) == 2 and all(len(part.strip()) == 3 for part in route_parts):
+        return route_parts[0].strip(), route_parts[1].strip()
+    return (
+        CITY_TO_IATA.get(fallback_origin.upper(), fallback_origin.upper()),
+        CITY_TO_IATA.get(fallback_destination.upper(), fallback_destination.upper()),
+    )
 
 
 def _distance(origin: str, destination: str) -> int:
@@ -77,8 +81,23 @@ def build_live_dashboard(db: Session) -> dict:
     weights = db.query(RouteWeight).order_by(RouteWeight.weight.desc()).limit(24).all()
     weight_by_route = {row.route_id: row for row in weights}
     route_ids = set(weight_by_route)
+    # Project only fields used below. Loading full ORM entities also loads the
+    # raw_payload JSON and keeps every entity in SQLAlchemy's identity map,
+    # which caused memory growth as the historical repository expanded.
     observations = (
-        db.query(FareObservation)
+        db.query(
+            FareObservation.id,
+            FareObservation.observation_id,
+            FareObservation.route_id,
+            FareObservation.airline,
+            FareObservation.flight_number,
+            FareObservation.observation_date,
+            FareObservation.advance_purchase_days,
+            FareObservation.fare,
+            FareObservation.source,
+            FareObservation.collected_at,
+            FareObservation.created_at,
+        )
         .filter(
             FareObservation.route_id.in_(route_ids),
             FareObservation.cleaning_status == "clean",
@@ -122,8 +141,7 @@ def build_live_dashboard(db: Session) -> dict:
         volatility = min(100, round((pstdev(all_fares) / mean(all_fares) * 100) if len(all_fares) > 1 and mean(all_fares) else 0))
         carriers = [name for name, _ in airlines.most_common(3)]
         sources = sorted({row.source for row in rows if row.source})
-        origin = _iata(rows, "origin", weight.origin)
-        destination = _iata(rows, "destination", weight.destination)
+        origin, destination = _route_airports(route_id, weight.origin, weight.destination)
         anomaly = abs(change) >= 20
         flight_routes.append({
             "id": route_id, "origin": origin, "destination": destination,
@@ -316,18 +334,53 @@ def build_live_dashboard(db: Session) -> dict:
         {"id": "kpai-anomalies", "title": "Active Anomalies", "value": len(anomalies), "trend": "20% baseline threshold", "trendType": "alert", "iconType": "alert", "subtitle": ", ".join(r["id"] for r in anomalies) or "None", "tooltip": "Routes whose latest mean differs from their earliest persisted mean by at least 20%."},
     ]
 
-    cpi_rows = {row.month: row for row in db.query(CPIReference).all()}
-    cpi_series = []
+    cpi_rows = {normalize_cpi_month(row.month): row for row in db.query(CPIReference).all()}
+    apix_monthly: dict[str, list[float]] = defaultdict(list)
     for point in index_timeline:
-        key = datetime.strptime(point["date"], "%d/%m/%y").strftime("%m/%y")
-        cpi = cpi_rows.get(key)
-        if cpi and cpi.transport_index is not None:
-            cpi_series.append({"month": key, "airfareIndex": point["indexValue"], "cpiGeneral": cpi.combined_index, "cpiTransport": cpi.transport_index, "divergence": _round(point["indexValue"] - cpi.combined_index)})
+        period = datetime.strptime(point["date"], "%d/%m/%y").strftime("%Y-%m")
+        apix_monthly[period].append(float(point["indexValue"]))
+    apix_monthly_mean = {period: mean(values) for period, values in apix_monthly.items()}
+    overlapping_periods = sorted(set(cpi_rows) & set(apix_monthly_mean))
+    comparison_base = overlapping_periods[0] if overlapping_periods else None
+    cpi_base = float(cpi_rows[comparison_base].combined_index) if comparison_base else None
+    apix_base = apix_monthly_mean.get(comparison_base) if comparison_base else None
+    transport_base = (
+        float(cpi_rows[comparison_base].transport_index)
+        if comparison_base and cpi_rows[comparison_base].transport_index is not None else None
+    )
+    cpi_series = []
+    for period in sorted(set(cpi_rows) | set(apix_monthly_mean)):
+        cpi = cpi_rows.get(period)
+        raw_apix = apix_monthly_mean.get(period)
+        raw_general = float(cpi.combined_index) if cpi else None
+        raw_transport = float(cpi.transport_index) if cpi and cpi.transport_index is not None else None
+        rebased_apix = raw_apix / apix_base * 100 if raw_apix is not None and apix_base else None
+        rebased_general = raw_general / cpi_base * 100 if raw_general is not None and cpi_base else None
+        rebased_transport = raw_transport / transport_base * 100 if raw_transport is not None and transport_base else None
+        cpi_series.append({
+            "month": datetime.strptime(period, "%Y-%m").strftime("%b %Y"),
+            "period": period,
+            "airfareIndex": _round(rebased_apix, 2) if rebased_apix is not None else None,
+            "airfareIndexRaw": _round(raw_apix, 2) if raw_apix is not None else None,
+            "cpiGeneral": _round(rebased_general, 2) if rebased_general is not None else None,
+            "cpiGeneralRaw": _round(raw_general, 2) if raw_general is not None else None,
+            "cpiTransport": _round(rebased_transport, 2) if rebased_transport is not None else None,
+            "cpiTransportRaw": _round(raw_transport, 2) if raw_transport is not None else None,
+            "divergence": _round(rebased_apix - rebased_general, 2)
+            if rebased_apix is not None and rebased_general is not None else None,
+        })
 
     return {
         "hasData": bool(observations), "generatedAt": datetime.now(timezone.utc).isoformat(),
         "kpaiMetrics": metrics, "routeWeights": route_weights, "airports": airport_rows,
         "flightRoutes": flight_routes, "indexTimeline": index_timeline, "cpiDataSeries": cpi_series,
+        "cpiComparisonMeta": {
+            "source": "MoSPI CPI Dashboard Data, updated July 2026 (12 August 2026 release)",
+            "officialSeries": "All-India General CPI (Combined)",
+            "comparisonBaseMonth": comparison_base,
+            "transportSeriesAvailable": any(row.transport_index is not None for row in cpi_rows.values()),
+            "note": "APIx and General CPI are independently rebased to 100 at the first overlapping month. General CPI is a macro benchmark, not an airfare validation target.",
+        },
         "sectorHeatmapData": sector_heatmap, "leadTimeByRoute": lead_time,
         "priceTrendSeries": [], "liveTelemetryFeed": telemetry, "dataQuality": quality, "dataSources": sources,
     }

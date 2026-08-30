@@ -7,7 +7,7 @@ export const FinalStatementSection: React.FC<{ onOpenCommandCenter: () => void }
     <section id="foundation-final" className="relative py-36 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center border-t border-slate-900">
       <div className="space-y-6">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 font-mono text-xs tracking-widest uppercase">
-          // SECTION 08 — THE FINAL STATEMENT
+          // SECTION 08 - THE FINAL STATEMENT
         </div>
 
         <h2 className="text-5xl sm:text-7xl font-black font-syne text-white tracking-tight leading-tight">

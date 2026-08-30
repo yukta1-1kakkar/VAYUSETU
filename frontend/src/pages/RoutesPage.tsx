@@ -113,7 +113,7 @@ export const RoutesPage: React.FC = () => {
 
   const isCombinedView = airlineFilter === 'ALL' && otaFilter === 'ALL';
   const activeDataView = isCombinedView
-    ? 'Combined — all airlines and OTA observations'
+    ? 'Combined - all airlines and OTA observations'
     : airlineFilter !== 'ALL' && otaFilter !== 'ALL'
       ? `${airlineFilter} via ${otaFilter}`
       : airlineFilter !== 'ALL'
@@ -476,7 +476,7 @@ export const RoutesPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="text-xs text-[#64748B] mt-0.5">
-                      {route.id} • {route.distanceKm} km • {route.weeklyFrequency} flts/wk
+                      {route.id} • {route.distanceKm} km
                     </div>
                   </div>
 

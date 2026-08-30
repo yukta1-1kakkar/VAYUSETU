@@ -29,7 +29,7 @@ export const ApixOverviewChart: React.FC<{
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-[#1769AA] uppercase tracking-wider mb-1">
             <span className="w-2 h-2 rounded-full bg-[#1769AA]" />
-            <span>APIx — AIRFARE PRICE INDEX</span>
+            <span>APIx - AIRFARE PRICE INDEX</span>
           </div>
           <div className="flex items-baseline gap-3">
             <span className="text-3xl sm:text-4xl font-black font-heading text-[#172033]">

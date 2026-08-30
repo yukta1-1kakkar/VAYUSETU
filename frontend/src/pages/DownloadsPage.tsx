@@ -121,7 +121,7 @@ function asciiPdfText(value: string) {
     .replaceAll('₹', 'Rs. ')
     .replaceAll('→', 'to')
     .replaceAll('–', '-')
-    .replaceAll('—', '-')
+    .replaceAll('\u2014', '-')
     .normalize('NFKD')
     .replaceAll(/[^\x20-\x7E]/g, '')
     .replaceAll('\\', '\\\\')

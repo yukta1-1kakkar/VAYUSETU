@@ -2,6 +2,7 @@ import React from 'react';
 import { CpiComparisonChart } from '../components/charts/CpiComparisonChart';
 import { CPI_COMPARISON_META, CPI_DATA_SERIES } from '../mock/airfareData';
 import { BarChart3 } from 'lucide-react';
+import { OfficialCpiDashboard } from '../components/charts/OfficialCpiDashboard';
 
 export const CpiPage: React.FC = () => {
   return (
@@ -23,13 +24,15 @@ export const CpiPage: React.FC = () => {
 
       </div>
 
-      {/* Main CPI Chart */}
+      <OfficialCpiDashboard />
+
+      {/* APIx comparison is additive to the official CPI file dashboard. */}
       <CpiComparisonChart />
 
       {/* Deep Dive Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Historical Divergence Table */}
-        <div className="lg:col-span-7 intel-card p-6 sm:p-7 space-y-4">
+        {CPI_DATA_SERIES.length > 0 && <div className="lg:col-span-7 intel-card p-6 sm:p-7 space-y-4">
           <h3 className="text-lg font-bold font-heading text-[#172033] pb-2 border-b border-[#E2E8F0]">
             Monthly APIx–CPI Comparison Matrix
           </h3>
@@ -48,21 +51,21 @@ export const CpiPage: React.FC = () => {
                 {CPI_DATA_SERIES.map((row, idx) => (
                   <tr key={idx} className="hover:bg-[#F8FAFC]">
                     <td className="py-2.5 font-bold text-[#172033]">{row.month}</td>
-                    <td className="py-2.5 font-extrabold text-[#1769AA]">{row.airfareIndex?.toFixed(2) ?? '—'}</td>
-                    <td className="py-2.5 font-semibold text-[#0F8B8D]">{row.cpiGeneral?.toFixed(2) ?? '—'}</td>
-                    <td className="py-2.5 font-medium text-[#6366F1]">{row.cpiGeneralRaw?.toFixed(2) ?? '—'}</td>
+                    <td className="py-2.5 font-extrabold text-[#1769AA]">{row.airfareIndex?.toFixed(2) ?? '-'}</td>
+                    <td className="py-2.5 font-semibold text-[#0F8B8D]">{row.cpiGeneral?.toFixed(2) ?? '-'}</td>
+                    <td className="py-2.5 font-medium text-[#6366F1]">{row.cpiGeneralRaw?.toFixed(2) ?? '-'}</td>
                     <td className="py-2.5 font-mono text-[#64748B] font-semibold">
-                      {row.divergence === null ? '—' : `${row.divergence.toFixed(2)} pts`}
+                      {row.divergence === null ? '-' : `${row.divergence.toFixed(2)} pts`}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
+        </div>}
 
         {/* Economic Transmission Explanations */}
-        <div className="lg:col-span-5 intel-card p-6 sm:p-7 space-y-4">
+        <div className={`${CPI_DATA_SERIES.length > 0 ? 'lg:col-span-5' : 'lg:col-span-12'} intel-card p-6 sm:p-7 space-y-4`}>
           <h3 className="text-lg font-bold font-heading text-[#172033] pb-2 border-b border-[#E2E8F0]">
             Methodological Insights
           </h3>

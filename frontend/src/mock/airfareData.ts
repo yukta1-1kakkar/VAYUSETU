@@ -41,7 +41,7 @@ export interface LiveDashboardPayload {
   flightRoutes: FlightRoute[];
   indexTimeline: IndexPoint[];
   cpiDataSeries: CPIDataPoint[];
-  cpiComparisonMeta: CPIComparisonMeta;
+  cpiComparisonMeta?: CPIComparisonMeta;
   sectorHeatmapData: SectorHeatmapItem[];
   leadTimeByRoute: Record<string, LeadTimeDataPoint[]>;
   priceTrendSeries: PriceTrendPoint[];
@@ -58,16 +58,21 @@ export interface CPIComparisonMeta {
   note: string;
 }
 
+const DEFAULT_CPI_COMPARISON_META: CPIComparisonMeta = {
+  source: 'MoSPI CPI Dashboard Data - July 2026 release',
+  officialSeries: 'All-India General CPI (Combined)',
+  comparisonBaseMonth: null,
+  transportSeriesAvailable: false,
+  note: 'APIx comparison is shown when an overlapping airfare month is available.',
+};
+
 export let KPAI_METRICS: KpaMetric[] = [];
 export let ROUTE_WEIGHTS_DATA: RouteWeight[] = [];
 export let AIRPORTS: Record<string, Airport> = {};
 export let FLIGHT_ROUTES: FlightRoute[] = [];
 export let INDEX_TIMELINE: IndexPoint[] = [];
 export let CPI_DATA_SERIES: CPIDataPoint[] = [];
-export let CPI_COMPARISON_META: CPIComparisonMeta = {
-  source: 'Official CPI source not loaded', officialSeries: 'All-India General CPI (Combined)',
-  comparisonBaseMonth: null, transportSeriesAvailable: false, note: '',
-};
+export let CPI_COMPARISON_META: CPIComparisonMeta = DEFAULT_CPI_COMPARISON_META;
 export let SECTOR_HEATMAP_DATA: SectorHeatmapItem[] = [];
 export let LEAD_TIME_ELASTICITY_DATA: LeadTimeDataPoint[] = [];
 export let PRICE_TREND_SERIES: PriceTrendPoint[] = [];
@@ -90,8 +95,8 @@ export function applyLiveDashboard(payload: LiveDashboardPayload): void {
   AIRPORTS = payload.airports;
   FLIGHT_ROUTES = payload.flightRoutes;
   INDEX_TIMELINE = payload.indexTimeline;
-  CPI_DATA_SERIES = payload.cpiDataSeries;
-  CPI_COMPARISON_META = payload.cpiComparisonMeta;
+  CPI_DATA_SERIES = Array.isArray(payload.cpiDataSeries) ? payload.cpiDataSeries : [];
+  CPI_COMPARISON_META = payload.cpiComparisonMeta ?? DEFAULT_CPI_COMPARISON_META;
   SECTOR_HEATMAP_DATA = payload.sectorHeatmapData;
   leadTimeByRoute = payload.leadTimeByRoute;
   LEAD_TIME_ELASTICITY_DATA = payload.leadTimeByRoute.ALL ?? [];

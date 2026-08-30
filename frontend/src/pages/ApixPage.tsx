@@ -15,6 +15,7 @@ import { filterByChartRange, formatINR, formatDelta, formatMonthYearLabel, type 
 export const ApixPage: React.FC = () => {
   const [filter, setFilter] = useState<ChartTimeRange>('1M');
   const [formulationOpen, setFormulationOpen] = useState(false);
+  const [showAllLedgerPeriods, setShowAllLedgerPeriods] = useState(false);
 
   const filteredData = React.useMemo(() => filterByChartRange(INDEX_TIMELINE, filter), [filter]);
 
@@ -23,6 +24,10 @@ export const ApixPage: React.FC = () => {
   const momGrowth = ((currentPoint.indexValue - previousPoint.indexValue) / previousPoint.indexValue * 100).toFixed(2);
   const observedMeanFare = Math.round(FLIGHT_ROUTES.reduce((sum, route) => sum + route.currentFare, 0) / FLIGHT_ROUTES.length);
   const monitoredAirlines = new Set(FLIGHT_ROUTES.map((route) => route.primaryAirline)).size;
+  const ledgerPeriodCount = Math.min(24, INDEX_TIMELINE.length);
+  const ledgerRows = INDEX_TIMELINE
+    .slice(-(showAllLedgerPeriods ? ledgerPeriodCount : 8))
+    .reverse();
 
   return (
     <div className="space-y-8 pb-16">
@@ -34,7 +39,7 @@ export const ApixPage: React.FC = () => {
             <span>SOVEREIGN BENCHMARK SERIES</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-[#172033] tracking-tight">
-            APIx — Airfare Price Index ({currentPoint.date})
+            APIx - Airfare Price Index ({currentPoint.date})
           </h1>
           <p className="text-sm text-[#64748B] mt-1">
             A high-frequency aviation price index weighted by DGCA passenger traffic across 24 representative domestic corridors.
@@ -254,7 +259,7 @@ export const ApixPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F1F5F9]">
-                {INDEX_TIMELINE.slice(-8).reverse().map((pt, idx) => (
+                {ledgerRows.map((pt, idx) => (
                   <tr key={idx} className="hover:bg-[#F8FAFC]">
                     <td className="py-2.5 font-bold text-[#172033]">{pt.date}</td>
                     <td className="py-2.5 font-extrabold text-[#1769AA]">{pt.indexValue}</td>
@@ -271,6 +276,17 @@ export const ApixPage: React.FC = () => {
               </tbody>
             </table>
           </div>
+          {ledgerPeriodCount > 8 && (
+            <div className="flex justify-center border-t border-[#E2E8F0] pt-4">
+              <button
+                type="button"
+                onClick={() => setShowAllLedgerPeriods((current) => !current)}
+                className="rounded-xl border border-[#BFD4E8] bg-white px-4 py-2 text-xs font-extrabold text-[#1769AA] transition-colors hover:bg-blue-50"
+              >
+                {showAllLedgerPeriods ? 'Show recent 8' : `View all ${ledgerPeriodCount}`}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Route Contribution Breakdown */}

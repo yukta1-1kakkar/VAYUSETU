@@ -21,7 +21,7 @@ export const ApixPage: React.FC = () => {
 
   const currentPoint = INDEX_TIMELINE[INDEX_TIMELINE.length - 1];
   const previousPoint = INDEX_TIMELINE[INDEX_TIMELINE.length - 2] ?? currentPoint;
-  const momGrowth = ((currentPoint.indexValue - previousPoint.indexValue) / previousPoint.indexValue * 100).toFixed(2);
+  const dodGrowth = (currentPoint.indexValue - previousPoint.indexValue) / previousPoint.indexValue * 100;
   const observedMeanFare = Math.round(FLIGHT_ROUTES.reduce((sum, route) => sum + route.currentFare, 0) / FLIGHT_ROUTES.length);
   const monitoredAirlines = new Set(FLIGHT_ROUTES.map((route) => route.primaryAirline)).size;
   const ledgerPeriodCount = Math.min(24, INDEX_TIMELINE.length);
@@ -132,7 +132,7 @@ export const ApixPage: React.FC = () => {
           </div>
           <div className="text-xs font-bold text-[#DC2626] mt-1 flex items-center gap-0.5">
             <TrendingUp className="w-3.5 h-3.5" />
-            +{momGrowth}% Month-over-Month
+            {formatDelta(dodGrowth)} Day-over-Day
           </div>
         </div>
 
@@ -220,7 +220,7 @@ export const ApixPage: React.FC = () => {
                           <span className="font-bold text-sm">{data.indexValue}</span>
                         </div>
                         <div className="flex justify-between items-center text-[#64748B]">
-                          <span>Monthly Δ:</span>
+                          <span>DoD change:</span>
                           <span className={`font-semibold ${data.monthlyChange >= 0 ? 'text-[#DC2626]' : 'text-[#16A34A]'}`}>
                             {data.monthlyChange >= 0 ? `+${data.monthlyChange}%` : `${data.monthlyChange}%`}
                           </span>
@@ -241,9 +241,9 @@ export const ApixPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Monthly Change Table & Route Basket Contributions */}
+      {/* Daily Change Table & Route Basket Contributions */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Monthly Breakdown Table */}
+        {/* Daily Breakdown Table */}
         <div className="lg:col-span-6 intel-card p-6 space-y-4">
           <h3 className="text-lg font-bold font-heading text-[#172033] pb-2 border-b border-[#E2E8F0]">
             Recent Persisted Performance Ledger
@@ -254,7 +254,7 @@ export const ApixPage: React.FC = () => {
                 <tr className="border-b border-[#E2E8F0] text-[#64748B] font-semibold">
                   <th className="py-2.5">Period</th>
                   <th className="py-2.5">APIx Value</th>
-                  <th className="py-2.5">MoM Shift</th>
+                  <th className="py-2.5">DoD Shift</th>
                   <th className="py-2.5">Daily Volume</th>
                 </tr>
               </thead>

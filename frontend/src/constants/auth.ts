@@ -79,6 +79,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
     'price-trends',
     'lead-time-elasticity',
     'route-basket',
+    'api-explorer',
   ],
   RBI: [
     'dashboard',

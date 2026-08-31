@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactElement } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Braces, FileBarChart, Play, Settings } from 'lucide-react';
+import { FileBarChart, Play, Settings } from 'lucide-react';
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { Navbar } from './components/common/Navbar';
 import { VayuSetuLogo } from './components/common/VayuSetuLogo';
@@ -10,6 +10,7 @@ import { VayuSetuIntro } from './components/intro/VayuSetuIntro';
 import type { Permission } from './constants/auth';
 import { AuthProvider } from './context/AuthContext';
 import { ApixPage } from './pages/ApixPage';
+import { ApiExplorerPage } from './pages/ApiExplorerPage';
 import { CpiPage } from './pages/CpiPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { DownloadsPage } from './pages/DownloadsPage';
@@ -72,7 +73,7 @@ function PortalRoutes({ onReplayIntro }: { onReplayIntro: () => void }) {
         <Route path="routes" element={modulePage('route-comparison', <RoutesPage />)} />
         <Route path="route-comparison" element={modulePage('route-comparison', <Navigate to="/routes" replace />)} />
         <Route path="lead-time-elasticity" element={modulePage('lead-time-elasticity', <LeadTimePage />)} />
-        <Route path="api-explorer" element={modulePage('api-explorer', <ModulePage icon={Braces} eyebrow="Developer services" title="API Explorer" description="Inspect documented airfare index endpoints and prepare authorized data queries." />)} />
+        <Route path="api-explorer" element={modulePage('api-explorer', <ApiExplorerPage />)} />
         <Route path="user-management" element={modulePage('user-management', <UserManagementPage />)} />
         <Route path="scraper-control" element={modulePage('scraping-scheduler', <ScraperControlPage />)} />
         <Route path="scraping-scheduler" element={modulePage('scraping-scheduler', <Navigate to="/scraper-control" replace />)} />

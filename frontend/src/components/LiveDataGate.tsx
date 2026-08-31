@@ -1,15 +1,20 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AlertTriangle, Database, LoaderCircle, RefreshCw } from 'lucide-react';
 import { applyLiveDashboard, type LiveDashboardPayload } from '../mock/airfareData';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'https://vayusetu.onrender.com/api').replace(/\/$/, '');
-const REFRESH_INTERVAL_MS = 2 * 60 * 60 * 1000;
+const REFRESH_INTERVAL_MS = 60 * 1000;
 // Render cold starts and the first uncached aggregation can exceed 30 seconds.
-// Subsequent responses are served by the API's two-hour snapshot cache.
+// Subsequent responses are served by the API's shared 60-second snapshot cache.
 const REQUEST_TIMEOUT_MS = 90_000;
 const DASHBOARD_CACHE_KEY = 'vayusetu-live-dashboard-cache';
 
 let activeDashboardRequest: Promise<LiveDashboardPayload> | null = null;
+const LiveDataRevisionContext = createContext(0);
+
+// Components that read the module-backed live store can subscribe to this
+// revision without forcing the whole routed application to remount.
+export const useLiveDataRevision = () => useContext(LiveDataRevisionContext);
 
 function requestLiveDashboard(): Promise<LiveDashboardPayload> {
   if (activeDashboardRequest) return activeDashboardRequest;
@@ -20,7 +25,7 @@ function requestLiveDashboard(): Promise<LiveDashboardPayload> {
     try {
       const response = await fetch(`${API_BASE}/dashboard/live`, {
         headers: { Accept: 'application/json' },
-        // Honour the API's two-hour cache so page remounts and multiple tabs do
+        // Honour the API cache so page navigation and multiple tabs do
         // not force the backend to rebuild the same dashboard payload.
         cache: 'default',
         signal: controller.signal,
@@ -116,7 +121,13 @@ export function LiveDataGate({ children }: { children: ReactNode }) {
     };
   }, [refresh]);
 
-  if (status === 'ready') return <div key={revision}>{children}</div>;
+  if (status === 'ready') {
+    return (
+      <LiveDataRevisionContext.Provider value={revision}>
+        {children}
+      </LiveDataRevisionContext.Provider>
+    );
+  }
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center bg-[#F6F8FB] px-6">

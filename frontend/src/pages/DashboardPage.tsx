@@ -10,8 +10,12 @@ import { formatINR, formatDelta } from '../utils/geo';
 import { RouteIntelligenceModal } from '../components/command-center/RouteIntelligenceModal';
 import { TrendingUp, AlertTriangle, ArrowRight, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLiveDataRevision } from '../components/LiveDataGate';
 
 export const DashboardPage: React.FC = () => {
+  // Re-render live visualizations in place when a background snapshot arrives.
+  // Unlike the previous keyed wrapper, this preserves the route and UI state.
+  useLiveDataRevision();
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
 
   const topRoutes = FLIGHT_ROUTES.slice(0, 6);
